@@ -1292,21 +1292,46 @@ section { padding: 120px 0; position: relative; }
 }
 
 /* ============ PROMOCIONES ============ */
-.promos-section { background: var(--crema-pure); padding: 100px 0; }
-.promos-container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+.promos-section {
+  background: linear-gradient(150deg, #fdf6f7 0%, #f0e3e8 50%, #faf7f4 100%);
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+}
+.promos-section::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(216,167,177,0.22) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.promos-section::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(198,138,149,0.15) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.promos-container { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 .promos-grid { display: grid; gap: 28px; margin-top: 48px; }
 .promo-card {
   position: relative;
-  background: white;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
   border-radius: 20px;
   padding: 36px 40px;
-  box-shadow: var(--sombra-card);
-  border: 1px solid var(--gris-suave);
+  box-shadow: 0 8px 40px rgba(198,138,149,0.15), var(--sombra-card);
+  border: 1px solid rgba(216,167,177,0.3);
+  border-top: 3px solid var(--rosa);
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
-.promo-card.finished { opacity: 0.75; }
+.promo-card.finished { opacity: 0.78; }
 .promo-badge-finished {
   position: absolute;
   top: 20px; right: 20px;
@@ -1321,28 +1346,47 @@ section { padding: 120px 0; position: relative; }
 }
 .promo-tag {
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .1em;
+  font-weight: 700;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--rosa-deep);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .promo-title {
-  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
   font-family: Georgia, serif;
   color: var(--negro-soft);
   margin: 0;
 }
 .promo-desc { font-size: 15px; color: var(--texto); line-height: 1.65; margin: 0; }
-.promo-prizes { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-.promo-prizes li { font-size: 14px; color: var(--texto); display: flex; align-items: center; gap: 8px; }
-.promo-prize-dot { color: var(--rosa); font-size: 10px; }
+.promo-prizes {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.promo-prizes li {
+  font-size: 14px;
+  color: var(--texto);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(216,167,177,0.12);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.promo-prize-dot { color: var(--rosa-deep); font-size: 10px; flex-shrink: 0; }
 .promo-cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-top: 8px;
-  padding: 12px 24px;
-  background: var(--negro-soft);
+  padding: 13px 28px;
+  background: linear-gradient(135deg, var(--rosa-deep) 0%, #b87080 100%);
   color: white;
   border-radius: 50px;
   font-size: 14px;
@@ -1350,10 +1394,15 @@ section { padding: 120px 0; position: relative; }
   text-decoration: none;
   width: fit-content;
   transition: var(--transicion);
+  box-shadow: 0 4px 16px rgba(198,138,149,0.35);
 }
-.promo-cta:hover { background: var(--rosa-deep); transform: translateY(-2px); }
-[data-theme="dark"] .promo-card { background: #2A2523; border-color: #3D3533; }
+.promo-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(198,138,149,0.45); }
+[data-theme="dark"] .promos-section { background: linear-gradient(150deg, #1e1a18 0%, #251c1e 50%, #1c1917 100%); }
+[data-theme="dark"] .promos-section::before { background: radial-gradient(circle, rgba(216,167,177,0.08) 0%, transparent 65%); }
+[data-theme="dark"] .promos-section::after { background: radial-gradient(circle, rgba(198,138,149,0.06) 0%, transparent 65%); }
+[data-theme="dark"] .promo-card { background: rgba(42,37,35,0.9); border-color: rgba(216,167,177,0.2); border-top-color: var(--rosa); }
 [data-theme="dark"] .promo-badge-finished { background: #3D3533; }
+[data-theme="dark"] .promo-prizes li { background: rgba(216,167,177,0.07); }
 
 /* ============ FOOTER ============ */
 footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 0 30px; }
