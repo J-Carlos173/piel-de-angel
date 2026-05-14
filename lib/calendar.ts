@@ -10,6 +10,10 @@ function getAuth() {
   const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
   if (!key) throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY not set");
   const credentials = JSON.parse(key);
+  // Vercel sometimes double-escapes newlines in the private key
+  if (credentials.private_key) {
+    credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+  }
   return new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/calendar"],
