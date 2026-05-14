@@ -14,7 +14,7 @@ export default function Hero() {
             experiencia delicada, segura y profundamente transformadora.
           </p>
           <div className="hero-buttons">
-            <a href="#contacto" className="btn-primary">
+            <a href="#agenda" className="btn-primary">
               <i className="fa-regular fa-calendar" /> Reservar Hora
             </a>
             <a href="#servicios" className="btn-secondary">
@@ -36,8 +36,8 @@ export default function Hero() {
               <i className="fa-solid fa-star" />
             </div>
             <div className="hero-badge-text">
-              <strong>+500 Clientas</strong>
-              <span>Felices y radiantes</span>
+              <strong>Atención Premium</strong>
+              <span>Cada piel es única</span>
             </div>
           </div>
         </div>

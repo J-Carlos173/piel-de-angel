@@ -27,7 +27,7 @@ export default function Navbar() {
         </a>
 
         <ul className={`nav-links${menuOpen ? " active" : ""}`} id="navLinks">
-          {["inicio", "nosotros", "servicios", "productos", "galeria", "agenda", "contacto"].map((id) => (
+          {["inicio", "nosotros", "servicios", "productos", "galeria", "agenda"].map((id) => (
             <li key={id}>
               <a
                 href={`#${id}`}
@@ -41,7 +41,7 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
-          <a href="#contacto" className="nav-cta">
+          <a href="#agenda" className="nav-cta">
             Reservar Hora
           </a>
           <button
