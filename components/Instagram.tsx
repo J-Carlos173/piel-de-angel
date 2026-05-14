@@ -1,10 +1,10 @@
 const igImgs = [
-  "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80",
-  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80",
-  "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=500&q=80",
-  "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80",
-  "https://images.unsplash.com/photo-1610465299993-e6675c9f9efa?w=500&q=80",
-  "https://images.unsplash.com/photo-1503236823255-94609f598e71?w=500&q=80",
+  { src: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=500&q=80", alt: "Tratamiento facial" },
+  { src: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=500&q=80", alt: "Ritual de bienestar" },
+  { src: "https://images.unsplash.com/photo-1571646034647-52e6ea84b28c?w=500&q=80", alt: "Skincare" },
+  { src: "https://images.unsplash.com/photo-1583241800698-9c2e5a4eb31a?w=500&q=80", alt: "Lifting de pestañas" },
+  { src: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=500&q=80", alt: "Productos premium" },
+  { src: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&q=80", alt: "Limpieza facial" },
 ];
 
 export default function Instagram() {
@@ -28,7 +28,7 @@ export default function Instagram() {
 
         <div className="ig-widget-container reveal">
           <div className="ig-grid">
-            {igImgs.map((src) => (
+            {igImgs.map(({ src, alt }) => (
               <a
                 key={src}
                 href="https://www.instagram.com/pieldeangel.cosmetica/"
@@ -37,7 +37,7 @@ export default function Instagram() {
                 className="ig-item"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="Instagram Piel de Ángel" />
+                <img src={src} alt={alt} />
                 <div className="ig-overlay">
                   <i className="fa-brands fa-instagram" />
                 </div>

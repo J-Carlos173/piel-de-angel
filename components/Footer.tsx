@@ -43,7 +43,7 @@ export default function Footer() {
                 ["#nosotros", "Nosotros"],
                 ["#servicios", "Servicios"],
                 ["#productos", "Tienda"],
-                ["#galeria", "Galería"],
+                ["#promociones", "Promos"],
                 ["#agenda", "Agenda"],
               ].map(([href, label]) => (
                 <li key={href}>
