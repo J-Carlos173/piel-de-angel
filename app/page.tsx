@@ -6,6 +6,7 @@ import Productos from "@/components/Productos";
 import Galeria from "@/components/Galeria";
 import Instagram from "@/components/Instagram";
 import Testimonios from "@/components/Testimonios";
+import Agenda from "@/components/Agenda";
 import Contacto from "@/components/Contacto";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
@@ -25,6 +26,7 @@ export default function Home() {
         <Galeria />
         <Instagram />
         <Testimonios />
+        <Agenda />
         <Contacto />
       </RevealObserver>
       <Footer />
