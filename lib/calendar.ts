@@ -87,7 +87,6 @@ export async function createCalendarEvent(data: {
       description: `Cliente: ${data.name}\nEmail: ${data.email}\nTeléfono: ${data.phone}\nServicio: ${data.service}`,
       start: { dateTime: start.toISOString(), timeZone: "America/Santiago" },
       end: { dateTime: end.toISOString(), timeZone: "America/Santiago" },
-      attendees: [{ email: data.email }],
     },
   });
 }
