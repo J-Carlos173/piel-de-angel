@@ -519,6 +519,34 @@ section { padding: 120px 0; position: relative; }
 
 /* ============ PRODUCTOS / TIENDA ============ */
 .productos { background: var(--crema-pure); }
+.productos-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 0 0 40px;
+}
+.tab-btn {
+  padding: 9px 22px;
+  border-radius: 50px;
+  border: 1.5px solid var(--gris-suave);
+  background: transparent;
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transicion);
+  letter-spacing: .03em;
+}
+.tab-btn:hover { border-color: var(--rosa); color: var(--rosa-deep); }
+.tab-btn.active {
+  background: var(--negro-soft);
+  border-color: var(--negro-soft);
+  color: white;
+}
+[data-theme="dark"] .tab-btn { border-color: #3D3533; color: var(--texto); }
+[data-theme="dark"] .tab-btn:hover { border-color: var(--rosa); }
+[data-theme="dark"] .tab-btn.active { background: var(--rosa-deep); border-color: var(--rosa-deep); }
 .productos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
