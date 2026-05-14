@@ -76,17 +76,18 @@ export async function createCalendarEvent(data: {
   const auth = getAuth();
   const calendar = google.calendar({ version: "v3", auth });
 
-  const [hour, minute] = data.time.split(":").map(Number);
-  const start = new Date(`${data.date}T${data.time}:00`);
-  const end = new Date(start.getTime() + SLOT_DURATION * 60 * 1000);
+  const [hour] = data.time.split(":").map(Number);
+  const startDateTime = `${data.date}T${data.time}:00`;
+  const endHour = String(hour + SLOT_DURATION / 60).padStart(2, "0");
+  const endDateTime = `${data.date}T${endHour}:00:00`;
 
   await calendar.events.insert({
     calendarId: CALENDAR_ID,
     requestBody: {
       summary: `Cita: ${data.name} — ${data.service}`,
       description: `Cliente: ${data.name}\nEmail: ${data.email}\nTeléfono: ${data.phone}\nServicio: ${data.service}`,
-      start: { dateTime: start.toISOString(), timeZone: "America/Santiago" },
-      end: { dateTime: end.toISOString(), timeZone: "America/Santiago" },
+      start: { dateTime: startDateTime, timeZone: "America/Santiago" },
+      end: { dateTime: endDateTime, timeZone: "America/Santiago" },
     },
   });
 }
