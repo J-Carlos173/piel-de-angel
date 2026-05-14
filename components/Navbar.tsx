@@ -27,14 +27,14 @@ export default function Navbar() {
         </a>
 
         <ul className={`nav-links${menuOpen ? " active" : ""}`} id="navLinks">
-          {["inicio", "nosotros", "servicios", "productos", "galeria", "agenda"].map((id) => (
+          {["inicio", "nosotros", "servicios", "productos", "galeria", "promociones", "agenda"].map((id) => (
             <li key={id}>
               <a
                 href={`#${id}`}
                 onClick={closeMenu}
                 style={{ textTransform: "capitalize" }}
               >
-                {id === "productos" ? "Tienda" : id.charAt(0).toUpperCase() + id.slice(1)}
+                {id === "productos" ? "Tienda" : id === "promociones" ? "Promos" : id.charAt(0).toUpperCase() + id.slice(1)}
               </a>
             </li>
           ))}
