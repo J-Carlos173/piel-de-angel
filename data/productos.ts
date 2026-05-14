@@ -120,27 +120,6 @@ export const PRODUCTOS: Producto[] = [
     img: "https://images.unsplash.com/photo-1596704017254-9b121068fb31?w=500&q=80",
   },
 
-  // ── Tratamiento ────────────────────────────────────────────────────────
-  {
-    id: "mascarilla-detox",
-    nombre: "Mascarilla Facial Detox",
-    categoria: "Tratamiento",
-    descripcion: "Arcilla rosa y aceites esenciales para purificar, oxigenar y dejar la piel radiante.",
-    precio: 14990,
-    stock: 12,
-    badge: "nuevo",
-    img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80",
-  },
-  {
-    id: "aceite-premium",
-    nombre: "Aceite Facial Premium",
-    categoria: "Tratamiento",
-    descripcion: "Mezcla de aceites botánicos —rosa mosqueta, jojoba, argán— para una piel luminosa y firme.",
-    precio: 39990,
-    stock: 7,
-    badge: "",
-    img: "https://images.unsplash.com/photo-1599751449128-eb7249c3d6b1?w=500&q=80",
-  },
 ];
 
 export const WHATSAPP_NUMERO = "56977031461";

@@ -5,20 +5,25 @@ import { fetchProductos } from "@/lib/medusa";
 import { useProductsStore } from "@/store/productsStore";
 import ProductCard from "./ProductCard";
 import { useReveal } from "@/hooks/useReveal";
+import { PRODUCTOS, type Producto } from "@/data/productos";
 
 export default function Productos() {
-  const { products, setProducts } = useProductsStore();
+  const { setProducts } = useProductsStore();
+  const [allProducts, setAllProducts] = useState<Producto[]>(PRODUCTOS);
   const [activeTab, setActiveTab] = useState("Todos");
-  const ref = useReveal([products]);
+  const ref = useReveal([allProducts]);
 
   useEffect(() => {
     fetchProductos().then((remote) => {
-      if (remote.length > 0) setProducts(remote);
+      if (remote.length > 0) {
+        setProducts(remote);
+        setAllProducts(remote);
+      }
     });
   }, [setProducts]);
 
-  const categorias = ["Todos", ...Array.from(new Set(products.map((p) => p.categoria))).filter(Boolean)];
-  const visible = activeTab === "Todos" ? products : products.filter((p) => p.categoria === activeTab);
+  const categorias = ["Todos", ...Array.from(new Set(allProducts.map((p) => p.categoria))).filter(Boolean)];
+  const visible = activeTab === "Todos" ? allProducts : allProducts.filter((p) => p.categoria === activeTab);
 
   return (
     <section className="productos" id="productos" ref={ref}>
