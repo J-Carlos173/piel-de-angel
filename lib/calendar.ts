@@ -52,9 +52,9 @@ export async function getBusySlots(dateStr: string): Promise<string[]> {
 
     for (const { start, end } of busy) {
       if (!start || !end) continue;
-      const startHour = new Date(start).getHours();
-      const endHour = new Date(end).getHours();
-      for (let h = startHour; h < endHour; h++) {
+      const startHour = new Date(start).toLocaleString("es-CL", { timeZone: "America/Santiago", hour: "numeric", hour12: false });
+      const endHour = new Date(end).toLocaleString("es-CL", { timeZone: "America/Santiago", hour: "numeric", hour12: false });
+      for (let h = parseInt(startHour); h < parseInt(endHour); h++) {
         busySlots.push(`${String(h).padStart(2, "0")}:00`);
       }
     }
