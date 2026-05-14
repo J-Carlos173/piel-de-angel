@@ -80,7 +80,7 @@ export default function Footer() {
                 <i className="fa-brands fa-whatsapp" /> &nbsp; +56 9 7703 1461
               </li>
               <li>
-                <i className="fa-solid fa-envelope" /> &nbsp; hola@pieldeangel.cl
+                <i className="fa-solid fa-envelope" /> &nbsp; pieldeangel.contacto@gmail.com
               </li>
               <li>
                 <i className="fa-solid fa-clock" /> &nbsp; Lun — Sáb · 10—20h
