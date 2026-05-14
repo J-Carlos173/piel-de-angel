@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-const ADMIN_EMAIL = "krlos173173@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "krlos173173@gmail.com";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://piel-de-angel.vercel.app";
 
 function getTransport() {
