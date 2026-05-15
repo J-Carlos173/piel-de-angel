@@ -8,6 +8,8 @@ import Link from "next/link";
 
 const COSTO_ENVIO = 2990;
 const GRATIS_SANTIAGO = 40000;
+const WEBPAY_PLUS_ACTIVO = false; // cambiar a true cuando lleguen las credenciales de Transbank
+const WEBPAY_SIMPLE_URL = "https://www.webpay.cl/form-pay/294463";
 
 function esSabado(): boolean {
   return new Date().getDay() === 6;
@@ -62,6 +64,17 @@ export default function CheckoutPage() {
     };
 
     try {
+      if (!WEBPAY_PLUS_ACTIVO) {
+        await fetch("/api/checkout/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: lineItems, customer, envio, total, zona }),
+        });
+        window.open(WEBPAY_SIMPLE_URL, "_blank");
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch("/api/checkout/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -153,11 +166,18 @@ export default function CheckoutPage() {
 
               <button type="submit" className="btn-webpay" disabled={loading}>
                 {loading ? (
-                  <><i className="fa-solid fa-spinner fa-spin" /> Conectando con WebPay...</>
+                  <><i className="fa-solid fa-spinner fa-spin" /> Preparando pedido...</>
                 ) : (
-                  <><i className="fa-solid fa-lock" /> Pagar {formatPrecio(total)} con WebPay</>
+                  <><i className="fa-solid fa-credit-card" /> Pagar {formatPrecio(total)} con Webpay</>
                 )}
               </button>
+
+              {!WEBPAY_PLUS_ACTIVO && (
+                <button type="button" className="btn-webpay btn-webpay-proximamente" disabled>
+                  <i className="fa-solid fa-lock" /> WebPay Plus — Próximamente
+                </button>
+              )}
+
               <p className="checkout-secure-note">
                 <i className="fa-solid fa-shield-halved" /> Pago 100% seguro con Transbank WebPay
               </p>

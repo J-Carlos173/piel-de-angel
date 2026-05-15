@@ -166,6 +166,126 @@ export async function sendOrderNotificationToAdmin(data: {
   });
 }
 
+type ItemPedido = { nombre: string; precio: number; qty: number };
+
+function tablaItems(items: ItemPedido[]) {
+  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return items
+    .map(
+      (i) =>
+        `<tr>
+          <td style="padding:5px 0;color:#444;">${i.nombre} ×${i.qty}</td>
+          <td style="padding:5px 0;text-align:right;color:#444;">${fmt(i.precio * i.qty)}</td>
+        </tr>`
+    )
+    .join("");
+}
+
+export async function sendPendingOrderToClient(data: {
+  email: string;
+  nombre: string;
+  buyOrder: string;
+  items: ItemPedido[];
+  envio: number;
+  total: number;
+}) {
+  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const WEBPAY_URL = "https://www.webpay.cl/form-pay/294463";
+
+  await getTransport().sendMail({
+    from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
+    to: data.email,
+    subject: `Pedido recibido — completa tu pago | Piel de Ángel`,
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
+        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Recibimos tu pedido!</h2>
+        <p style="color: #666; margin-top: 0;">Hola <strong>${data.nombre}</strong>, ya tenemos los detalles de tu compra. Solo falta completar el pago.</p>
+        <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
+
+        <h3 style="color: #8B6F6F; font-size: 14px; margin-bottom: 8px;">DETALLE DEL PEDIDO · ${data.buyOrder}</h3>
+        <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+          ${tablaItems(data.items)}
+          <tr style="border-top: 1px solid #e8d5cc;">
+            <td style="padding:6px 0;color:#888;">Envío</td>
+            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmt(data.envio)}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;font-weight:bold;color:#444;">Total a pagar</td>
+            <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:18px;color:#8B6F6F;">${fmt(data.total)}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 28px; background: #fff8f5; border: 2px solid #e8d5cc; border-radius: 10px; padding: 20px; text-align: center;">
+          <p style="margin: 0 0 4px 0; font-size: 13px; color: #888;">Ingresa exactamente este monto en el formulario de pago:</p>
+          <p style="margin: 0 0 16px 0; font-size: 28px; font-weight: bold; color: #8B6F6F;">${fmt(data.total)}</p>
+          <a href="${WEBPAY_URL}" style="display: inline-block; padding: 14px 32px; background: #8B6F6F; color: white; text-decoration: none; border-radius: 8px; font-size: 15px;">
+            Ir a pagar con Webpay
+          </a>
+        </div>
+
+        <p style="margin-top: 20px; color: #888; font-size: 13px;">Una vez confirmado el pago te contactaremos por WhatsApp para coordinar el despacho.</p>
+        <p style="margin-top: 8px; font-size: 12px; color: #aaa;">Piel de Ángel · Estética & Belleza Premium</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendPendingOrderToAdmin(data: {
+  customer: { nombre: string; email: string; telefono: string; direccion: string; depto: string; ciudad: string; region: string };
+  buyOrder: string;
+  items: ItemPedido[];
+  envio: number;
+  total: number;
+  zona: string;
+}) {
+  const STORE_EMAIL = process.env.STORE_EMAIL || "pieldeangel.contacto@gmail.com";
+  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const { customer } = data;
+  const direccionCompleta = [customer.direccion, customer.depto, customer.ciudad, customer.region].filter(Boolean).join(", ");
+
+  await getTransport().sendMail({
+    from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
+    to: STORE_EMAIL,
+    subject: `🛍️ Nuevo pedido pendiente — ${fmt(data.total)} — ${data.buyOrder}`,
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
+        <h2 style="color: #8B6F6F; margin-bottom: 4px;">Nuevo pedido pendiente de pago</h2>
+        <p style="color: #666; margin-top: 0;">El cliente está siendo dirigido a Webpay.cl para completar el pago. Verifica en tu panel.</p>
+        <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
+
+        <h3 style="color: #8B6F6F; font-size: 14px; margin-bottom: 8px;">CLIENTE</h3>
+        <table style="width: 100%; font-size: 14px; color: #444;">
+          <tr><td style="padding:4px 0;color:#888;width:130px;">Nombre</td><td><strong>${customer.nombre}</strong></td></tr>
+          <tr><td style="padding:4px 0;color:#888;">Email</td><td>${customer.email}</td></tr>
+          <tr><td style="padding:4px 0;color:#888;">Teléfono</td><td>${customer.telefono}</td></tr>
+          <tr><td style="padding:4px 0;color:#888;">Dirección</td><td>${direccionCompleta}</td></tr>
+          <tr><td style="padding:4px 0;color:#888;">Zona envío</td><td>${data.zona === "santiago" ? "Santiago" : "Regiones"}</td></tr>
+        </table>
+
+        <h3 style="color: #8B6F6F; font-size: 14px; margin: 20px 0 8px 0;">PRODUCTOS</h3>
+        <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+          ${tablaItems(data.items)}
+          <tr style="border-top: 1px solid #e8d5cc;">
+            <td style="padding:6px 0;color:#888;">Envío</td>
+            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmt(data.envio)}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;font-weight:bold;color:#444;">Total a recibir</td>
+            <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:20px;color:#8B6F6F;">${fmt(data.total)}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 24px; background: #fff3cd; border-radius: 10px; padding: 16px;">
+          <p style="margin: 0; color: #444; font-size: 14px;">
+            ⚠️ <strong>Acción:</strong> Verifica el pago de ${fmt(data.total)} en tu panel de Webpay.cl antes de despachar. Orden: <strong>${data.buyOrder}</strong>
+          </p>
+        </div>
+        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Sistema de ventas</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendDeclineToClient(data: {
   name: string;
   email: string;

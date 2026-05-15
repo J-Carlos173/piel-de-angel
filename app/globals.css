@@ -1767,6 +1767,13 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
   box-shadow: 0 8px 24px rgba(198, 138, 149, 0.4);
 }
 .btn-webpay:disabled { opacity: 0.65; cursor: not-allowed; }
+.btn-webpay-proximamente {
+  background: #c8bfbd !important;
+  color: #fff !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
 
 .checkout-secure-note {
   text-align: center;
