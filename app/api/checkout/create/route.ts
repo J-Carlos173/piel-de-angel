@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
     );
 
     const buyOrder = `PA-${Date.now()}`;
-    const sessionId = `${customer.email}-${Date.now()}`;
+    // Guardamos el email en sessionId (Transbank lo devuelve al confirmar, máx 61 chars)
+    const sessionId = customer.email.slice(0, 61);
     const returnUrl = `${SITE_URL}/api/checkout/confirm`;
 
     const tx = getTransaction();

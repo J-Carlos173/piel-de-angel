@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
+import { sendOrderConfirmationToClient, sendOrderNotificationToAdmin } from "@/lib/email";
 
 const COMMERCE_CODE = process.env.TRANSBANK_COMMERCE_CODE!;
 const API_KEY = process.env.TRANSBANK_API_KEY!;
@@ -41,11 +42,25 @@ export async function POST(req: NextRequest) {
 
     // Pago aprobado (responseCode 0 = aprobado)
     if (result.response_code === 0) {
+      const clientEmail = result.session_id ?? "";
+      const card = result.card_detail?.card_number ?? "";
+      const authCode = result.authorization_code ?? "";
+      const amount = result.amount;
+      const buyOrder = result.buy_order;
+
+      // Enviar emails en paralelo (no bloqueamos el redirect si falla)
+      Promise.all([
+        clientEmail
+          ? sendOrderConfirmationToClient({ email: clientEmail, buyOrder, amount, authCode, card })
+          : Promise.resolve(),
+        sendOrderNotificationToAdmin({ clientEmail, buyOrder, amount, authCode, card }),
+      ]).catch((err) => console.error("[checkout/emails]", err));
+
       const params = new URLSearchParams({
-        order: result.buy_order,
-        amount: String(result.amount),
-        card: result.card_detail?.card_number ?? "",
-        auth: result.authorization_code ?? "",
+        order: buyOrder,
+        amount: String(amount),
+        card,
+        auth: authCode,
       });
       return NextResponse.redirect(`${SITE_URL}/checkout/success?${params}`);
     }

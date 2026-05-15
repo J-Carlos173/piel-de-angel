@@ -92,6 +92,80 @@ export async function sendConfirmationToClient(data: {
   });
 }
 
+export async function sendOrderConfirmationToClient(data: {
+  email: string;
+  buyOrder: string;
+  amount: number;
+  authCode: string;
+  card: string;
+}) {
+  const formatPrecio = (n: number) =>
+    "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+  await getTransport().sendMail({
+    from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
+    to: data.email,
+    subject: `✓ Compra confirmada — Piel de Ángel`,
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
+        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Tu compra fue aprobada!</h2>
+        <p style="color: #666; margin-top: 0;">Gracias por comprar en Piel de Ángel. Aquí está el resumen:</p>
+        <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
+        <table style="width: 100%; font-size: 15px; color: #444;">
+          <tr><td style="padding: 6px 0; color: #888;">Número de orden</td><td><strong>${data.buyOrder}</strong></td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Total pagado</td><td><strong>${formatPrecio(data.amount)}</strong></td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Tarjeta</td><td>**** **** **** ${data.card}</td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Código autorización</td><td>${data.authCode}</td></tr>
+        </table>
+        <div style="margin-top: 28px; background: #f0fdf4; border-radius: 10px; padding: 16px;">
+          <p style="margin: 0; color: #444; font-size: 14px;">
+            📦 <strong>Próximo paso:</strong> Nos contactaremos contigo por WhatsApp para coordinar el despacho de tu pedido.
+          </p>
+        </div>
+        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Estética & Belleza Premium</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendOrderNotificationToAdmin(data: {
+  clientEmail: string;
+  buyOrder: string;
+  amount: number;
+  authCode: string;
+  card: string;
+}) {
+  const STORE_EMAIL = process.env.STORE_EMAIL || "pieldeangel.contacto@gmail.com";
+  const formatPrecio = (n: number) =>
+    "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+  await getTransport().sendMail({
+    from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
+    to: STORE_EMAIL,
+    subject: `🛍️ Nueva venta — ${formatPrecio(data.amount)} — ${data.buyOrder}`,
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
+        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Nueva venta confirmada!</h2>
+        <p style="color: #666; margin-top: 0;">Se procesó un pago exitoso en la tienda.</p>
+        <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
+        <table style="width: 100%; font-size: 15px; color: #444;">
+          <tr><td style="padding: 6px 0; color: #888;">Orden</td><td><strong>${data.buyOrder}</strong></td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Cliente</td><td>${data.clientEmail}</td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Total</td><td><strong style="color: #8B6F6F; font-size: 18px;">${formatPrecio(data.amount)}</strong></td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Tarjeta</td><td>**** **** **** ${data.card}</td></tr>
+          <tr><td style="padding: 6px 0; color: #888;">Autorización</td><td>${data.authCode}</td></tr>
+        </table>
+        <div style="margin-top: 28px; background: #fff3cd; border-radius: 10px; padding: 16px;">
+          <p style="margin: 0; color: #444; font-size: 14px;">
+            📦 <strong>Acción requerida:</strong> Contactar al cliente por WhatsApp para coordinar el despacho.
+          </p>
+        </div>
+        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Sistema de ventas</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendDeclineToClient(data: {
   name: string;
   email: string;
