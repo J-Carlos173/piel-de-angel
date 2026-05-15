@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useProductsStore } from "@/store/productsStore";
 import { formatPrecio } from "@/data/productos";
@@ -14,6 +14,9 @@ export default function CheckoutPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const webpayFormRef = useRef<HTMLFormElement>(null);
   const [webpay, setWebpay] = useState<{ url: string; token: string } | null>(null);
+
+  // Siempre mostrar desde arriba al entrar a esta página
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, []);
 
   const total = totalAmount();
   const lineItems = items
