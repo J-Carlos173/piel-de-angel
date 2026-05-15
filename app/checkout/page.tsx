@@ -10,8 +10,12 @@ const COSTO_ENVIO = 2990;
 const GRATIS_SANTIAGO = 39990;
 const GRATIS_REGIONES = 49990;
 
+function esSabado(): boolean {
+  return new Date().getDay() === 6;
+}
+
 function calcularEnvio(subtotal: number, zona: "santiago" | "regiones"): number {
-  if (zona === "santiago" && subtotal >= GRATIS_SANTIAGO) return 0;
+  if (zona === "santiago" && esSabado() && subtotal >= GRATIS_SANTIAGO) return 0;
   if (zona === "regiones" && subtotal >= GRATIS_REGIONES) return 0;
   return COSTO_ENVIO;
 }
@@ -85,9 +89,10 @@ export default function CheckoutPage() {
     );
   }
 
+  const sabado = esSabado();
   const faltaParaGratis =
     zona === "santiago"
-      ? Math.max(0, GRATIS_SANTIAGO - subtotal)
+      ? (sabado ? Math.max(0, GRATIS_SANTIAGO - subtotal) : -1)
       : Math.max(0, GRATIS_REGIONES - subtotal);
 
   return (
@@ -160,6 +165,14 @@ export default function CheckoutPage() {
                   <i className="fa-solid fa-map-location-dot" /> Regiones
                 </button>
               </div>
+              {zona === "santiago" && (
+                <p className="checkout-zona-info">
+                  <i className="fa-solid fa-circle-info" /> Solo Santiago Urbano · dentro del círculo Américo Vespucio
+                  {!sabado && (
+                    <> · <strong>Despacho los sábados</strong></>
+                  )}
+                </p>
+              )}
               {zona === "regiones" && (
                 <p className="checkout-zona-info">
                   Blue Express · Copiapó hasta Puerto Montt
@@ -190,14 +203,26 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Banner: cuánto falta para envío gratis */}
-            {faltaParaGratis > 0 && (
+            {/* Banners envío */}
+            {zona === "santiago" && !sabado && (
+              <div className="checkout-envio-banner sabado">
+                <i className="fa-solid fa-calendar-day" />
+                Despacho en Santiago solo los <strong>sábados</strong>. Compra hoy y te llega el próximo sábado.
+              </div>
+            )}
+            {zona === "santiago" && sabado && faltaParaGratis > 0 && (
+              <div className="checkout-envio-banner">
+                <i className="fa-solid fa-truck" />
+                Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis (hoy es sábado 🎉)
+              </div>
+            )}
+            {zona === "regiones" && faltaParaGratis > 0 && (
               <div className="checkout-envio-banner">
                 <i className="fa-solid fa-truck" />
                 Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis
               </div>
             )}
-            {faltaParaGratis === 0 && envio === 0 && (
+            {envio === 0 && (
               <div className="checkout-envio-banner gratis">
                 <i className="fa-solid fa-circle-check" /> ¡Envío gratis aplicado!
               </div>
