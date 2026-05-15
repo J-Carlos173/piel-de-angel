@@ -11,7 +11,7 @@ export default function Productos() {
   const { setProducts } = useProductsStore();
   const [allProducts, setAllProducts] = useState<Producto[]>(PRODUCTOS);
   const [activeTab, setActiveTab] = useState("Todos");
-  const ref = useReveal([allProducts]);
+  const ref = useReveal([allProducts, activeTab]);
 
   useEffect(() => {
     fetchProductos().then((remote) => {
