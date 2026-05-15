@@ -3,11 +3,13 @@
 import { useCartStore } from "@/store/cartStore";
 import { formatPrecio } from "@/data/productos";
 import { useProductsStore } from "@/store/productsStore";
+import { useRouter } from "next/navigation";
 
 export default function CartDrawer() {
   const { items, isOpen, close, remove, updateQty, checkout, totalItems, totalAmount } =
     useCartStore();
   const products = useProductsStore((s) => s.products);
+  const router = useRouter();
 
   const count = totalItems();
   const total = totalAmount();
@@ -90,12 +92,15 @@ export default function CartDrawer() {
               <span className="cart-total-label">Total</span>
               <span className="cart-total-amount">{formatPrecio(total)}</span>
             </div>
-            <button className="btn-checkout" onClick={checkout}>
-              <i className="fa-brands fa-whatsapp" /> Comprar por WhatsApp
+            <button
+              className="btn-checkout btn-webpay-drawer"
+              onClick={() => { close(); router.push("/checkout"); }}
+            >
+              <i className="fa-solid fa-lock" /> Pagar con WebPay
             </button>
-            <p className="checkout-note">
-              Recibirás confirmación de stock y método de pago
-            </p>
+            <button className="btn-checkout-secondary" onClick={checkout}>
+              <i className="fa-brands fa-whatsapp" /> Consultar por WhatsApp
+            </button>
           </div>
         )}
       </aside>
