@@ -24,14 +24,18 @@ function mapProduct(p: any): Producto {
 
 export async function fetchProductos(): Promise<Producto[]> {
   try {
+    console.log("[medusa] fetching from:", BASE);
     const res = await fetch(
       `${BASE}/store/products?fields=*variants.prices,+metadata&limit=100`,
       { headers: { "x-publishable-api-key": KEY } }
     );
+    console.log("[medusa] status:", res.status, res.ok);
     if (!res.ok) return [];
     const { products } = await res.json();
+    console.log("[medusa] products count:", products?.length);
     return (products ?? []).map(mapProduct);
-  } catch {
+  } catch (e) {
+    console.error("[medusa] error:", e);
     return [];
   }
 }
