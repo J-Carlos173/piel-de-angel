@@ -14,7 +14,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "serum-hidratante",
     nombre: "Sérum Hidratante Premium",
-    categoria: "Serums",
+    categoria: "Sérums",
     descripcion: "Ácido hialurónico puro que devuelve elasticidad y brillo a tu piel desde la primera aplicación.",
     precio: 29990,
     stock: 5,
@@ -24,7 +24,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "serum-vitamina-c",
     nombre: "Sérum Vitamina C Iluminador",
-    categoria: "Serums",
+    categoria: "Sérums",
     descripcion: "Vitamina C estabilizada al 15% para unificar el tono, reducir manchas y dar luminosidad duradera.",
     precio: 32990,
     stock: 4,
@@ -58,7 +58,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "limpiador-suave",
     nombre: "Limpiador Facial Suave",
-    categoria: "Limpieza",
+    categoria: "Limpiadores",
     descripcion: "Espuma delicada que limpia profundamente sin alterar el equilibrio natural de la piel.",
     precio: 19990,
     stock: 0,
@@ -68,7 +68,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "tonico-rose",
     nombre: "Tónico Facial Rose",
-    categoria: "Limpieza",
+    categoria: "Tónicos",
     descripcion: "Agua de rosas y niacinamida para minimizar poros, equilibrar pH y preparar la piel.",
     precio: 16990,
     stock: 3,
@@ -80,7 +80,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "contorno-ojos",
     nombre: "Contorno de Ojos Iluminador",
-    categoria: "Ojos & Pestañas",
+    categoria: "Contorno de ojos",
     descripcion: "Reduce ojeras, bolsas y líneas finas. Aplicador metálico con efecto fresco al instante.",
     precio: 22990,
     stock: 6,
@@ -90,7 +90,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "serum-pestanas",
     nombre: "Sérum para Pestañas",
-    categoria: "Ojos & Pestañas",
+    categoria: "Pestañas y cejas",
     descripcion: "Biotina y aceite de ricino para fortalecer, alargar y densificar las pestañas en 4 semanas.",
     precio: 18990,
     stock: 7,
@@ -102,7 +102,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "protector-solar",
     nombre: "Protector Solar FPS 50",
-    categoria: "Protección",
+    categoria: "Protección solar",
     descripcion: "Fórmula ligera, no comedogénica, con efecto satinado. Protección UVA/UVB de amplio espectro.",
     precio: 24990,
     stock: 10,
@@ -112,7 +112,7 @@ export const PRODUCTOS: Producto[] = [
   {
     id: "bruma-fps",
     nombre: "Bruma Hidratante FPS 30",
-    categoria: "Protección",
+    categoria: "Protección solar",
     descripcion: "Spray refrescante de retoque solar. Ideal para reponer protección sobre el maquillaje.",
     precio: 17990,
     stock: 9,

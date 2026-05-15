@@ -1708,6 +1708,29 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
 }
 .checkout-form input:focus { border-color: var(--rosa); }
 
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.label-opcional {
+  font-weight: 400;
+  color: var(--gris-calido);
+  font-size: 0.78rem;
+}
+
+.checkout-form h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--negro-soft);
+  margin: 4px 0 2px;
+}
+
+@media (max-width: 480px) {
+  .form-row-2 { grid-template-columns: 1fr; }
+}
+
 .checkout-error {
   background: #fef2f2;
   border: 1px solid #fecaca;

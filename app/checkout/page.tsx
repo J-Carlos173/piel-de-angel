@@ -7,8 +7,7 @@ import { formatPrecio } from "@/data/productos";
 import Link from "next/link";
 
 const COSTO_ENVIO = 2990;
-const GRATIS_SANTIAGO = 39990;
-const GRATIS_REGIONES = 49990;
+const GRATIS_SANTIAGO = 40000;
 
 function esSabado(): boolean {
   return new Date().getDay() === 6;
@@ -16,7 +15,6 @@ function esSabado(): boolean {
 
 function calcularEnvio(subtotal: number, zona: "santiago" | "regiones"): number {
   if (zona === "santiago" && esSabado() && subtotal >= GRATIS_SANTIAGO) return 0;
-  if (zona === "regiones" && subtotal >= GRATIS_REGIONES) return 0;
   return COSTO_ENVIO;
 }
 
@@ -34,6 +32,10 @@ export default function CheckoutPage() {
   const subtotal = totalAmount();
   const envio = calcularEnvio(subtotal, zona);
   const total = subtotal + envio;
+  const sabado = esSabado();
+  const faltaParaGratis = zona === "santiago" && sabado
+    ? Math.max(0, GRATIS_SANTIAGO - subtotal)
+    : -1;
 
   const lineItems = items
     .map((item) => {
@@ -53,6 +55,10 @@ export default function CheckoutPage() {
       nombre: fd.get("nombre") as string,
       email: fd.get("email") as string,
       telefono: fd.get("telefono") as string,
+      direccion: fd.get("direccion") as string,
+      depto: fd.get("depto") as string,
+      ciudad: fd.get("ciudad") as string,
+      region: fd.get("region") as string,
     };
 
     try {
@@ -89,12 +95,6 @@ export default function CheckoutPage() {
     );
   }
 
-  const sabado = esSabado();
-  const faltaParaGratis =
-    zona === "santiago"
-      ? (sabado ? Math.max(0, GRATIS_SANTIAGO - subtotal) : -1)
-      : Math.max(0, GRATIS_REGIONES - subtotal);
-
   return (
     <main className="checkout-page">
       <div className="checkout-container">
@@ -108,20 +108,42 @@ export default function CheckoutPage() {
         <div className="checkout-grid">
           {/* Formulario */}
           <section className="checkout-form-section">
-            <h2>Datos de contacto</h2>
             <form onSubmit={handlePagar} className="checkout-form">
+              <h2>Datos de contacto</h2>
               <label>
                 Nombre completo
                 <input name="nombre" type="text" required placeholder="María González" />
               </label>
+              <div className="form-row-2">
+                <label>
+                  Correo electrónico
+                  <input name="email" type="email" required placeholder="correo@ejemplo.com" />
+                </label>
+                <label>
+                  Teléfono
+                  <input name="telefono" type="tel" required placeholder="+56 9 1234 5678" />
+                </label>
+              </div>
+
+              <h2 style={{ marginTop: "8px" }}>Dirección de despacho</h2>
               <label>
-                Correo electrónico
-                <input name="email" type="email" required placeholder="correo@ejemplo.com" />
+                Calle y número
+                <input name="direccion" type="text" required placeholder="Av. Providencia 1234" />
               </label>
               <label>
-                Teléfono
-                <input name="telefono" type="tel" required placeholder="+56 9 1234 5678" />
+                Depto / Casa / Block <span className="label-opcional">(opcional)</span>
+                <input name="depto" type="text" placeholder="Depto 5B" />
               </label>
+              <div className="form-row-2">
+                <label>
+                  Ciudad
+                  <input name="ciudad" type="text" required placeholder="Santiago" />
+                </label>
+                <label>
+                  Región
+                  <input name="region" type="text" required placeholder="Región Metropolitana" />
+                </label>
+              </div>
 
               {error && (
                 <p className="checkout-error">
@@ -146,40 +168,31 @@ export default function CheckoutPage() {
           <section className="checkout-summary">
             <h2>Resumen del pedido</h2>
 
-            {/* Selector de zona */}
+            {/* Selector zona */}
             <div className="checkout-zona">
               <p className="checkout-zona-label">¿Dónde te lo enviamos?</p>
               <div className="checkout-zona-btns">
-                <button
-                  type="button"
-                  className={`zona-btn${zona === "santiago" ? " active" : ""}`}
-                  onClick={() => setZona("santiago")}
-                >
+                <button type="button" className={`zona-btn${zona === "santiago" ? " active" : ""}`} onClick={() => setZona("santiago")}>
                   <i className="fa-solid fa-city" /> Santiago
                 </button>
-                <button
-                  type="button"
-                  className={`zona-btn${zona === "regiones" ? " active" : ""}`}
-                  onClick={() => setZona("regiones")}
-                >
+                <button type="button" className={`zona-btn${zona === "regiones" ? " active" : ""}`} onClick={() => setZona("regiones")}>
                   <i className="fa-solid fa-map-location-dot" /> Regiones
                 </button>
               </div>
               {zona === "santiago" && (
                 <p className="checkout-zona-info">
-                  <i className="fa-solid fa-circle-info" /> Solo Santiago Urbano · dentro del círculo Américo Vespucio
-                  {!sabado && (
-                    <> · <strong>Despacho los sábados</strong></>
-                  )}
+                  Solo Santiago Urbano · círculo Américo Vespucio
+                  {!sabado && <> · <strong>Despacho los sábados</strong></>}
                 </p>
               )}
               {zona === "regiones" && (
                 <p className="checkout-zona-info">
-                  Blue Express · Copiapó hasta Puerto Montt
+                  Blue Express o Starken · Copiapó hasta Puerto Montt
                 </p>
               )}
             </div>
 
+            {/* Items */}
             <div className="checkout-items">
               {lineItems.map((item) => (
                 <div className="checkout-item" key={item.id}>
@@ -189,34 +202,25 @@ export default function CheckoutPage() {
                   <span className="checkout-item-price">{formatPrecio(item.precio * item.qty)}</span>
                 </div>
               ))}
-
-              {/* Envío */}
               <div className="checkout-item checkout-item-envio">
                 <span className="checkout-item-name">
                   <i className="fa-solid fa-truck" /> Envío
                 </span>
-                {envio === 0 ? (
-                  <span className="checkout-envio-gratis">¡Gratis!</span>
-                ) : (
-                  <span className="checkout-item-price">{formatPrecio(envio)}</span>
-                )}
+                {envio === 0
+                  ? <span className="checkout-envio-gratis">¡Gratis!</span>
+                  : <span className="checkout-item-price">{formatPrecio(envio)}</span>
+                }
               </div>
             </div>
 
-            {/* Banners envío */}
+            {/* Banners */}
             {zona === "santiago" && !sabado && (
               <div className="checkout-envio-banner sabado">
                 <i className="fa-solid fa-calendar-day" />
-                Despacho en Santiago solo los <strong>sábados</strong>. Compra hoy y te llega el próximo sábado.
+                Despacho en Santiago solo los <strong>sábados</strong>. Tu pedido llegará el próximo sábado.
               </div>
             )}
             {zona === "santiago" && sabado && faltaParaGratis > 0 && (
-              <div className="checkout-envio-banner">
-                <i className="fa-solid fa-truck" />
-                Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis (hoy es sábado 🎉)
-              </div>
-            )}
-            {zona === "regiones" && faltaParaGratis > 0 && (
               <div className="checkout-envio-banner">
                 <i className="fa-solid fa-truck" />
                 Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis
