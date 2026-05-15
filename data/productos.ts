@@ -125,4 +125,4 @@ export const PRODUCTOS: Producto[] = [
 export const WHATSAPP_NUMERO = "56977031461";
 
 export const formatPrecio = (n: number) =>
-  "$" + n.toLocaleString("es-CL");
+  "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
