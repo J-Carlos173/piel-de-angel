@@ -6,19 +6,31 @@ import { useProductsStore } from "@/store/productsStore";
 import { formatPrecio } from "@/data/productos";
 import Link from "next/link";
 
+const COSTO_ENVIO = 2990;
+const GRATIS_SANTIAGO = 39990;
+const GRATIS_REGIONES = 49990;
+
+function calcularEnvio(subtotal: number, zona: "santiago" | "regiones"): number {
+  if (zona === "santiago" && subtotal >= GRATIS_SANTIAGO) return 0;
+  if (zona === "regiones" && subtotal >= GRATIS_REGIONES) return 0;
+  return COSTO_ENVIO;
+}
+
 export default function CheckoutPage() {
   const { items, totalAmount } = useCartStore();
   const products = useProductsStore((s) => s.products);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const formRef = useRef<HTMLFormElement>(null);
+  const [zona, setZona] = useState<"santiago" | "regiones">("santiago");
   const webpayFormRef = useRef<HTMLFormElement>(null);
   const [webpay, setWebpay] = useState<{ url: string; token: string } | null>(null);
 
-  // Siempre mostrar desde arriba al entrar a esta página
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, []);
 
-  const total = totalAmount();
+  const subtotal = totalAmount();
+  const envio = calcularEnvio(subtotal, zona);
+  const total = subtotal + envio;
+
   const lineItems = items
     .map((item) => {
       const prod = products.find((p) => p.id === item.id);
@@ -43,7 +55,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: lineItems, customer }),
+        body: JSON.stringify({ items: lineItems, customer, envio, zona }),
       });
       const data = await res.json();
 
@@ -54,7 +66,6 @@ export default function CheckoutPage() {
       }
 
       setWebpay({ url: data.url, token: data.token });
-      // Submit the hidden WebPay form after state update
       setTimeout(() => webpayFormRef.current?.submit(), 100);
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
@@ -74,6 +85,11 @@ export default function CheckoutPage() {
     );
   }
 
+  const faltaParaGratis =
+    zona === "santiago"
+      ? Math.max(0, GRATIS_SANTIAGO - subtotal)
+      : Math.max(0, GRATIS_REGIONES - subtotal);
+
   return (
     <main className="checkout-page">
       <div className="checkout-container">
@@ -85,10 +101,10 @@ export default function CheckoutPage() {
         </div>
 
         <div className="checkout-grid">
-          {/* Formulario de contacto */}
+          {/* Formulario */}
           <section className="checkout-form-section">
             <h2>Datos de contacto</h2>
-            <form ref={formRef} onSubmit={handlePagar} className="checkout-form">
+            <form onSubmit={handlePagar} className="checkout-form">
               <label>
                 Nombre completo
                 <input name="nombre" type="text" required placeholder="María González" />
@@ -102,7 +118,11 @@ export default function CheckoutPage() {
                 <input name="telefono" type="tel" required placeholder="+56 9 1234 5678" />
               </label>
 
-              {error && <p className="checkout-error"><i className="fa-solid fa-circle-exclamation" /> {error}</p>}
+              {error && (
+                <p className="checkout-error">
+                  <i className="fa-solid fa-circle-exclamation" /> {error}
+                </p>
+              )}
 
               <button type="submit" className="btn-webpay" disabled={loading}>
                 {loading ? (
@@ -117,9 +137,36 @@ export default function CheckoutPage() {
             </form>
           </section>
 
-          {/* Resumen del pedido */}
+          {/* Resumen */}
           <section className="checkout-summary">
             <h2>Resumen del pedido</h2>
+
+            {/* Selector de zona */}
+            <div className="checkout-zona">
+              <p className="checkout-zona-label">¿Dónde te lo enviamos?</p>
+              <div className="checkout-zona-btns">
+                <button
+                  type="button"
+                  className={`zona-btn${zona === "santiago" ? " active" : ""}`}
+                  onClick={() => setZona("santiago")}
+                >
+                  <i className="fa-solid fa-city" /> Santiago
+                </button>
+                <button
+                  type="button"
+                  className={`zona-btn${zona === "regiones" ? " active" : ""}`}
+                  onClick={() => setZona("regiones")}
+                >
+                  <i className="fa-solid fa-map-location-dot" /> Regiones
+                </button>
+              </div>
+              {zona === "regiones" && (
+                <p className="checkout-zona-info">
+                  Blue Express · Copiapó hasta Puerto Montt
+                </p>
+              )}
+            </div>
+
             <div className="checkout-items">
               {lineItems.map((item) => (
                 <div className="checkout-item" key={item.id}>
@@ -129,19 +176,41 @@ export default function CheckoutPage() {
                   <span className="checkout-item-price">{formatPrecio(item.precio * item.qty)}</span>
                 </div>
               ))}
+
+              {/* Envío */}
+              <div className="checkout-item checkout-item-envio">
+                <span className="checkout-item-name">
+                  <i className="fa-solid fa-truck" /> Envío
+                </span>
+                {envio === 0 ? (
+                  <span className="checkout-envio-gratis">¡Gratis!</span>
+                ) : (
+                  <span className="checkout-item-price">{formatPrecio(envio)}</span>
+                )}
+              </div>
             </div>
+
+            {/* Banner: cuánto falta para envío gratis */}
+            {faltaParaGratis > 0 && (
+              <div className="checkout-envio-banner">
+                <i className="fa-solid fa-truck" />
+                Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis
+              </div>
+            )}
+            {faltaParaGratis === 0 && envio === 0 && (
+              <div className="checkout-envio-banner gratis">
+                <i className="fa-solid fa-circle-check" /> ¡Envío gratis aplicado!
+              </div>
+            )}
+
             <div className="checkout-total">
               <span>Total a pagar</span>
               <span className="checkout-total-amount">{formatPrecio(total)}</span>
             </div>
-            <p className="checkout-despacho-note">
-              <i className="fa-solid fa-circle-info" /> El despacho se coordina por WhatsApp tras confirmar el pago.
-            </p>
           </section>
         </div>
       </div>
 
-      {/* Formulario oculto que redirige a WebPay */}
       {webpay && (
         <form ref={webpayFormRef} method="POST" action={webpay.url} style={{ display: "none" }}>
           <input type="hidden" name="token_ws" value={webpay.token} />
