@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const COSTO_ENVIO = 2990;
 const GRATIS_SANTIAGO = 40000;
-const WEBPAY_PLUS_ACTIVO = false; // cambiar a true cuando lleguen las credenciales de Transbank
+const WEBPAY_PLUS_ACTIVO = true; // false = link simple webpay.cl | true = WebPay Plus API
 const WEBPAY_SIMPLE_URL = "https://www.webpay.cl/form-pay/294463";
 
 function esSabado(): boolean {
