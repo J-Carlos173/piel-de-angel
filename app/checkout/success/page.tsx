@@ -1,43 +1,48 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrecio } from "@/data/productos";
-import { Suspense } from "react";
+
+const WA_NUMBER = "56977031461";
 
 function SuccessContent() {
   const params = useSearchParams();
-  const clearCart = useCartStore((s) => s.items);
-  const { items } = useCartStore();
-
-  const order = params.get("order") ?? "";
+  const order  = params.get("order")  ?? "";
   const amount = parseInt(params.get("amount") ?? "0");
-  const card = params.get("card") ?? "";
-  const auth = params.get("auth") ?? "";
+  const card   = params.get("card")   ?? "";
+  const auth   = params.get("auth")   ?? "";
 
-  // Vaciar carrito al llegar a esta página
   useEffect(() => {
     useCartStore.setState({ items: [] });
   }, []);
 
+  const waText = encodeURIComponent(
+    `Hola Tere, ya pagué mi pedido *${order}*. ¿Puedes confirmarme el despacho? 🌸`
+  );
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${waText}`;
+
   return (
     <main className="checkout-result">
       <div className="checkout-result-card success">
+
         <div className="result-icon success">
           <i className="fa-solid fa-circle-check" />
         </div>
+
         <h1>¡Pago aprobado!</h1>
-        <p className="result-subtitle">Tu compra fue procesada correctamente.</p>
+        <p className="result-subtitle">Tu compra fue procesada correctamente.<br/>Te enviaremos un correo con el detalle.</p>
+
+        {order && (
+          <div className="result-order-badge">
+            <span className="result-order-label">Número de orden</span>
+            <span className="result-order-id">{order}</span>
+          </div>
+        )}
 
         <div className="result-details">
-          {order && (
-            <div className="result-row">
-              <span>Orden</span>
-              <strong>{order}</strong>
-            </div>
-          )}
           {amount > 0 && (
             <div className="result-row">
               <span>Total pagado</span>
@@ -58,12 +63,18 @@ function SuccessContent() {
           )}
         </div>
 
-        <p className="result-next">
-          <i className="fa-solid fa-whatsapp" style={{ color: "#25d366" }} />{" "}
-          Nos contactaremos contigo por WhatsApp para coordinar el despacho.
-        </p>
+        <div className="result-next-steps">
+          <p className="result-next-title">¿Qué sigue?</p>
+          <p className="result-next-text">
+            Escríbele a Tere por WhatsApp indicando tu número de orden para coordinar el despacho más rápido.
+          </p>
+          <a href={waUrl} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-success">
+            <i className="fa-brands fa-whatsapp" />
+            Escribir a Tere — {order}
+          </a>
+        </div>
 
-        <Link href="/#productos" className="btn-webpay">
+        <Link href="/#productos" className="btn-seguir-comprando">
           Seguir comprando
         </Link>
       </div>
