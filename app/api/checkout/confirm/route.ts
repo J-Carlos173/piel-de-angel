@@ -38,12 +38,16 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
       const amount = result.amount;
       const buyOrder = result.buy_order;
 
-      Promise.all([
-        clientEmail
-          ? sendOrderConfirmationToClient({ email: clientEmail, buyOrder, amount, authCode, card })
-          : Promise.resolve(),
-        sendOrderNotificationToAdmin({ clientEmail, buyOrder, amount, authCode, card }),
-      ]).catch((err) => console.error("[checkout/emails]", err));
+      try {
+        await Promise.all([
+          clientEmail
+            ? sendOrderConfirmationToClient({ email: clientEmail, buyOrder, amount, authCode, card })
+            : Promise.resolve(),
+          sendOrderNotificationToAdmin({ clientEmail, buyOrder, amount, authCode, card }),
+        ]);
+      } catch (emailErr) {
+        console.error("[checkout/emails]", emailErr);
+      }
 
       const qs = new URLSearchParams({
         order: buyOrder,
