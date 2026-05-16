@@ -16,16 +16,7 @@ function getTransaction() {
   return new WebpayPlus.Transaction(options);
 }
 
-// Transbank hace POST a esta ruta después del pago
-export async function POST(req: NextRequest) {
-  const body = await req.formData().catch(() => null);
-  const params = body
-    ? Object.fromEntries(body.entries())
-    : Object.fromEntries(new URL(req.url).searchParams.entries());
-
-  const tokenWs: string | undefined = params["token_ws"] as string;
-  const tbkToken: string | undefined = params["TBK_TOKEN"] as string;
-
+async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
   // Pago cancelado por el usuario
   if (tbkToken && !tokenWs) {
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=cancelled`);
@@ -40,7 +31,6 @@ export async function POST(req: NextRequest) {
     const tx = getTransaction();
     const result = await tx.commit(tokenWs);
 
-    // Pago aprobado (responseCode 0 = aprobado)
     if (result.response_code === 0) {
       const clientEmail = result.session_id ?? "";
       const card = result.card_detail?.card_number ?? "";
@@ -48,7 +38,6 @@ export async function POST(req: NextRequest) {
       const amount = result.amount;
       const buyOrder = result.buy_order;
 
-      // Enviar emails en paralelo (no bloqueamos el redirect si falla)
       Promise.all([
         clientEmail
           ? sendOrderConfirmationToClient({ email: clientEmail, buyOrder, amount, authCode, card })
@@ -56,13 +45,13 @@ export async function POST(req: NextRequest) {
         sendOrderNotificationToAdmin({ clientEmail, buyOrder, amount, authCode, card }),
       ]).catch((err) => console.error("[checkout/emails]", err));
 
-      const params = new URLSearchParams({
+      const qs = new URLSearchParams({
         order: buyOrder,
         amount: String(amount),
         card,
         auth: authCode,
       });
-      return NextResponse.redirect(`${SITE_URL}/checkout/success?${params}`);
+      return NextResponse.redirect(`${SITE_URL}/checkout/success?${qs}`);
     }
 
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=rejected`);
@@ -70,4 +59,18 @@ export async function POST(req: NextRequest) {
     console.error("[checkout/confirm]", err);
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=error`);
   }
+}
+
+// Transbank redirige con GET (token en query string)
+export async function GET(req: NextRequest) {
+  const sp = req.nextUrl.searchParams;
+  return handleConfirm(sp.get("token_ws"), sp.get("TBK_TOKEN"));
+}
+
+// Transbank también puede enviar POST con form-data
+export async function POST(req: NextRequest) {
+  const body = await req.formData().catch(() => null);
+  const get = (k: string) =>
+    (body?.get(k) as string | null) ?? req.nextUrl.searchParams.get(k);
+  return handleConfirm(get("token_ws"), get("TBK_TOKEN"));
 }
