@@ -11,6 +11,7 @@ export default function Productos() {
   const { setProducts } = useProductsStore();
   const [allProducts, setAllProducts] = useState<Producto[]>(PRODUCTOS);
   const [activeTab, setActiveTab] = useState("Todos");
+  const [compact, setCompact] = useState(false);
   const ref = useReveal([allProducts, activeTab]);
 
   useEffect(() => {
@@ -39,19 +40,37 @@ export default function Productos() {
           </p>
         </div>
 
-        <div className="productos-tabs reveal">
-          {categorias.map((cat) => (
+        <div className="productos-toolbar reveal">
+          <div className="productos-tabs">
+            {categorias.map((cat) => (
+              <button
+                key={cat}
+                className={`tab-btn${activeTab === cat ? " active" : ""}`}
+                onClick={() => setActiveTab(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <div className="grid-size-toggle">
             <button
-              key={cat}
-              className={`tab-btn${activeTab === cat ? " active" : ""}`}
-              onClick={() => setActiveTab(cat)}
+              className={`grid-size-btn${!compact ? " active" : ""}`}
+              onClick={() => setCompact(false)}
+              title="Vista normal"
             >
-              {cat}
+              <i className="fa-solid fa-table-cells-large" />
             </button>
-          ))}
+            <button
+              className={`grid-size-btn${compact ? " active" : ""}`}
+              onClick={() => setCompact(true)}
+              title="Vista compacta"
+            >
+              <i className="fa-solid fa-grip" />
+            </button>
+          </div>
         </div>
 
-        <div className="productos-grid">
+        <div className={`productos-grid${compact ? " compact" : ""}`}
           {visible.map((p) => (
             <ProductCard key={p.id} p={p} />
           ))}

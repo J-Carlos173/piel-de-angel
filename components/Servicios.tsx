@@ -56,8 +56,8 @@ export default function Servicios() {
               <div className="servicio-content">
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
-                <a href="#contacto" className="servicio-btn">
-                  Consultar <i className="fa-solid fa-arrow-right" />
+                <a href="#agenda" className="servicio-btn">
+                  Agendar <i className="fa-solid fa-calendar-check" />
                 </a>
               </div>
             </div>

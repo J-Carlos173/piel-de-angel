@@ -519,11 +519,19 @@ section { padding: 120px 0; position: relative; }
 
 /* ============ PRODUCTOS / TIENDA ============ */
 .productos { background: var(--crema-pure); }
+.productos-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
 .productos-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
+  justify-content: flex-start;
   margin: 0 0 40px;
 }
 .tab-btn {
@@ -547,10 +555,52 @@ section { padding: 120px 0; position: relative; }
 [data-theme="dark"] .tab-btn { border-color: #3D3533; color: var(--texto); }
 [data-theme="dark"] .tab-btn:hover { border-color: var(--rosa); }
 [data-theme="dark"] .tab-btn.active { background: var(--rosa-deep); border-color: var(--rosa-deep); }
+/* Toggle de tamaño */
+.grid-size-toggle {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.grid-size-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--gris-suave);
+  background: transparent;
+  color: var(--texto-soft);
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transicion);
+}
+.grid-size-btn:hover { border-color: var(--rosa); color: var(--rosa-deep); }
+.grid-size-btn.active { background: var(--rosa-soft); border-color: var(--rosa); color: var(--rosa-deep); }
+
 .productos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
+}
+.productos-grid.compact {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+.productos-grid.compact .producto-desc { display: none; }
+.productos-grid.compact .producto-card { border-radius: 14px; }
+.productos-grid.compact .producto-img { aspect-ratio: 1 / 1; }
+.productos-grid.compact .producto-content { padding: 12px 14px 14px; }
+.productos-grid.compact h3 { font-size: 0.85rem; margin-bottom: 4px; }
+.productos-grid.compact .producto-precio { font-size: 1rem; }
+.productos-grid.compact .producto-stock { font-size: 0.72rem; margin-bottom: 10px; }
+.productos-grid.compact .btn-add-cart { font-size: 0.78rem; padding: 9px 12px; }
+
+@media (max-width: 600px) {
+  .productos-grid { grid-template-columns: 1fr; }
+  .productos-grid.compact { grid-template-columns: repeat(2, 1fr); }
+  .productos-toolbar { justify-content: center; }
+  .productos-tabs { justify-content: center; }
 }
 .producto-card {
   background: white;
