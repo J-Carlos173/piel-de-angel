@@ -70,7 +70,7 @@ export default function Productos() {
           </div>
         </div>
 
-        <div className={`productos-grid${compact ? " compact" : ""}`}
+        <div className={`productos-grid${compact ? " compact" : ""}`}>
           {visible.map((p) => (
             <ProductCard key={p.id} p={p} />
           ))}
