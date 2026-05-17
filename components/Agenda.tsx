@@ -47,6 +47,7 @@ export default function Agenda() {
     setSelectedDate(date);
     setLoadingSlots(true);
     setSlots([]);
+    setStep("time"); // muestra el spinner de inmediato
     try {
       const res = await fetch(`/api/availability?date=${date}`);
       const data = await res.json();
@@ -55,7 +56,6 @@ export default function Agenda() {
       setSlots([]);
     }
     setLoadingSlots(false);
-    setStep("time");
   }
 
   function handleTimeSelect(time: string) {
@@ -145,7 +145,10 @@ export default function Agenda() {
                     <strong>{formatDate(selectedDate)}</strong>
                   </p>
                   {loadingSlots ? (
-                    <div className="agenda-loading">Cargando horarios…</div>
+                    <div className="agenda-loading">
+                      <i className="fa-solid fa-spinner fa-spin" />
+                      Cargando horarios…
+                    </div>
                   ) : slots.length === 0 ? (
                     <div className="agenda-empty">No hay horarios disponibles este día.</div>
                   ) : (
