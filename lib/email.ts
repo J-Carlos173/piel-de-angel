@@ -135,7 +135,7 @@ export async function sendOrderNotificationToAdmin(data: {
   authCode: string;
   card: string;
 }) {
-  const STORE_EMAIL = process.env.STORE_EMAIL || "pieldeangel.contacto@gmail.com";
+  const STORE_EMAIL = (process.env.STORE_EMAIL || "").trim() || "pieldeangel.contacto@gmail.com";
   const formatPrecio = (n: number) =>
     "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
@@ -238,7 +238,7 @@ export async function sendPendingOrderToAdmin(data: {
   total: number;
   zona: string;
 }) {
-  const STORE_EMAIL = process.env.STORE_EMAIL || "pieldeangel.contacto@gmail.com";
+  const STORE_EMAIL = (process.env.STORE_EMAIL || "").trim() || "pieldeangel.contacto@gmail.com";
   const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   const { customer } = data;
   const direccionCompleta = [customer.direccion, customer.depto, customer.ciudad, customer.region].filter(Boolean).join(", ");

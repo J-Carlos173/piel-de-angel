@@ -23,9 +23,9 @@ export default function Home() {
         <Servicios />
         <Productos />
         <Promociones />
-        <Instagram />
         <Agenda />
         <Testimonios />
+        <Instagram />
       </RevealObserver>
       <Footer />
       <WhatsappFloat />
