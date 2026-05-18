@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 const SITE_URL = "https://piel-de-angel.vercel.app";
 const SITE_NAME = "Piel de Ángel";
@@ -153,6 +154,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider />
         {children}
+        <Analytics />
       </body>
     </html>
   );

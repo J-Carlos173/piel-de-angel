@@ -106,3 +106,38 @@ export async function getAllOrders() {
     LIMIT 200
   `;
 }
+
+export async function getConfirmedOrders() {
+  const sql = getDb();
+  return sql`
+    SELECT * FROM orders
+    WHERE status = 'confirmed'
+    ORDER BY confirmed_at DESC
+    LIMIT 500
+  `;
+}
+
+async function ensureSettingsTable(sql: ReturnType<typeof getDb>) {
+  await sql`
+    CREATE TABLE IF NOT EXISTS settings (
+      key   VARCHAR(100) PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `;
+}
+
+export async function getSetting(key: string): Promise<string | null> {
+  const sql = getDb();
+  await ensureSettingsTable(sql);
+  const rows = await sql`SELECT value FROM settings WHERE key = ${key} LIMIT 1`;
+  return rows[0]?.value ?? null;
+}
+
+export async function setSetting(key: string, value: string): Promise<void> {
+  const sql = getDb();
+  await ensureSettingsTable(sql);
+  await sql`
+    INSERT INTO settings (key, value) VALUES (${key}, ${value})
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+  `;
+}
