@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
 import { sendOrderConfirmationToClient, sendOrderNotificationToAdmin } from "@/lib/email";
+import { confirmOrder, getOrder } from "@/lib/db";
 
 const COMMERCE_CODE = process.env.TRANSBANK_COMMERCE_CODE!;
 const API_KEY = process.env.TRANSBANK_API_KEY!;
@@ -17,12 +18,9 @@ function getTransaction() {
 }
 
 async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
-  // Pago cancelado por el usuario
   if (tbkToken && !tokenWs) {
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=cancelled`);
   }
-
-  // Timeout de sesión
   if (!tokenWs) {
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=timeout`);
   }
@@ -38,12 +36,55 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
       const amount = result.amount;
       const buyOrder = result.buy_order;
 
+      // Actualizar estado en Neon y recuperar datos completos del pedido
+      let orderData: Record<string, unknown> | null = null;
       try {
+        await confirmOrder({ buyOrder, amount, authCode, cardLast4: card });
+        orderData = await getOrder(buyOrder);
+      } catch (dbErr) {
+        console.error("[checkout/confirm/db]", dbErr);
+      }
+
+      // Enviar correos con datos completos si están disponibles
+      try {
+        const items = orderData?.items ? (orderData.items as { nombre: string; precio: number; qty: number }[]) : [];
+        const customer = orderData
+          ? {
+              nombre: String(orderData.customer_nombre ?? ""),
+              email: String(orderData.customer_email ?? clientEmail),
+              telefono: String(orderData.customer_tel ?? ""),
+              direccion: String(orderData.customer_dir ?? ""),
+              depto: String(orderData.customer_depto ?? ""),
+              ciudad: String(orderData.customer_ciudad ?? ""),
+              region: String(orderData.customer_region ?? ""),
+            }
+          : null;
+        const envio = Number(orderData?.envio ?? 0);
+        const zona = String(orderData?.zona ?? "santiago");
+
         await Promise.all([
           clientEmail
-            ? sendOrderConfirmationToClient({ email: clientEmail, buyOrder, amount, authCode, card })
+            ? sendOrderConfirmationToClient({
+                email: clientEmail,
+                buyOrder,
+                amount,
+                authCode,
+                card,
+                items,
+                customer,
+              })
             : Promise.resolve(),
-          sendOrderNotificationToAdmin({ clientEmail, buyOrder, amount, authCode, card }),
+          sendOrderNotificationToAdmin({
+            clientEmail,
+            buyOrder,
+            amount,
+            authCode,
+            card,
+            items,
+            customer,
+            envio,
+            zona,
+          }),
         ]);
       } catch (emailErr) {
         console.error("[checkout/emails]", emailErr);
@@ -65,13 +106,11 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
   }
 }
 
-// Transbank redirige con GET (token en query string)
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   return handleConfirm(sp.get("token_ws"), sp.get("TBK_TOKEN"));
 }
 
-// Transbank también puede enviar POST con form-data
 export async function POST(req: NextRequest) {
   const body = await req.formData().catch(() => null);
   const get = (k: string) =>

@@ -92,15 +92,50 @@ export async function sendConfirmationToClient(data: {
   });
 }
 
+type ItemPedidoSimple = { nombre: string; precio: number; qty: number };
+type CustomerInfo = {
+  nombre: string; email: string; telefono: string;
+  direccion: string; depto: string; ciudad: string; region: string;
+} | null;
+
+function fmtPrecio(n: number) {
+  return "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function tablaItemsHtml(items: ItemPedidoSimple[]) {
+  if (!items?.length) return "";
+  return items
+    .map(
+      (i) =>
+        `<tr>
+          <td style="padding:6px 0;color:#555;">${i.nombre} <span style="color:#aaa;">×${i.qty}</span></td>
+          <td style="padding:6px 0;text-align:right;color:#444;">${fmtPrecio(i.precio * i.qty)}</td>
+        </tr>`
+    )
+    .join("");
+}
+
 export async function sendOrderConfirmationToClient(data: {
   email: string;
   buyOrder: string;
   amount: number;
   authCode: string;
   card: string;
+  items?: ItemPedidoSimple[];
+  customer?: CustomerInfo;
 }) {
-  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   const WA = `https://wa.me/56977031461?text=${encodeURIComponent(`Hola Tere, ya pagué mi pedido *${data.buyOrder}*. ¿Puedes confirmarme el despacho? 🌸`)}`;
+  const hasItems = data.items && data.items.length > 0;
+  const nombre = data.customer?.nombre || "";
+
+  const itemsSection = hasItems
+    ? `<div style="margin-top:24px;">
+        <p style="margin:0 0 10px;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:0.08em;">Productos comprados</p>
+        <table style="width:100%;font-size:14px;border-collapse:collapse;border-top:1px solid #f0e8e4;">
+          ${tablaItemsHtml(data.items!)}
+        </table>
+       </div>`
+    : "";
 
   await getTransport().sendMail({
     from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
@@ -109,27 +144,25 @@ export async function sendOrderConfirmationToClient(data: {
     html: `
     <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #fdf9f7;">
 
-      <!-- Header -->
       <div style="background: linear-gradient(135deg, #D8A7B1, #C68A95); padding: 36px 32px; text-align: center; border-radius: 12px 12px 0 0;">
         <p style="margin: 0; color: rgba(255,255,255,0.85); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;">Piel de Ángel · Skincare Premium</p>
         <h1 style="margin: 12px 0 0; color: #fff; font-size: 26px; font-weight: normal;">¡Tu pago fue aprobado! 🎉</h1>
       </div>
 
-      <!-- Body -->
       <div style="padding: 36px 32px;">
-        <p style="color: #666; font-size: 15px; margin: 0 0 28px;">Gracias por tu compra. Aquí tienes el resumen de tu pedido:</p>
+        <p style="color: #666; font-size: 15px; margin: 0 0 24px;">
+          ${nombre ? `Hola <strong>${nombre}</strong>, g` : "G"}racias por tu compra. Aquí tienes el resumen:
+        </p>
 
-        <!-- Orden badge -->
         <div style="background: #fff; border: 1.5px solid #e8d5cc; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; text-align: center;">
           <p style="margin: 0 0 4px; font-size: 11px; color: #aaa; letter-spacing: 0.1em; text-transform: uppercase;">Número de orden</p>
-          <p style="margin: 0; font-size: 20px; font-weight: bold; color: #C68A95;">${data.buyOrder}</p>
+          <p style="margin: 0; font-size: 22px; font-weight: bold; color: #C68A95;">${data.buyOrder}</p>
         </div>
 
-        <!-- Detalle -->
         <table style="width: 100%; font-size: 15px; color: #444; border-collapse: collapse;">
           <tr style="border-bottom: 1px solid #f0e8e4;">
             <td style="padding: 12px 0; color: #888;">Total pagado</td>
-            <td style="padding: 12px 0; text-align: right; font-weight: bold; font-size: 18px; color: #C68A95;">${fmt(data.amount)}</td>
+            <td style="padding: 12px 0; text-align: right; font-weight: bold; font-size: 18px; color: #C68A95;">${fmtPrecio(data.amount)}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f0e8e4;">
             <td style="padding: 12px 0; color: #888;">Tarjeta</td>
@@ -141,14 +174,14 @@ export async function sendOrderConfirmationToClient(data: {
           </tr>
         </table>
 
-        <!-- Qué sigue -->
+        ${itemsSection}
+
         <div style="margin-top: 28px; background: #f9f2f3; border-left: 4px solid #D8A7B1; border-radius: 0 10px 10px 0; padding: 20px 24px;">
           <p style="margin: 0 0 8px; font-weight: bold; color: #444; font-size: 14px;">¿Qué sigue?</p>
           <p style="margin: 0 0 6px; color: #666; font-size: 14px;">🚚 Te contactaremos para coordinar el despacho de tu pedido.</p>
           <p style="margin: 0; color: #666; font-size: 14px;">📦 Si quieres acelerar el proceso, escríbenos directamente:</p>
         </div>
 
-        <!-- WhatsApp CTA -->
         <div style="text-align: center; margin-top: 24px;">
           <a href="${WA}" style="display: inline-block; background: #25d366; color: #fff; font-size: 15px; font-weight: bold; padding: 14px 32px; border-radius: 50px; text-decoration: none;">
             💬 Escribir a Tere por WhatsApp
@@ -157,7 +190,6 @@ export async function sendOrderConfirmationToClient(data: {
         </div>
       </div>
 
-      <!-- Footer -->
       <div style="background: #f0e8e4; padding: 20px 32px; border-radius: 0 0 12px 12px; text-align: center;">
         <p style="margin: 0; font-size: 12px; color: #a08888;">Piel de Ángel · Estética & Skincare Premium · Santiago, Chile</p>
       </div>
@@ -173,62 +205,82 @@ export async function sendOrderNotificationToAdmin(data: {
   amount: number;
   authCode: string;
   card: string;
+  items?: ItemPedidoSimple[];
+  customer?: CustomerInfo;
+  envio?: number;
+  zona?: string;
 }) {
   const STORE_EMAIL = (process.env.STORE_EMAIL || "").trim() || "pieldeangel.contacto@gmail.com";
-  const formatPrecio = (n: number) =>
-    "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const c = data.customer;
+  const hasItems = data.items && data.items.length > 0;
+  const direccion = c
+    ? [c.direccion, c.depto, c.ciudad, c.region].filter(Boolean).join(", ")
+    : "";
+  const zonaLabel = data.zona === "santiago" ? "Santiago (RM)" : "Regiones";
+
+  const clienteSection = c
+    ? `<h3 style="color:#8B6F6F;font-size:13px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.06em;">Datos del cliente</h3>
+       <table style="width:100%;font-size:14px;color:#444;">
+         <tr><td style="padding:4px 0;color:#888;width:120px;">Nombre</td><td><strong>${c.nombre}</strong></td></tr>
+         <tr><td style="padding:4px 0;color:#888;">Email</td><td>${c.email || data.clientEmail}</td></tr>
+         <tr><td style="padding:4px 0;color:#888;">Teléfono</td><td>${c.telefono}</td></tr>
+         <tr><td style="padding:4px 0;color:#888;">Dirección</td><td>${direccion}</td></tr>
+         <tr><td style="padding:4px 0;color:#888;">Zona envío</td><td>${zonaLabel}</td></tr>
+       </table>`
+    : `<p style="color:#666;font-size:14px;">Email cliente: ${data.clientEmail}</p>`;
+
+  const productosSection = hasItems
+    ? `<h3 style="color:#8B6F6F;font-size:13px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.06em;">Productos</h3>
+       <table style="width:100%;font-size:14px;border-collapse:collapse;border-top:1px solid #e8d5cc;">
+         ${tablaItemsHtml(data.items!)}
+         <tr style="border-top:1px solid #e8d5cc;">
+           <td style="padding:6px 0;color:#888;">Envío</td>
+           <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmtPrecio(data.envio ?? 0)}</td>
+         </tr>
+         <tr>
+           <td style="padding:6px 0;font-weight:bold;color:#444;">Total recibido</td>
+           <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:20px;color:#8B6F6F;">${fmtPrecio(data.amount)}</td>
+         </tr>
+       </table>`
+    : `<p style="color:#666;">Total: <strong>${fmtPrecio(data.amount)}</strong></p>`;
 
   await getTransport().sendMail({
     from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
     to: STORE_EMAIL,
-    subject: `🛍️ Nueva venta — ${formatPrecio(data.amount)} — ${data.buyOrder}`,
+    subject: `🛍️ Nueva venta — ${fmtPrecio(data.amount)} — ${data.buyOrder}`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
-        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Nueva venta confirmada!</h2>
+        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Nueva venta confirmada! 🎉</h2>
         <p style="color: #666; margin-top: 0;">Se procesó un pago exitoso en la tienda.</p>
         <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
-        <table style="width: 100%; font-size: 15px; color: #444;">
-          <tr><td style="padding: 6px 0; color: #888;">Orden</td><td><strong>${data.buyOrder}</strong></td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Cliente</td><td>${data.clientEmail}</td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Total</td><td><strong style="color: #8B6F6F; font-size: 18px;">${formatPrecio(data.amount)}</strong></td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Tarjeta</td><td>**** **** **** ${data.card}</td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Autorización</td><td>${data.authCode}</td></tr>
-        </table>
-        <div style="margin-top: 28px; background: #fff3cd; border-radius: 10px; padding: 16px;">
+
+        <div style="background:#fff;border:1.5px solid #e8d5cc;border-radius:10px;padding:16px 20px;margin-bottom:4px;">
+          <p style="margin:0 0 4px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;">Orden</p>
+          <p style="margin:0;font-size:18px;font-weight:bold;color:#C68A95;">${data.buyOrder}</p>
+        </div>
+
+        ${clienteSection}
+        ${productosSection}
+
+        <div style="margin-top: 24px; background: #fff3cd; border-radius: 10px; padding: 16px;">
           <p style="margin: 0; color: #444; font-size: 14px;">
-            📦 <strong>Acción requerida:</strong> Contactar al cliente por WhatsApp para coordinar el despacho.
+            📦 <strong>Acción:</strong> Contactar al cliente para coordinar el despacho.
           </p>
         </div>
-        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Sistema de ventas</p>
+        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Sistema de ventas · Tarjeta: **** ${data.card} · Auth: ${data.authCode}</p>
       </div>
     `,
   });
-}
-
-type ItemPedido = { nombre: string; precio: number; qty: number };
-
-function tablaItems(items: ItemPedido[]) {
-  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return items
-    .map(
-      (i) =>
-        `<tr>
-          <td style="padding:5px 0;color:#444;">${i.nombre} ×${i.qty}</td>
-          <td style="padding:5px 0;text-align:right;color:#444;">${fmt(i.precio * i.qty)}</td>
-        </tr>`
-    )
-    .join("");
 }
 
 export async function sendPendingOrderToClient(data: {
   email: string;
   nombre: string;
   buyOrder: string;
-  items: ItemPedido[];
+  items: ItemPedidoSimple[];
   envio: number;
   total: number;
 }) {
-  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   const WEBPAY_URL = "https://www.webpay.cl/form-pay/294463";
 
   await getTransport().sendMail({
@@ -243,20 +295,20 @@ export async function sendPendingOrderToClient(data: {
 
         <h3 style="color: #8B6F6F; font-size: 14px; margin-bottom: 8px;">DETALLE DEL PEDIDO · ${data.buyOrder}</h3>
         <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
-          ${tablaItems(data.items)}
+          ${tablaItemsHtml(data.items)}
           <tr style="border-top: 1px solid #e8d5cc;">
             <td style="padding:6px 0;color:#888;">Envío</td>
-            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmt(data.envio)}</td>
+            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmtPrecio(data.envio)}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;font-weight:bold;color:#444;">Total a pagar</td>
-            <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:18px;color:#8B6F6F;">${fmt(data.total)}</td>
+            <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:18px;color:#8B6F6F;">${fmtPrecio(data.total)}</td>
           </tr>
         </table>
 
         <div style="margin-top: 28px; background: #fff8f5; border: 2px solid #e8d5cc; border-radius: 10px; padding: 20px; text-align: center;">
           <p style="margin: 0 0 4px 0; font-size: 13px; color: #888;">Ingresa exactamente este monto en el formulario de pago:</p>
-          <p style="margin: 0 0 16px 0; font-size: 28px; font-weight: bold; color: #8B6F6F;">${fmt(data.total)}</p>
+          <p style="margin: 0 0 16px 0; font-size: 28px; font-weight: bold; color: #8B6F6F;">${fmtPrecio(data.total)}</p>
           <a href="${WEBPAY_URL}" style="display: inline-block; padding: 14px 32px; background: #8B6F6F; color: white; text-decoration: none; border-radius: 8px; font-size: 15px;">
             Ir a pagar con Webpay
           </a>
@@ -272,20 +324,19 @@ export async function sendPendingOrderToClient(data: {
 export async function sendPendingOrderToAdmin(data: {
   customer: { nombre: string; email: string; telefono: string; direccion: string; depto: string; ciudad: string; region: string };
   buyOrder: string;
-  items: ItemPedido[];
+  items: ItemPedidoSimple[];
   envio: number;
   total: number;
   zona: string;
 }) {
   const STORE_EMAIL = (process.env.STORE_EMAIL || "").trim() || "pieldeangel.contacto@gmail.com";
-  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   const { customer } = data;
   const direccionCompleta = [customer.direccion, customer.depto, customer.ciudad, customer.region].filter(Boolean).join(", ");
 
   await getTransport().sendMail({
     from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
     to: STORE_EMAIL,
-    subject: `🛍️ Nuevo pedido pendiente — ${fmt(data.total)} — ${data.buyOrder}`,
+    subject: `🛍️ Nuevo pedido pendiente — ${fmtPrecio(data.total)} — ${data.buyOrder}`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
         <h2 style="color: #8B6F6F; margin-bottom: 4px;">Nuevo pedido pendiente de pago</h2>
@@ -303,20 +354,20 @@ export async function sendPendingOrderToAdmin(data: {
 
         <h3 style="color: #8B6F6F; font-size: 14px; margin: 20px 0 8px 0;">PRODUCTOS</h3>
         <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
-          ${tablaItems(data.items)}
+          ${tablaItemsHtml(data.items)}
           <tr style="border-top: 1px solid #e8d5cc;">
             <td style="padding:6px 0;color:#888;">Envío</td>
-            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmt(data.envio)}</td>
+            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmtPrecio(data.envio)}</td>
           </tr>
           <tr>
             <td style="padding:6px 0;font-weight:bold;color:#444;">Total a recibir</td>
-            <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:20px;color:#8B6F6F;">${fmt(data.total)}</td>
+            <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:20px;color:#8B6F6F;">${fmtPrecio(data.total)}</td>
           </tr>
         </table>
 
         <div style="margin-top: 24px; background: #fff3cd; border-radius: 10px; padding: 16px;">
           <p style="margin: 0; color: #444; font-size: 14px;">
-            ⚠️ <strong>Acción:</strong> Verifica el pago de ${fmt(data.total)} en tu panel de Webpay.cl antes de despachar. Orden: <strong>${data.buyOrder}</strong>
+            ⚠️ <strong>Acción:</strong> Verifica el pago de ${fmtPrecio(data.total)} en tu panel de Webpay.cl antes de despachar. Orden: <strong>${data.buyOrder}</strong>
           </p>
         </div>
         <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Sistema de ventas</p>

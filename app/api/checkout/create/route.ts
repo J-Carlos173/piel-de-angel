@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
+import { saveOrderPending } from "@/lib/db";
 
 const COMMERCE_CODE = process.env.TRANSBANK_COMMERCE_CODE!;
 const API_KEY = process.env.TRANSBANK_API_KEY!;
@@ -17,7 +18,7 @@ function getTransaction() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { items, customer, envio = 0 } = await req.json();
+    const { items, customer, envio = 0, zona = "santiago" } = await req.json();
 
     if (!items?.length) {
       return NextResponse.json({ error: "Carrito vacío" }, { status: 400 });
@@ -30,9 +31,15 @@ export async function POST(req: NextRequest) {
     const total = subtotal + (envio ?? 0);
 
     const buyOrder = `PA-${Date.now()}`;
-    // Guardamos el email en sessionId (Transbank lo devuelve al confirmar, máx 61 chars)
     const sessionId = customer.email.slice(0, 61);
     const returnUrl = `${SITE_URL}/api/checkout/confirm`;
+
+    // Guardar pedido completo en Neon antes de redirigir a Transbank
+    try {
+      await saveOrderPending({ buyOrder, customer, items, subtotal, envio, total, zona });
+    } catch (dbErr) {
+      console.error("[checkout/create/db]", dbErr);
+    }
 
     const tx = getTransaction();
     const response = await tx.create(buyOrder, sessionId, total, returnUrl);
