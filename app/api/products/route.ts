@@ -9,7 +9,7 @@ export async function GET() {
   }
   try {
     const res = await fetch(
-      `${BASE}/store/products?fields=*variants.prices,+metadata&limit=100`,
+      `${BASE}/store/products?fields=*variants.prices,*variants.inventory_quantity,*variants.manage_inventory,+metadata&limit=100`,
       {
         headers: { "x-publishable-api-key": KEY },
         next: { revalidate: 60 },

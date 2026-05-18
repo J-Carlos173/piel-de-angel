@@ -19,12 +19,6 @@ export default function Footer() {
               >
                 <i className="fa-brands fa-instagram" />
               </a>
-              <a href="#">
-                <i className="fa-brands fa-facebook-f" />
-              </a>
-              <a href="#">
-                <i className="fa-brands fa-tiktok" />
-              </a>
               <a
                 href="https://wa.me/56977031461"
                 target="_blank"

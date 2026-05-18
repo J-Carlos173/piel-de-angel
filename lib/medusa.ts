@@ -4,7 +4,17 @@ import { Producto } from "@/data/productos";
 function mapProduct(p: any): Producto {
   const variant = p.variants?.[0];
   const precio  = variant?.prices?.[0]?.amount ?? 0;
-  const stock   = typeof p.metadata?.stock === "number" ? p.metadata.stock : 10;
+
+  // Prioridad: inventory_quantity del variant (Medusa nativo) → metadata.stock → 10
+  let stock: number;
+  if (variant?.manage_inventory === true && typeof variant?.inventory_quantity === "number") {
+    stock = variant.inventory_quantity;
+  } else if (typeof p.metadata?.stock === "number") {
+    stock = p.metadata.stock;
+  } else {
+    stock = 10;
+  }
+
   const badge   = (p.metadata?.badge as "" | "bestseller" | "nuevo") ?? "";
 
   return {

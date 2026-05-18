@@ -64,12 +64,6 @@ export default function Contacto() {
             >
               <i className="fa-brands fa-instagram" />
             </a>
-            <a href="#" className="red-social">
-              <i className="fa-brands fa-facebook-f" />
-            </a>
-            <a href="#" className="red-social">
-              <i className="fa-brands fa-tiktok" />
-            </a>
             <a
               href="https://wa.me/56977031461"
               target="_blank"
