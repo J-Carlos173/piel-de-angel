@@ -65,7 +65,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const [statusFilter, setStatusFilter] = useState("confirmed");
   const [periodoFilter, setPeriodoFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [sheetsLoading, setSheetsLoading] = useState(false);
 
   async function handleExportSheets() {
@@ -181,6 +181,14 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
                 ? <><i className="fa-solid fa-spinner fa-spin" /><span>Descargando…</span></>
                 : <><i className="fa-solid fa-file-excel" /><span>Excel</span></>}
             </button>
+            <button onClick={() => setExpanded(new Set(filtered.map(o => o.buy_order)))}
+              title="Expandir todo" style={{ ...glassBtn, padding: "9px 13px" }}>
+              <i className="fa-solid fa-angles-down" />
+            </button>
+            <button onClick={() => setExpanded(new Set())}
+              title="Colapsar todo" style={{ ...glassBtn, padding: "9px 13px" }}>
+              <i className="fa-solid fa-angles-up" />
+            </button>
             <button onClick={handleLogout}
               style={{ ...glassBtn, background: "rgba(0,0,0,0.18)", border: "1.5px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.82)" }}>
               <i className="fa-solid fa-right-from-bracket" /><span>Salir</span>
@@ -266,7 +274,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {filtered.map((order) => {
             const isConfirmed = order.status === "confirmed";
-            const isOpen = expanded === order.buy_order;
+            const isOpen = expanded.has(order.buy_order);
             const direccion = [order.customer_dir, order.customer_depto, order.customer_ciudad, order.customer_region].filter(Boolean).join(", ");
             const itemTotal = order.amount || order.total;
 
@@ -294,7 +302,11 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
 
                 {/* Fila compacta */}
                 <button
-                  onClick={() => setExpanded(isOpen ? null : order.buy_order)}
+                  onClick={() => setExpanded(prev => {
+                    const next = new Set(prev);
+                    isOpen ? next.delete(order.buy_order) : next.add(order.buy_order);
+                    return next;
+                  })}
                   style={{ width: "100%", background: "none", border: "none", cursor: "pointer", padding: "15px 20px 15px 22px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", textAlign: "left", fontFamily: "Georgia, serif" }}
                 >
                   <i className={`fa-solid ${isConfirmed ? "fa-circle-check" : "fa-clock"}`}
