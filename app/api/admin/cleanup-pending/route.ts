@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const result = await sql`
     DELETE FROM orders
     WHERE status = 'pending'
-      AND created_at < NOW() - INTERVAL '2 hours'
+      AND created_at < NOW() - INTERVAL '24 hours'
     RETURNING buy_order
   `;
 
