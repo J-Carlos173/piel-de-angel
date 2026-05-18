@@ -1600,15 +1600,23 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
 .footer-admin-link {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-left: 18px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.25);
+  gap: 6px;
+  margin-left: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--gris-calido);
   text-decoration: none;
-  letter-spacing: 0.08em;
-  transition: color 0.2s;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(139, 111, 111, 0.25);
+  border-radius: 20px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  vertical-align: middle;
 }
-.footer-admin-link:hover { color: rgba(255, 255, 255, 0.55); }
+.footer-admin-link:hover {
+  color: var(--rosa);
+  border-color: var(--rosa);
+  background: rgba(198, 138, 149, 0.08);
+}
 
 /* ============ WHATSAPP FLOTANTE ============ */
 .whatsapp-float {
