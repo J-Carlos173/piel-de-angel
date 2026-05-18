@@ -107,6 +107,14 @@ export default function DashboardClient({
       accent: "#6B4F5A",
       glow: "rgba(107,79,90,0.22)",
     },
+    {
+      icon: "fa-spa",
+      title: "Servicios",
+      desc: "Gestionar los servicios del salón: nombres, precios, imágenes",
+      href: "/admin/servicios",
+      accent: "#7A6B8A",
+      glow: "rgba(122,107,138,0.22)",
+    },
   ];
 
   async function handleLogout() {
