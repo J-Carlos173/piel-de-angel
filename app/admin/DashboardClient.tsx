@@ -69,10 +69,8 @@ export default function DashboardClient({
     {
       icon: "fa-chart-line",
       title: "Visitas",
-      desc: "Tráfico del sitio en tiempo real",
-      statLabel: "Ver en Vercel Analytics",
-      href: "https://vercel.com/analytics",
-      external: true,
+      desc: "Tráfico del sitio, páginas populares y tendencias",
+      href: "/admin/analytics",
       accent: "#7A5560",
       glow: "rgba(122,85,96,0.22)",
     },
