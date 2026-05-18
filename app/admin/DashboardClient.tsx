@@ -92,6 +92,14 @@ export default function DashboardClient({
       glow: "rgba(122,158,138,0.22)",
     },
     {
+      icon: "fa-tag",
+      title: "Promociones",
+      desc: "Crear y gestionar códigos de descuento",
+      href: "/admin/promos",
+      accent: "#9B6E7A",
+      glow: "rgba(155,110,122,0.22)",
+    },
+    {
       icon: "fa-box-open",
       title: "Productos",
       desc: "Gestionar catálogo, stock, precios y categorías",

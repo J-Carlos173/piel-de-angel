@@ -46,6 +46,8 @@ export async function ensureOrdersTable() {
     )
   `;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS token_ws VARCHAR(200)`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS promo_code VARCHAR(50) DEFAULT ''`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS descuento INTEGER DEFAULT 0`;
 }
 
 export async function saveOrderPending(data: {
@@ -54,21 +56,23 @@ export async function saveOrderPending(data: {
   items: OrderItem[];
   subtotal: number;
   envio: number;
+  descuento?: number;
   total: number;
   zona: string;
+  promoCode?: string;
 }) {
   const sql = getDb();
   await ensureOrdersTable();
-  const { buyOrder, customer, items, subtotal, envio, total, zona } = data;
+  const { buyOrder, customer, items, subtotal, envio, descuento = 0, total, zona, promoCode = "" } = data;
   await sql`
     INSERT INTO orders
       (buy_order, status, customer_nombre, customer_email, customer_tel,
        customer_dir, customer_depto, customer_ciudad, customer_region,
-       zona, items, subtotal, envio, total)
+       zona, items, subtotal, envio, descuento, total, promo_code)
     VALUES
       (${buyOrder}, 'pending', ${customer.nombre}, ${customer.email}, ${customer.telefono},
        ${customer.direccion}, ${customer.depto}, ${customer.ciudad}, ${customer.region},
-       ${zona}, ${JSON.stringify(items)}, ${subtotal}, ${envio}, ${total})
+       ${zona}, ${JSON.stringify(items)}, ${subtotal}, ${envio}, ${descuento}, ${total}, ${promoCode})
     ON CONFLICT (buy_order) DO NOTHING
   `;
 }

@@ -30,13 +30,18 @@ export default function CheckoutPage() {
   const [webpay, setWebpay] = useState<{ url: string; token: string } | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [terminos, setTerminos] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoValido, setPromoValido] = useState<{ code: string; discount: number } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, []);
   useEffect(() => { setHydrated(true); }, []);
 
   const subtotal = totalAmount();
   const envio = calcularEnvio(subtotal, zona);
-  const total = subtotal + envio;
+  const descuento = promoValido?.discount ?? 0;
+  const total = Math.max(0, subtotal + envio - descuento);
   const sabado = esSabado();
   const faltaParaGratis = zona === "santiago" && sabado
     ? Math.max(0, GRATIS_SANTIAGO - subtotal)
@@ -81,7 +86,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: lineItems, customer, envio, zona }),
+        body: JSON.stringify({ items: lineItems, customer, envio, zona, promoCode: promoValido?.code ?? "" }),
       });
       const data = await res.json();
 
@@ -96,6 +101,30 @@ export default function CheckoutPage() {
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
       setLoading(false);
+    }
+  }
+
+  async function aplicarPromo() {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    setPromoError("");
+    setPromoValido(null);
+    try {
+      const res = await fetch("/api/promos/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setPromoValido({ code: data.code, discount: data.discount });
+      } else {
+        setPromoError(data.error ?? "Código inválido");
+      }
+    } catch {
+      setPromoError("Error al validar el código");
+    } finally {
+      setPromoLoading(false);
     }
   }
 
@@ -271,6 +300,53 @@ export default function CheckoutPage() {
             {envio === 0 && (
               <div className="checkout-envio-banner gratis">
                 <i className="fa-solid fa-circle-check" /> ¡Envío gratis aplicado!
+              </div>
+            )}
+
+            {/* Código de descuento */}
+            <div style={{ margin: "12px 0", padding: "14px", background: "rgba(198,138,149,0.06)", borderRadius: 12, border: "1px solid rgba(198,138,149,0.2)" }}>
+              <p style={{ margin: "0 0 8px", fontSize: 12, color: "var(--texto-soft)", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                <i className="fa-solid fa-tag" style={{ marginRight: 6 }} />Código de descuento
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="text"
+                  placeholder="MESDELAMAMA"
+                  value={promoInput}
+                  disabled={!!promoValido}
+                  onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
+                  onKeyDown={(e) => e.key === "Enter" && aplicarPromo()}
+                  style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--borde-suave, #e0d0d0)", fontSize: 13, fontFamily: "Montserrat, sans-serif", outline: "none", background: promoValido ? "#f0f9f0" : "white", color: "#333" }}
+                />
+                {promoValido ? (
+                  <button
+                    type="button"
+                    onClick={() => { setPromoValido(null); setPromoInput(""); setPromoError(""); }}
+                    style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e57373", background: "transparent", color: "#e57373", fontSize: 12, cursor: "pointer", fontFamily: "Montserrat, sans-serif" }}
+                  >
+                    Quitar
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={aplicarPromo}
+                    disabled={promoLoading || !promoInput.trim()}
+                    style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "var(--rosa-deep, #C68A95)", color: "white", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", opacity: promoLoading || !promoInput.trim() ? 0.6 : 1 }}
+                  >
+                    {promoLoading ? <i className="fa-solid fa-spinner fa-spin" /> : "Aplicar"}
+                  </button>
+                )}
+              </div>
+              {promoError && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#e57373", fontFamily: "Montserrat, sans-serif" }}><i className="fa-solid fa-circle-exclamation" style={{ marginRight: 4 }} />{promoError}</p>}
+              {promoValido && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#4caf50", fontFamily: "Montserrat, sans-serif" }}><i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} />¡Código aplicado! −{formatPrecio(promoValido.discount)}</p>}
+            </div>
+
+            {descuento > 0 && (
+              <div className="checkout-item" style={{ color: "#4caf50" }}>
+                <span className="checkout-item-name">
+                  <i className="fa-solid fa-tag" /> Descuento ({promoValido?.code})
+                </span>
+                <span>−{formatPrecio(descuento)}</span>
               </div>
             )}
 
