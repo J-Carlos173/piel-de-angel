@@ -45,6 +45,11 @@ export default function ProductosAdminClient() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Filtros
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroCat, setFiltroCat] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState<"todos" | "stock" | "agotado">("todos");
+
   // Cambio de imagen en edición
   const [editImageFile, setEditImageFile] = useState<Record<string, File>>({});
   const [editImagePreview, setEditImagePreview] = useState<Record<string, string>>({});
@@ -205,6 +210,18 @@ export default function ProductosAdminClient() {
     }
   }
 
+  const categorias = Array.from(new Set(productos.map((p) => p.metadata?.categoria).filter(Boolean))) as string[];
+
+  const productosFiltrados = productos.filter((p) => {
+    const f = form[p.id];
+    const stock = Number(f?.stock ?? p.metadata?.stock ?? 0);
+    if (busqueda && !p.title.toLowerCase().includes(busqueda.toLowerCase())) return false;
+    if (filtroCat && (f?.categoria || p.metadata?.categoria || "") !== filtroCat) return false;
+    if (filtroEstado === "stock" && stock <= 0) return false;
+    if (filtroEstado === "agotado" && stock > 0) return false;
+    return true;
+  });
+
   const inputStyle: React.CSSProperties = {
     width: "100%", background: inputBg, border: `1px solid ${border}`,
     borderRadius: 10, padding: "9px 12px", color: textMain,
@@ -352,6 +369,42 @@ export default function ProductosAdminClient() {
           </div>
         )}
 
+        {/* Buscador y filtros */}
+        {!loading && productos.length > 0 && (
+          <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
+              <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: textMuted, fontSize: 13 }} />
+              <input
+                type="text"
+                placeholder="Buscar producto..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                style={{ ...inputStyle, paddingLeft: 36 }}
+              />
+            </div>
+            <select value={filtroCat} onChange={(e) => setFiltroCat(e.target.value)} style={{ ...inputStyle, width: "auto", minWidth: 150 }}>
+              <option value="">Todas las categorías</option>
+              {categorias.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <div style={{ display: "flex", gap: 6 }}>
+              {(["todos", "stock", "agotado"] as const).map((op) => (
+                <button
+                  key={op}
+                  onClick={() => setFiltroEstado(op)}
+                  style={{ padding: "8px 14px", borderRadius: 10, fontSize: 12, cursor: "pointer", ...MONO, border: `1px solid ${filtroEstado === op ? "#C68A95" : border}`, background: filtroEstado === op ? "rgba(198,138,149,0.12)" : inputBg, color: filtroEstado === op ? "#C68A95" : textMuted }}
+                >
+                  {op === "todos" ? "Todos" : op === "stock" ? "En stock" : "Agotados"}
+                </button>
+              ))}
+            </div>
+            {(busqueda || filtroCat || filtroEstado !== "todos") && (
+              <button onClick={() => { setBusqueda(""); setFiltroCat(""); setFiltroEstado("todos"); }} style={{ fontSize: 11, color: textMuted, background: "none", border: "none", cursor: "pointer", ...MONO }}>
+                <i className="fa-solid fa-xmark" style={{ marginRight: 4 }} />Limpiar
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Lista de productos */}
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: textMuted, ...MONO }}>
@@ -364,7 +417,13 @@ export default function ProductosAdminClient() {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {productos.map((p) => {
+            {productosFiltrados.length === 0 && (
+              <div style={{ textAlign: "center", padding: "40px 0", color: textMuted, ...MONO, fontSize: 13 }}>
+                <i className="fa-solid fa-filter" style={{ fontSize: 22, display: "block", marginBottom: 10 }} />
+                Sin resultados para esa búsqueda.
+              </div>
+            )}
+            {productosFiltrados.map((p) => {
               const f = form[p.id] ?? { stock: "0", precio: "", categoria: "", badge: "", title: p.title, description: p.description };
               const stock = Number(f.stock);
               const agotado = stock <= 0;
