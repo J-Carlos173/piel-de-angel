@@ -12,21 +12,27 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import CartDrawer from "@/components/CartDrawer";
 import Toast from "@/components/Toast";
 import RevealObserver from "@/components/RevealObserver";
-import BotanicalVine from "@/components/BotanicalVine";
+import VineDivider from "@/components/VineDivider";
 
 export default function Home() {
   return (
     <>
-      <BotanicalVine />
       <Navbar />
       <Hero />
       <RevealObserver>
+        <VineDivider />
         <About />
+        <VineDivider />
         <Servicios />
+        <VineDivider />
         <Productos />
+        <VineDivider />
         <Promociones />
+        <VineDivider />
         <Agenda />
+        <VineDivider />
         <Testimonios />
+        <VineDivider />
         <Instagram />
       </RevealObserver>
       <Footer />
