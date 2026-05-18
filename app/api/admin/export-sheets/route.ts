@@ -12,7 +12,7 @@ function fmtFecha(d: string) {
   });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const keyRaw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
     if (!keyRaw) return NextResponse.json({ error: "GOOGLE_SERVICE_ACCOUNT_KEY no configurada" }, { status: 500 });
@@ -31,21 +31,27 @@ export async function POST(req: NextRequest) {
     const drive = google.drive({ version: "v3", auth });
 
     const fecha = new Date().toLocaleDateString("es-CL");
-    const spreadsheet = await sheets.spreadsheets.create({
+
+    // Crear el archivo como Google Sheet vía Drive API (esto da control total de permisos)
+    const file = await drive.files.create({
       requestBody: {
-        properties: { title: `Órdenes Piel de Ángel · ${fecha}` },
-        sheets: [{ properties: { title: "Órdenes", sheetId: 0 } }],
+        name: `Órdenes Piel de Ángel · ${fecha}`,
+        mimeType: "application/vnd.google-apps.spreadsheet",
       },
+      fields: "id",
     });
 
-    const spreadsheetId = spreadsheet.data.spreadsheetId!;
+    const spreadsheetId = file.data.id!;
 
     // Armar filas
     const header = ["Orden", "Estado", "Fecha creación", "Fecha pago", "Nombre", "Email", "Teléfono", "Dirección", "Zona", "Productos", "Envío", "Total"];
     const rows = (orders as Record<string, unknown>[]).map((o) => {
-      const items = Array.isArray(o.items) ? (o.items as { nombre: string; qty: number }[]).map((i) => `${i.nombre} ×${i.qty}`).join(", ") : "";
+      const items = Array.isArray(o.items)
+        ? (o.items as { nombre: string; qty: number }[]).map((i) => `${i.nombre} ×${i.qty}`).join(", ")
+        : "";
       return [
-        o.buy_order, o.status === "confirmed" ? "Pagado" : "Pendiente",
+        o.buy_order,
+        o.status === "confirmed" ? "Pagado" : "Pendiente",
         fmtFecha(o.created_at as string),
         o.confirmed_at ? fmtFecha(o.confirmed_at as string) : "—",
         o.customer_nombre || "", o.customer_email || "", o.customer_tel || "",
@@ -57,14 +63,15 @@ export async function POST(req: NextRequest) {
       ];
     });
 
+    // Escribir datos
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: "Órdenes!A1",
+      range: "Sheet1!A1",
       valueInputOption: "RAW",
       requestBody: { values: [header, ...rows] },
     });
 
-    // Formato: cabecera en negrita y fondo rosado, columnas ajustadas
+    // Formato bonito: cabecera rosada, negrita, columnas ajustadas, fila fija
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -75,22 +82,33 @@ export async function POST(req: NextRequest) {
               cell: {
                 userEnteredFormat: {
                   backgroundColor: { red: 0.85, green: 0.67, blue: 0.58 },
-                  textFormat: { bold: true, foregroundColor: { red: 1, green: 1, blue: 1 } },
+                  textFormat: { bold: true, foregroundColor: { red: 1, green: 1, blue: 1 }, fontSize: 11 },
+                  horizontalAlignment: "CENTER",
                 },
               },
-              fields: "userEnteredFormat(backgroundColor,textFormat)",
+              fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
             },
           },
-          { updateSheetProperties: { properties: { sheetId: 0, gridProperties: { frozenRowCount: 1 } }, fields: "gridProperties.frozenRowCount" } },
-          { autoResizeDimensions: { dimensions: { sheetId: 0, dimension: "COLUMNS", startIndex: 0, endIndex: 12 } } },
+          {
+            updateSheetProperties: {
+              properties: { sheetId: 0, gridProperties: { frozenRowCount: 1 } },
+              fields: "gridProperties.frozenRowCount",
+            },
+          },
+          {
+            autoResizeDimensions: {
+              dimensions: { sheetId: 0, dimension: "COLUMNS", startIndex: 0, endIndex: 12 },
+            },
+          },
         ],
       },
     });
 
-    // Hacer el archivo accesible a cualquiera con el link
+    // Compartir con cualquiera que tenga el link (editor)
     await drive.permissions.create({
       fileId: spreadsheetId,
       requestBody: { role: "writer", type: "anyone" },
+      fields: "id",
     });
 
     const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`;
