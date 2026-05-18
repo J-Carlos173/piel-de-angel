@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
-import VineDivider from "@/components/VineDivider";
 
 type Producto = {
   id: string;
@@ -285,8 +284,7 @@ export default function ProductosAdminClient() {
         </div>
       </div>
 
-      <VineDivider />
-      <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 16px 60px" }}>
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 16px 60px" }}>
 
         {/* Formulario Nuevo Producto */}
         {creando && (

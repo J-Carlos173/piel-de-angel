@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
-import VineDivider from "@/components/VineDivider";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -147,8 +146,7 @@ export default function VentasClient({
         </div>
       </div>
 
-      <VineDivider />
-      <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 16px 56px" }}>
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 16px 56px" }}>
 
         {/* Stats */}
         <div style={{ display: "flex", gap: 14, marginBottom: 28, flexWrap: "wrap" }}>

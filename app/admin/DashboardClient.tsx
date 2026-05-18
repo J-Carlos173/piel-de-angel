@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
-import VineDivider from "@/components/VineDivider";
 
 function fmtPrecio(n: number) {
   return "$" + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -157,7 +156,6 @@ export default function DashboardClient({
         </div>
       </div>
 
-      <VineDivider />
       {/* Grid de cards */}
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "8px 16px 60px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>

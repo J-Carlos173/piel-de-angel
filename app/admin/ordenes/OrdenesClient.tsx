@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
-import VineDivider from "@/components/VineDivider";
 
 const MONO: React.CSSProperties = {
   fontFamily: "Montserrat, sans-serif",
@@ -202,7 +201,6 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
         </div>
       </div>
 
-      <VineDivider />
       {/* ── Barra de filtros ── */}
       <div style={{
         background: dark ? "rgba(22,15,19,0.98)" : "rgba(255,255,255,0.98)",
@@ -239,7 +237,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 16px 56px" }}>
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 16px 56px" }}>
 
         {/* ── Stat cards ── */}
         <div style={{ display: "flex", gap: 14, margin: "26px 0 22px", flexWrap: "wrap" }}>

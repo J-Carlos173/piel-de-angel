@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
-import VineDivider from "@/components/VineDivider";
 import type { PromoCode } from "@/lib/promos-db";
 
 function fmtPrecio(n: number) {
@@ -101,8 +100,7 @@ export default function PromosClient() {
         </div>
       </div>
 
-      <VineDivider />
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 16px 60px" }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px 60px" }}>
 
         {/* Formulario nuevo código */}
         <div style={{ background: cardBg, border: `1.5px solid #C68A95`, borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 30px rgba(198,138,149,0.18)", marginBottom: 28 }}>
