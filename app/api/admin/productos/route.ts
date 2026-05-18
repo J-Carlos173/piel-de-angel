@@ -107,12 +107,15 @@ export async function POST(req: NextRequest) {
   try {
     const { title, description, stock, precio, categoria, badge, thumbnail } = await req.json();
 
+    const handle = title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Date.now();
+
     // Crear producto con opciones y variante en una sola llamada (requerido por Medusa v2)
     const prodRes = await fetch(`${BASE}/admin/products`, {
       method: "POST",
       headers: authHeaders(token),
       body: JSON.stringify({
         title,
+        handle,
         description,
         status: "published",
         ...(thumbnail && { thumbnail }),

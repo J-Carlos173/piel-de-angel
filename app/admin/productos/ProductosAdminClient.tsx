@@ -265,7 +265,18 @@ export default function ProductosAdminClient() {
 
                   <div>
                     <label style={labelStyle}>Categoría</label>
-                    <input type="text" placeholder="Serums" value={nuevoForm.categoria} onChange={(e) => setNuevoForm((f) => ({ ...f, categoria: e.target.value }))} style={inputStyle} />
+                    <select value={nuevoForm.categoria} onChange={(e) => setNuevoForm((f) => ({ ...f, categoria: e.target.value }))} style={inputStyle}>
+                      <option value="">Sin categoría</option>
+                      <option value="Serums">Serums</option>
+                      <option value="Cremas">Cremas</option>
+                      <option value="Limpieza">Limpieza</option>
+                      <option value="Ojos & Pestañas">Ojos &amp; Pestañas</option>
+                      <option value="Protección Solar">Protección Solar</option>
+                      <option value="Hidratación">Hidratación</option>
+                      <option value="Mascarillas">Mascarillas</option>
+                      <option value="Cabello">Cabello</option>
+                      <option value="Corporal">Corporal</option>
+                    </select>
                   </div>
 
                   <div>
@@ -378,7 +389,18 @@ export default function ProductosAdminClient() {
                         </div>
                         <div>
                           <label style={labelStyle}>Categoría</label>
-                          <input type="text" value={f.categoria} onChange={(e) => updateField(p.id, "categoria", e.target.value)} placeholder="Serums" style={inputStyle} />
+                          <select value={f.categoria} onChange={(e) => updateField(p.id, "categoria", e.target.value)} style={inputStyle}>
+                            <option value="">Sin categoría</option>
+                            <option value="Serums">Serums</option>
+                            <option value="Cremas">Cremas</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Ojos & Pestañas">Ojos &amp; Pestañas</option>
+                            <option value="Protección Solar">Protección Solar</option>
+                            <option value="Hidratación">Hidratación</option>
+                            <option value="Mascarillas">Mascarillas</option>
+                            <option value="Cabello">Cabello</option>
+                            <option value="Corporal">Corporal</option>
+                          </select>
                         </div>
                         <div>
                           <label style={labelStyle}>Badge</label>
