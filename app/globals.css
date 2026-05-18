@@ -1597,6 +1597,18 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
   letter-spacing: 1px;
 }
 .footer-bottom span { color: var(--rosa); }
+.footer-admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 18px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  transition: color 0.2s;
+}
+.footer-admin-link:hover { color: rgba(255, 255, 255, 0.55); }
 
 /* ============ WHATSAPP FLOTANTE ============ */
 .whatsapp-float {

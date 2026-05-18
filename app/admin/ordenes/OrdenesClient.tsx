@@ -67,12 +67,14 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
     setSheetsLoading(true);
     try {
       const res = await fetch("/api/admin/export-sheets", { method: "POST" });
-      const data = await res.json();
-      if (data.ok && data.url) {
-        window.open(data.url, "_blank");
-      } else {
-        alert("Error al exportar: " + (data.error || "desconocido"));
-      }
+      if (!res.ok) throw new Error("Error " + res.status);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ordenes-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch {
       alert("Error de conexión al exportar");
     }
@@ -146,7 +148,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
             </button>
             <button onClick={handleExportSheets} disabled={sheetsLoading}
               style={{ background: "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.45)", borderRadius: 10, padding: "9px 16px", color: "#fff", fontSize: 13, cursor: sheetsLoading ? "not-allowed" : "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 7, opacity: sheetsLoading ? 0.7 : 1 }}>
-              {sheetsLoading ? <><i className="fa-solid fa-spinner fa-spin" /> Creando…</> : <><i className="fa-brands fa-google" /> Sheets</>}
+              {sheetsLoading ? <><i className="fa-solid fa-spinner fa-spin" /> Descargando…</> : <><i className="fa-solid fa-file-excel" /> Excel</>}
             </button>
             <button onClick={handleLogout}
               style={{ background: "rgba(0,0,0,0.2)", border: "1.5px solid rgba(255,255,255,0.25)", borderRadius: 10, padding: "9px 14px", color: "rgba(255,255,255,0.85)", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 7 }}>
