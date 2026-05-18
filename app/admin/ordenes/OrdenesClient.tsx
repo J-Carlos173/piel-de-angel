@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 function fmtPrecio(n: number) {
   return "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -52,11 +53,34 @@ function isInPeriod(dateStr: string, period: string) {
 }
 
 export default function OrdenesClient({ orders }: { orders: Order[] }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [periodoFilter, setPeriodoFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [sheetsLoading, setSheetsLoading] = useState(false);
+
+  async function handleExportSheets() {
+    setSheetsLoading(true);
+    try {
+      const res = await fetch("/api/admin/export-sheets", { method: "POST" });
+      const data = await res.json();
+      if (data.ok && data.url) {
+        window.open(data.url, "_blank");
+      } else {
+        alert("Error al exportar: " + (data.error || "desconocido"));
+      }
+    } catch {
+      alert("Error de conexión al exportar");
+    }
+    setSheetsLoading(false);
+  }
+
+  async function handleLogout() {
+    await fetch("/api/admin/login", { method: "DELETE" });
+    router.push("/admin/login");
+  }
 
   const filtered = useMemo(() => {
     let result = [...orders];
@@ -103,12 +127,29 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
               <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 28, fontWeight: "normal" }}>Historial de Órdenes</h1>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13 }}>Piel de Ángel · Estética & Skincare Premium</p>
             </div>
-            <button
-              onClick={() => exportCSV(filtered)}
-              style={{ background: "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 10, padding: "10px 20px", color: "#fff", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
-            >
-              <i className="fa-solid fa-file-csv" /> Exportar CSV ({filtered.length})
-            </button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button
+                onClick={() => exportCSV(filtered)}
+                style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
+              >
+                <i className="fa-solid fa-file-csv" /> CSV ({filtered.length})
+              </button>
+              <button
+                onClick={handleExportSheets}
+                disabled={sheetsLoading}
+                style={{ background: sheetsLoading ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, cursor: sheetsLoading ? "not-allowed" : "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
+              >
+                {sheetsLoading
+                  ? <><i className="fa-solid fa-spinner fa-spin" /> Creando…</>
+                  : <><i className="fa-brands fa-google" /> Google Sheets</>}
+              </button>
+              <button
+                onClick={handleLogout}
+                style={{ background: "rgba(0,0,0,0.15)", border: "1.5px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.8)", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
+              >
+                <i className="fa-solid fa-right-from-bracket" /> Salir
+              </button>
+            </div>
           </div>
 
           {/* Filtros */}
