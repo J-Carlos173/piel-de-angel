@@ -11,12 +11,12 @@ export default function Instagram() {
             Resultados reales, tips de skincare y el día a día de Piel de Ángel.
           </p>
           <a
-            href="https://www.instagram.com/pieldeangel.cosmetica/"
+            href="https://www.instagram.com/pieldeangel.ls/"
             target="_blank"
             rel="noopener noreferrer"
             className="ig-cta-btn"
           >
-            <i className="fa-brands fa-instagram" /> @pieldeangel.cosmetica
+            <i className="fa-brands fa-instagram" /> @pieldeangel.ls
           </a>
         </div>
       </div>
