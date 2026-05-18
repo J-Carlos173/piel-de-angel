@@ -43,6 +43,7 @@ export default function ProductosAdminClient() {
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filtros
@@ -132,6 +133,18 @@ export default function ProductosAdminClient() {
 
   function updateField(id: string, field: string, value: string) {
     setForm((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+  }
+
+  async function toggleStatus(id: string, currentStatus: string) {
+    setToggling(id);
+    const newStatus = currentStatus === "published" ? "draft" : "published";
+    await fetch("/api/admin/productos", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: newStatus }),
+    });
+    setProductos((prev) => prev.map((p) => p.id === id ? { ...p, status: newStatus } : p));
+    setToggling(null);
   }
 
   async function eliminar(id: string, title: string) {
@@ -430,9 +443,11 @@ export default function ProductosAdminClient() {
               const isEditing = editando === p.id;
               const isSaving = saving === p.id;
               const wasSaved = saved === p.id;
+              const isPublished = p.status === "published";
+              const isToggling = toggling === p.id;
 
               return (
-                <div key={p.id} style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+                <div key={p.id} style={{ background: cardBg, border: `1.5px solid ${isPublished ? border : textMuted}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)", opacity: isPublished ? 1 : 0.6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px" }}>
 
                     <div style={{ width: 64, height: 64, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "rgba(198,138,149,0.1)", border: `1px solid ${border}` }}>
@@ -461,6 +476,19 @@ export default function ProductosAdminClient() {
                           <i className="fa-solid fa-check" /> Guardado
                         </span>
                       )}
+                      <button
+                        onClick={() => toggleStatus(p.id, p.status)}
+                        disabled={isToggling}
+                        title={isPublished ? "Ocultar de la tienda" : "Publicar en la tienda"}
+                        style={{ background: isPublished ? "transparent" : "rgba(154,124,134,0.12)", border: `1px solid ${isPublished ? border : textMuted}`, borderRadius: 8, padding: "6px 12px", color: isPublished ? textMuted : textMuted, fontSize: 12, cursor: isToggling ? "wait" : "pointer", ...MONO }}
+                      >
+                        {isToggling
+                          ? <i className="fa-solid fa-spinner fa-spin" />
+                          : isPublished
+                            ? <><i className="fa-solid fa-eye-slash" style={{ marginRight: 5 }} />Ocultar</>
+                            : <><i className="fa-solid fa-eye" style={{ marginRight: 5 }} />Publicar</>
+                        }
+                      </button>
                       <button
                         onClick={() => setEditando(isEditing ? null : p.id)}
                         style={{ background: isEditing ? "rgba(198,138,149,0.15)" : "transparent", border: `1px solid ${border}`, borderRadius: 8, padding: "6px 14px", color: "#C68A95", fontSize: 12, cursor: "pointer", ...MONO }}
