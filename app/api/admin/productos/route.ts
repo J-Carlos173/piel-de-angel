@@ -8,16 +8,23 @@ function headers() {
 }
 
 export async function GET() {
-  if (!BASE || !KEY) return NextResponse.json({ products: [] });
+  if (!BASE || !KEY) {
+    console.error("[admin/productos GET] Missing env vars — BASE:", !!BASE, "KEY:", !!KEY);
+    return NextResponse.json({ products: [] });
+  }
   try {
     const res = await fetch(`${BASE}/admin/products?fields=id,title,description,thumbnail,status,+metadata&limit=100`, {
       headers: headers(),
       cache: "no-store",
     });
-    if (!res.ok) return NextResponse.json({ products: [] });
+    if (!res.ok) {
+      console.error("[admin/productos GET] Medusa error:", res.status, await res.text());
+      return NextResponse.json({ products: [] });
+    }
     const data = await res.json();
     return NextResponse.json(data);
-  } catch {
+  } catch (err) {
+    console.error("[admin/productos GET]", err);
     return NextResponse.json({ products: [] });
   }
 }
