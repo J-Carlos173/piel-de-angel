@@ -62,7 +62,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const router = useRouter();
   const { dark, toggle } = useThemeStore();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("confirmed");
   const [periodoFilter, setPeriodoFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [expanded, setExpanded] = useState<string | null>(null);
