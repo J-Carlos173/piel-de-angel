@@ -42,6 +42,7 @@ export default function ProductosAdminClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const bg       = dark ? "#160f13" : "#f5eeec";
@@ -105,6 +106,19 @@ export default function ProductosAdminClient() {
 
   function updateField(id: string, field: string, value: string) {
     setForm((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+  }
+
+  async function eliminar(id: string, title: string) {
+    if (!confirm(`¿Eliminar "${title}"? Esta acción no se puede deshacer.`)) return;
+    setDeleting(id);
+    await fetch("/api/admin/productos", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setProductos((prev) => prev.filter((p) => p.id !== id));
+    setEditando(null);
+    setDeleting(null);
   }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -419,7 +433,14 @@ export default function ProductosAdminClient() {
                           <textarea value={f.description} onChange={(e) => updateField(p.id, "description", e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                         </div>
                       </div>
-                      <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                      <div style={{ marginTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <button
+                          onClick={() => eliminar(p.id, p.title)}
+                          disabled={deleting === p.id}
+                          style={{ background: "transparent", border: "1px solid #e57373", borderRadius: 10, padding: "9px 18px", color: "#e57373", fontSize: 12, cursor: deleting === p.id ? "wait" : "pointer", ...MONO, display: "flex", alignItems: "center", gap: 7 }}
+                        >
+                          {deleting === p.id ? <><i className="fa-solid fa-spinner fa-spin" /> Eliminando...</> : <><i className="fa-solid fa-trash" /> Eliminar producto</>}
+                        </button>
                         <button
                           onClick={() => guardar(p.id)}
                           disabled={isSaving}

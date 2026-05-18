@@ -144,3 +144,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const token = await getToken();
+  if (!token) return NextResponse.json({ error: "No configurado" }, { status: 500 });
+  try {
+    const { id } = await req.json();
+    const res = await fetch(`${BASE}/admin/products/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    });
+    if (!res.ok) return NextResponse.json({ error: "Error al eliminar" }, { status: 400 });
+    return NextResponse.json({ deleted: true });
+  } catch (err) {
+    console.error("[admin/productos DELETE]", err);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
