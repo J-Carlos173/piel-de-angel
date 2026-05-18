@@ -58,7 +58,7 @@ export default function VentasClient({
               <i className="fa-solid fa-arrow-left" /> Panel
             </button>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>Reportes · Piel de Ángel</p>
-            <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Resumen de Ventas</h1>
+            <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Reportes</h1>
           </div>
           <button onClick={toggle} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.32)", borderRadius: 12, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
             <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
@@ -89,50 +89,54 @@ export default function VentasClient({
             <p>Aún no hay ventas confirmadas para mostrar.</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-            {/* Dona: Por zona */}
-            <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)" }}>
-              <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: "normal", color: textMain }}>Por zona de despacho</h3>
-              <p style={{ margin: "0 0 20px", fontSize: 12, color: textMuted, fontFamily: "Montserrat, sans-serif" }}>Ingresos según destino</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie data={zonaData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={3} dataKey="value">
-                    {zonaData.map((_, i) => <Cell key={i} fill={ROSA_PALETTE[i % ROSA_PALETTE.length]} />)}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend formatter={(v) => <span style={{ color: textMuted, fontSize: 12, fontFamily: "Montserrat, sans-serif" }}>{v}</span>} />
-                </PieChart>
-              </ResponsiveContainer>
+            {/* Fila: dos donas lado a lado en pantallas anchas */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", gap: 20 }}>
+
+              {/* Dona: Por zona */}
+              <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)" }}>
+                <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: "normal", color: textMain }}>Por zona de despacho</h3>
+                <p style={{ margin: "0 0 20px", fontSize: 12, color: textMuted, fontFamily: "Montserrat, sans-serif" }}>Ingresos según destino</p>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie data={zonaData} cx="50%" cy="45%" innerRadius={70} outerRadius={115} paddingAngle={3} dataKey="value">
+                      {zonaData.map((_, i) => <Cell key={i} fill={ROSA_PALETTE[i % ROSA_PALETTE.length]} />)}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend formatter={(v) => <span style={{ color: textMuted, fontSize: 13, fontFamily: "Montserrat, sans-serif" }}>{v}</span>} iconSize={10} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Dona: Por producto */}
+              <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)" }}>
+                <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: "normal", color: textMain }}>Top productos</h3>
+                <p style={{ margin: "0 0 20px", fontSize: 12, color: textMuted, fontFamily: "Montserrat, sans-serif" }}>Ingresos por producto (top 6)</p>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie data={productData} cx="50%" cy="40%" innerRadius={70} outerRadius={115} paddingAngle={3} dataKey="value">
+                      {productData.map((_, i) => <Cell key={i} fill={ROSA_PALETTE[i % ROSA_PALETTE.length]} />)}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend formatter={(v) => <span style={{ color: textMuted, fontSize: 12, fontFamily: "Montserrat, sans-serif" }}>{v.length > 28 ? v.slice(0, 28) + "…" : v}</span>} iconSize={10} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
-            {/* Dona: Por producto */}
-            <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)" }}>
-              <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: "normal", color: textMain }}>Top productos</h3>
-              <p style={{ margin: "0 0 20px", fontSize: 12, color: textMuted, fontFamily: "Montserrat, sans-serif" }}>Ingresos por producto (top 6)</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie data={productData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={3} dataKey="value">
-                    {productData.map((_, i) => <Cell key={i} fill={ROSA_PALETTE[i % ROSA_PALETTE.length]} />)}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend formatter={(v) => <span style={{ color: textMuted, fontSize: 11, fontFamily: "Montserrat, sans-serif" }}>{v.length > 20 ? v.slice(0, 20) + "…" : v}</span>} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Barras: por mes */}
+            {/* Barras: por mes — ancho completo */}
             {monthData.length > 0 && (
-              <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)", gridColumn: "1 / -1" }}>
+              <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)" }}>
                 <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: "normal", color: textMain }}>Ingresos por mes</h3>
-                <p style={{ margin: "0 0 24px", fontSize: 12, color: textMuted, fontFamily: "Montserrat, sans-serif" }}>Últimos meses con actividad</p>
-                <ResponsiveContainer width="100%" height={220}>
+                <p style={{ margin: "0 0 24px", fontSize: 12, color: textMuted, fontFamily: "Montserrat, sans-serif" }}>Meses con actividad</p>
+                <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={monthData} margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                     <XAxis dataKey="name" tick={{ fill: textMuted, fontSize: 12, fontFamily: "Montserrat, sans-serif" }} axisLine={false} tickLine={false} />
                     <YAxis tickFormatter={(v) => "$" + (v / 1000).toFixed(0) + "k"} tick={{ fill: textMuted, fontSize: 11, fontFamily: "Montserrat, sans-serif" }} axisLine={false} tickLine={false} />
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(198,138,149,0.08)" }} />
-                    <Bar dataKey="value" fill="#C68A95" radius={[8, 8, 0, 0]} name="Ingresos" />
+                    <Bar dataKey="value" fill="#C68A95" radius={[8, 8, 0, 0]} name="Ingresos" maxBarSize={80} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

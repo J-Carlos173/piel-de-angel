@@ -50,7 +50,7 @@ export default function DashboardClient({
     },
     {
       icon: "fa-chart-pie",
-      title: "Ventas",
+      title: "Reportes",
       desc: "Ingresos, gráficos de dona y tendencias",
       stat: fmtPrecio(totalRevenue),
       statLabel: `${fmtPrecio(thisMonthRevenue)} este mes`,
