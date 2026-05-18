@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
+import VineDivider from "@/components/VineDivider";
 
 const MONO: React.CSSProperties = {
   fontFamily: "Montserrat, sans-serif",
@@ -127,10 +128,10 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const inputBorder = dark ? "#4a3040" : "#e5d0cc";
 
   const glassBtn: React.CSSProperties = {
-    background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)",
-    border: `1.5px solid ${dark ? "#3a5540" : "#c5dcc6"}`,
+    background: dark ? "rgba(255,255,255,0.07)" : "rgba(91,126,100,0.10)",
+    border: `1.5px solid ${dark ? "#3a2830" : "#c5dcc6"}`,
     borderRadius: 12, padding: "9px 16px",
-    color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 13, cursor: "pointer",
+    color: dark ? "#c8a8b4" : "#4A6B52", fontSize: 13, cursor: "pointer",
     fontFamily: "Montserrat, sans-serif", fontWeight: 500,
     display: "flex", alignItems: "center", gap: 7,
     transition: "background 0.18s, border-color 0.18s",
@@ -151,10 +152,10 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
       {/* ── Header ── */}
       <div style={{
         background: dark
-          ? "linear-gradient(160deg, #1a2620 0%, #1e2e24 55%, #16231a 100%)"
+          ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
           : "linear-gradient(160deg, #ffffff 0%, #f6fbf7 60%, #eef7ef 100%)",
         padding: "36px 32px 32px", position: "relative", overflow: "hidden",
-        borderBottom: dark ? "1.5px solid #3a5540" : "1.5px solid #c5dcc6",
+        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #c5dcc6",
       }}>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)" }} />
         <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 160, pointerEvents: "none" }} viewBox="0 0 220 320">
@@ -165,9 +166,9 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
 
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
           <div>
-            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.65)" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
-            <h1 style={{ margin: "8px 0 3px", color: dark ? "#d4e8d6" : "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Historial de Órdenes</h1>
-            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.50)" : "#9a8486", fontSize: 12, letterSpacing: "0.05em" }}>Estética & Skincare Premium</p>
+            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
+            <h1 style={{ margin: "8px 0 3px", color: dark ? "#f0dde6" : "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Historial de Órdenes</h1>
+            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#9a8486", fontSize: 12, letterSpacing: "0.05em" }}>Estética & Skincare Premium</p>
           </div>
 
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -201,6 +202,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
         </div>
       </div>
 
+      <VineDivider />
       {/* ── Barra de filtros ── */}
       <div style={{
         background: dark ? "rgba(22,15,19,0.98)" : "rgba(255,255,255,0.98)",

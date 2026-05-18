@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
+import VineDivider from "@/components/VineDivider";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -122,10 +123,10 @@ export default function VentasClient({
       {/* Header */}
       <div style={{
         background: dark
-          ? "linear-gradient(160deg, #1a2620 0%, #1e2e24 55%, #16231a 100%)"
+          ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
           : "linear-gradient(160deg, #ffffff 0%, #f6fbf7 60%, #eef7ef 100%)",
         padding: "32px 32px 28px", position: "relative", overflow: "hidden",
-        borderBottom: dark ? "1.5px solid #3a5540" : "1.5px solid #c5dcc6",
+        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #c5dcc6",
       }}>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)" }} />
         <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 150, pointerEvents: "none" }} viewBox="0 0 220 320">
@@ -134,19 +135,20 @@ export default function VentasClient({
         </svg>
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, position: "relative" }}>
           <div>
-            <button onClick={() => router.push("/admin")} style={{ background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)", border: `1px solid ${dark ? "#3a5540" : "#c5dcc6"}`, borderRadius: 8, padding: "5px 12px", color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 12, cursor: "pointer", marginBottom: 10, fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
+            <button onClick={() => router.push("/admin")} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(91,126,100,0.10)", border: `1px solid ${dark ? "#3a2830" : "#c5dcc6"}`, borderRadius: 8, padding: "5px 12px", color: dark ? "#c8a8b4" : "#4A6B52", fontSize: 12, cursor: "pointer", marginBottom: 10, fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
               <i className="fa-solid fa-arrow-left" /> Panel
             </button>
-            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.65)" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Reportes · Piel de Ángel</p>
-            <h1 style={{ margin: "6px 0 2px", color: dark ? "#d4e8d6" : "#2e1e24", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Reportes</h1>
+            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Reportes · Piel de Ángel</p>
+            <h1 style={{ margin: "6px 0 2px", color: dark ? "#f0dde6" : "#2e1e24", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Reportes</h1>
           </div>
-          <button onClick={toggle} style={{ background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)", border: `1.5px solid ${dark ? "#3a5540" : "#c5dcc6"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 15, cursor: "pointer" }}>
+          <button onClick={toggle} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(91,126,100,0.10)", border: `1.5px solid ${dark ? "#3a2830" : "#c5dcc6"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#c8a8b4" : "#4A6B52", fontSize: 15, cursor: "pointer" }}>
             <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
           </button>
         </div>
       </div>
 
-      <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 16px 56px" }}>
+      <VineDivider />
+      <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 16px 56px" }}>
 
         {/* Stats */}
         <div style={{ display: "flex", gap: 14, marginBottom: 28, flexWrap: "wrap" }}>
