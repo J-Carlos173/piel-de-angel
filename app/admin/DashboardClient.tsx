@@ -77,10 +77,10 @@ export default function DashboardClient({
     {
       icon: "fa-calendar-days",
       title: "Agenda",
-      desc: "Gestión de citas — próximamente",
+      desc: "Citas pasadas y próximas del salón",
+      href: "/admin/agenda",
       accent: "#C4919A",
-      glow: "rgba(196,145,154,0.15)",
-      disabled: true,
+      glow: "rgba(196,145,154,0.22)",
     },
     {
       icon: "fa-globe",
