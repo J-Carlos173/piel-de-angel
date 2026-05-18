@@ -2,8 +2,9 @@ import { Producto } from "@/data/productos";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapProduct(p: any): Producto {
-  const variant = p.variants?.[0];
-  const precio  = variant?.prices?.[0]?.amount ?? 0;
+  const variant   = p.variants?.[0];
+  const clpPrice  = variant?.prices?.find((pr: { currency_code: string }) => pr.currency_code === "clp");
+  const precio    = clpPrice?.amount ?? 0;
 
   const stock = typeof p.metadata?.stock === "number" ? p.metadata.stock : 0;
 

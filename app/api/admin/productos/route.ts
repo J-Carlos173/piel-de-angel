@@ -33,7 +33,7 @@ export async function GET() {
   }
   try {
     const res = await fetch(
-      `${BASE}/admin/products?fields=id,title,description,thumbnail,status,+metadata&limit=100`,
+      `${BASE}/admin/products?fields=id,title,description,thumbnail,status,+metadata,*variants,*variants.prices&limit=100`,
       { headers: authHeaders(token), cache: "no-store" }
     );
     if (!res.ok) {
