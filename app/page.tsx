@@ -12,10 +12,12 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import CartDrawer from "@/components/CartDrawer";
 import Toast from "@/components/Toast";
 import RevealObserver from "@/components/RevealObserver";
+import BotanicalVine from "@/components/BotanicalVine";
 
 export default function Home() {
   return (
     <>
+      <BotanicalVine />
       <Navbar />
       <Hero />
       <RevealObserver>

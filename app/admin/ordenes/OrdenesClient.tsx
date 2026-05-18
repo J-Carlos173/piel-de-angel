@@ -127,10 +127,10 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const inputBorder = dark ? "#4a3040" : "#e5d0cc";
 
   const glassBtn: React.CSSProperties = {
-    background: "rgba(255,255,255,0.14)",
-    border: "1.5px solid rgba(255,255,255,0.32)",
+    background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)",
+    border: `1.5px solid ${dark ? "#3a5540" : "#c5dcc6"}`,
     borderRadius: 12, padding: "9px 16px",
-    color: "#fff", fontSize: 13, cursor: "pointer",
+    color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 13, cursor: "pointer",
     fontFamily: "Montserrat, sans-serif", fontWeight: 500,
     display: "flex", alignItems: "center", gap: 7,
     transition: "background 0.18s, border-color 0.18s",
@@ -150,20 +150,24 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
 
       {/* ── Header ── */}
       <div style={{
-        background: "linear-gradient(145deg, #5C3D47 0%, #8B5E6A 30%, #C68A95 68%, #E2B4BC 100%)",
+        background: dark
+          ? "linear-gradient(160deg, #1a2620 0%, #1e2e24 55%, #16231a 100%)"
+          : "linear-gradient(160deg, #ffffff 0%, #f6fbf7 60%, #eef7ef 100%)",
         padding: "36px 32px 32px", position: "relative", overflow: "hidden",
+        borderBottom: dark ? "1.5px solid #3a5540" : "1.5px solid #c5dcc6",
       }}>
-        {/* Orbes */}
-        <div style={{ position: "absolute", top: -80, right: -80, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -60, left: "30%", width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
-        {/* Línea de acento superior */}
-        <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 3, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), rgba(255,255,255,0.9), rgba(255,255,255,0.6), transparent)" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)" }} />
+        <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 160, pointerEvents: "none" }} viewBox="0 0 220 320">
+          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#4A6B52"/>
+          <path d="M110,10 C105,80 108,175 108,268" stroke="#2E4D35" strokeWidth="2" fill="none" opacity={0.4}/>
+          <path d="M110,50 C140,65 175,60 200,50" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.3}/>
+        </svg>
 
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
           <div>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
-            <h1 style={{ margin: "8px 0 3px", color: "#fff", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.18)" }}>Historial de Órdenes</h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontSize: 12, letterSpacing: "0.05em" }}>Estética & Skincare Premium</p>
+            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.65)" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
+            <h1 style={{ margin: "8px 0 3px", color: dark ? "#d4e8d6" : "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Historial de Órdenes</h1>
+            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.50)" : "#9a8486", fontSize: 12, letterSpacing: "0.05em" }}>Estética & Skincare Premium</p>
           </div>
 
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -176,7 +180,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
               <span>CSV ({filtered.length})</span>
             </button>
             <button onClick={handleExportSheets} disabled={sheetsLoading}
-              style={{ ...glassBtn, background: "rgba(255,255,255,0.20)", border: "1.5px solid rgba(255,255,255,0.42)", opacity: sheetsLoading ? 0.7 : 1, cursor: sheetsLoading ? "not-allowed" : "pointer" }}>
+              style={{ ...glassBtn, opacity: sheetsLoading ? 0.7 : 1, cursor: sheetsLoading ? "not-allowed" : "pointer" }}>
               {sheetsLoading
                 ? <><i className="fa-solid fa-spinner fa-spin" /><span>Descargando…</span></>
                 : <><i className="fa-solid fa-file-excel" /><span>Excel</span></>}
@@ -190,7 +194,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
               <i className="fa-solid fa-angles-up" />
             </button>
             <button onClick={handleLogout}
-              style={{ ...glassBtn, background: "rgba(0,0,0,0.18)", border: "1.5px solid rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.82)" }}>
+              style={{ ...glassBtn, background: dark ? "rgba(198,138,149,0.15)" : "rgba(198,138,149,0.10)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, color: dark ? "#e8b4bc" : "#C68A95" }}>
               <i className="fa-solid fa-right-from-bracket" /><span>Salir</span>
             </button>
           </div>

@@ -249,25 +249,35 @@ export default function ProductosAdminClient() {
     <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
 
       {/* Header */}
-      <div style={{ background: "linear-gradient(145deg, #5C3D47 0%, #8B5E6A 30%, #C68A95 68%, #E2B4BC 100%)", padding: "32px 32px 28px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 3, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)" }} />
+      <div style={{
+        background: dark
+          ? "linear-gradient(160deg, #1a2620 0%, #1e2e24 55%, #16231a 100%)"
+          : "linear-gradient(160deg, #ffffff 0%, #f6fbf7 60%, #eef7ef 100%)",
+        padding: "32px 32px 28px", position: "relative", overflow: "hidden",
+        borderBottom: dark ? "1.5px solid #3a5540" : "1.5px solid #c5dcc6",
+      }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)" }} />
+        <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 150, pointerEvents: "none" }} viewBox="0 0 220 320">
+          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#4A6B52"/>
+          <path d="M110,10 C105,80 108,175 108,268" stroke="#2E4D35" strokeWidth="2" fill="none" opacity={0.4}/>
+        </svg>
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, position: "relative" }}>
           <div>
-            <button onClick={() => router.push("/admin")} style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 8, padding: "5px 12px", color: "#fff", fontSize: 12, cursor: "pointer", marginBottom: 10, ...MONO, display: "flex", alignItems: "center", gap: 6 }}>
+            <button onClick={() => router.push("/admin")} style={{ background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)", border: `1px solid ${dark ? "#3a5540" : "#c5dcc6"}`, borderRadius: 8, padding: "5px 12px", color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 12, cursor: "pointer", marginBottom: 10, ...MONO, display: "flex", alignItems: "center", gap: 6 }}>
               <i className="fa-solid fa-arrow-left" /> Panel
             </button>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Gestión de Productos</p>
-            <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Productos</h1>
+            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.65)" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Gestión de Productos</p>
+            <h1 style={{ margin: "6px 0 2px", color: dark ? "#d4e8d6" : "#2e1e24", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Productos</h1>
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <button
               onClick={() => { setCreando((v) => !v); setCreateError(null); }}
-              style={{ background: creando ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "9px 18px", color: "#fff", fontSize: 13, cursor: "pointer", ...MONO, display: "flex", alignItems: "center", gap: 7 }}
+              style={{ background: creando ? (dark ? "rgba(198,138,149,0.22)" : "rgba(198,138,149,0.14)") : (dark ? "rgba(198,138,149,0.14)" : "rgba(198,138,149,0.08)"), border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 18px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", ...MONO, display: "flex", alignItems: "center", gap: 7 }}
             >
               <i className={`fa-solid ${creando ? "fa-xmark" : "fa-plus"}`} />
               {creando ? "Cancelar" : "Nuevo Producto"}
             </button>
-            <button onClick={toggle} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.32)", borderRadius: 12, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
+            <button onClick={toggle} style={{ background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)", border: `1.5px solid ${dark ? "#3a5540" : "#c5dcc6"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 15, cursor: "pointer" }}>
               <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
             </button>
           </div>

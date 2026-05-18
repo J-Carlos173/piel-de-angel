@@ -118,26 +118,38 @@ export default function DashboardClient({
     <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
 
       {/* Header */}
-      <div style={{ background: "linear-gradient(145deg, #5C3D47 0%, #8B5E6A 30%, #C68A95 68%, #E2B4BC 100%)", padding: "36px 32px 32px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -80, right: -80, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -50, left: "20%", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", top: 0, left: "12%", right: "12%", height: 3, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.7), rgba(255,255,255,0.95), rgba(255,255,255,0.7), transparent)" }} />
+      <div style={{
+        background: dark
+          ? "linear-gradient(160deg, #1a2620 0%, #1e2e24 55%, #16231a 100%)"
+          : "linear-gradient(160deg, #ffffff 0%, #f6fbf7 60%, #eef7ef 100%)",
+        padding: "36px 32px 32px", position: "relative", overflow: "hidden",
+        borderBottom: dark ? "1.5px solid #3a5540" : "1.5px solid #c5dcc6",
+      }}>
+        {/* Stripe botánico superior */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)" }} />
+        {/* Hoja decorativa */}
+        <svg aria-hidden style={{ position: "absolute", right: 0, top: -10, opacity: dark ? 0.08 : 0.09, width: 180, pointerEvents: "none" }} viewBox="0 0 220 320">
+          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#4A6B52"/>
+          <path d="M110,10 C105,80 108,175 108,268" stroke="#2E4D35" strokeWidth="2" fill="none" opacity={0.5}/>
+          <path d="M110,50 C140,65 175,60 200,50" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.35}/>
+          <path d="M106,110 C130,122 160,118 185,108" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.35}/>
+        </svg>
 
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
           <div>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>Panel de administración</p>
-            <h1 style={{ margin: "8px 0 3px", color: "#fff", fontSize: 30, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.18)" }}>
+            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.65)" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>Panel de administración</p>
+            <h1 style={{ margin: "8px 0 3px", color: dark ? "#d4e8d6" : "#2e1e24", fontSize: 30, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
               Piel de Ángel
             </h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontSize: 13, letterSpacing: "0.04em" }}>
+            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.50)" : "#9a8486", fontSize: 13, letterSpacing: "0.04em" }}>
               ¿Qué deseas hacer hoy?
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={toggle} style={{ background: "rgba(255,255,255,0.14)", border: "1.5px solid rgba(255,255,255,0.32)", borderRadius: 12, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
+            <button onClick={toggle} style={{ background: dark ? "rgba(91,126,100,0.20)" : "rgba(91,126,100,0.10)", border: `1.5px solid ${dark ? "#3a5540" : "#c5dcc6"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#a8d4a8" : "#4A6B52", fontSize: 15, cursor: "pointer" }}>
               <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
             </button>
-            <button onClick={handleLogout} style={{ background: "rgba(0,0,0,0.18)", border: "1.5px solid rgba(255,255,255,0.20)", borderRadius: 12, padding: "9px 14px", color: "rgba(255,255,255,0.82)", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7 }}>
+            <button onClick={handleLogout} style={{ background: dark ? "rgba(198,138,149,0.15)" : "rgba(198,138,149,0.10)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 14px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7 }}>
               <i className="fa-solid fa-right-from-bracket" /> Salir
             </button>
           </div>
