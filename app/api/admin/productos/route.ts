@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
   try {
     const { title, description, stock, precio, categoria, badge, thumbnail } = await req.json();
 
-    // Crear producto
+    // Crear producto con opciones y variante en una sola llamada (requerido por Medusa v2)
     const prodRes = await fetch(`${BASE}/admin/products`, {
       method: "POST",
       headers: authHeaders(token),
@@ -121,6 +121,12 @@ export async function POST(req: NextRequest) {
           ...(categoria && { categoria }),
           ...(badge && { badge }),
         },
+        options: [{ title: "Titulo", values: ["Default"] }],
+        variants: [{
+          title: "Default",
+          options: { Titulo: "Default" },
+          prices: precio ? [{ currency_code: "clp", amount: Number(precio) }] : [],
+        }],
       }),
     });
     if (!prodRes.ok) {
@@ -129,20 +135,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Error al crear producto" }, { status: 400 });
     }
     const { product } = await prodRes.json();
-
-    // Crear variante con precio CLP
-    const varRes = await fetch(`${BASE}/admin/products/${product.id}/variants`, {
-      method: "POST",
-      headers: authHeaders(token),
-      body: JSON.stringify({
-        title: "Default",
-        prices: precio ? [{ currency_code: "clp", amount: Number(precio) }] : [],
-      }),
-    });
-    if (!varRes.ok) {
-      console.error("[admin/productos POST] variant error:", await varRes.text());
-    }
-
     return NextResponse.json({ product });
   } catch (err) {
     console.error("[admin/productos POST]", err);
