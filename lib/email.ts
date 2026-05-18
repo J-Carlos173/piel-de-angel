@@ -99,31 +99,70 @@ export async function sendOrderConfirmationToClient(data: {
   authCode: string;
   card: string;
 }) {
-  const formatPrecio = (n: number) =>
-    "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const fmt = (n: number) => "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const WA = `https://wa.me/56977031461?text=${encodeURIComponent(`Hola Tere, ya pagué mi pedido *${data.buyOrder}*. ¿Puedes confirmarme el despacho? 🌸`)}`;
 
   await getTransport().sendMail({
     from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
     to: data.email,
-    subject: `✓ Compra confirmada — Piel de Ángel`,
+    subject: `✓ Pago aprobado — ${data.buyOrder} | Piel de Ángel`,
     html: `
-      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
-        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Tu compra fue aprobada!</h2>
-        <p style="color: #666; margin-top: 0;">Gracias por comprar en Piel de Ángel. Aquí está el resumen:</p>
-        <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
-        <table style="width: 100%; font-size: 15px; color: #444;">
-          <tr><td style="padding: 6px 0; color: #888;">Número de orden</td><td><strong>${data.buyOrder}</strong></td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Total pagado</td><td><strong>${formatPrecio(data.amount)}</strong></td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Tarjeta</td><td>**** **** **** ${data.card}</td></tr>
-          <tr><td style="padding: 6px 0; color: #888;">Código autorización</td><td>${data.authCode}</td></tr>
-        </table>
-        <div style="margin-top: 28px; background: #f0fdf4; border-radius: 10px; padding: 16px;">
-          <p style="margin: 0; color: #444; font-size: 14px;">
-            📦 <strong>Próximo paso:</strong> Nos contactaremos contigo por WhatsApp para coordinar el despacho de tu pedido.
-          </p>
-        </div>
-        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Estética & Belleza Premium</p>
+    <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #fdf9f7;">
+
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #D8A7B1, #C68A95); padding: 36px 32px; text-align: center; border-radius: 12px 12px 0 0;">
+        <p style="margin: 0; color: rgba(255,255,255,0.85); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;">Piel de Ángel · Skincare Premium</p>
+        <h1 style="margin: 12px 0 0; color: #fff; font-size: 26px; font-weight: normal;">¡Tu pago fue aprobado! 🎉</h1>
       </div>
+
+      <!-- Body -->
+      <div style="padding: 36px 32px;">
+        <p style="color: #666; font-size: 15px; margin: 0 0 28px;">Gracias por tu compra. Aquí tienes el resumen de tu pedido:</p>
+
+        <!-- Orden badge -->
+        <div style="background: #fff; border: 1.5px solid #e8d5cc; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; text-align: center;">
+          <p style="margin: 0 0 4px; font-size: 11px; color: #aaa; letter-spacing: 0.1em; text-transform: uppercase;">Número de orden</p>
+          <p style="margin: 0; font-size: 20px; font-weight: bold; color: #C68A95;">${data.buyOrder}</p>
+        </div>
+
+        <!-- Detalle -->
+        <table style="width: 100%; font-size: 15px; color: #444; border-collapse: collapse;">
+          <tr style="border-bottom: 1px solid #f0e8e4;">
+            <td style="padding: 12px 0; color: #888;">Total pagado</td>
+            <td style="padding: 12px 0; text-align: right; font-weight: bold; font-size: 18px; color: #C68A95;">${fmt(data.amount)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f0e8e4;">
+            <td style="padding: 12px 0; color: #888;">Tarjeta</td>
+            <td style="padding: 12px 0; text-align: right;">**** **** **** ${data.card}</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 0; color: #888;">Código de autorización</td>
+            <td style="padding: 12px 0; text-align: right;">${data.authCode}</td>
+          </tr>
+        </table>
+
+        <!-- Qué sigue -->
+        <div style="margin-top: 28px; background: #f9f2f3; border-left: 4px solid #D8A7B1; border-radius: 0 10px 10px 0; padding: 20px 24px;">
+          <p style="margin: 0 0 8px; font-weight: bold; color: #444; font-size: 14px;">¿Qué sigue?</p>
+          <p style="margin: 0 0 6px; color: #666; font-size: 14px;">🚚 Te contactaremos para coordinar el despacho de tu pedido.</p>
+          <p style="margin: 0; color: #666; font-size: 14px;">📦 Si quieres acelerar el proceso, escríbenos directamente:</p>
+        </div>
+
+        <!-- WhatsApp CTA -->
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="${WA}" style="display: inline-block; background: #25d366; color: #fff; font-size: 15px; font-weight: bold; padding: 14px 32px; border-radius: 50px; text-decoration: none;">
+            💬 Escribir a Tere por WhatsApp
+          </a>
+          <p style="margin: 10px 0 0; font-size: 12px; color: #bbb;">Menciona tu número de orden: ${data.buyOrder}</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="background: #f0e8e4; padding: 20px 32px; border-radius: 0 0 12px 12px; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #a08888;">Piel de Ángel · Estética & Skincare Premium · Santiago, Chile</p>
+      </div>
+
+    </div>
     `,
   });
 }
