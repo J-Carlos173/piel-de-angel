@@ -85,9 +85,8 @@ export default function DashboardClient({
     {
       icon: "fa-box-open",
       title: "Productos",
-      desc: "Gestionar catálogo en Medusa",
-      href: "https://piel-de-angel-backend-production.up.railway.app/app",
-      external: true,
+      desc: "Gestionar catálogo, stock, precios y categorías",
+      href: "/admin/productos",
       accent: "#6B4F5A",
       glow: "rgba(107,79,90,0.22)",
     },
