@@ -1,22 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
-const KEY = process.env.MEDUSA_ADMIN_API_KEY;
+const BASE  = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
+const EMAIL = process.env.MEDUSA_ADMIN_EMAIL;
+const PASS  = process.env.MEDUSA_ADMIN_PASSWORD;
 
-function headers() {
-  return { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
+async function getToken(): Promise<string | null> {
+  if (!BASE || !EMAIL || !PASS) return null;
+  try {
+    const res = await fetch(`${BASE}/auth/user/emailpass`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: EMAIL, password: PASS }),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const { token } = await res.json();
+    return token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function authHeaders(token: string) {
+  return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 }
 
 export async function GET() {
-  if (!BASE || !KEY) {
-    console.error("[admin/productos GET] Missing env vars — BASE:", !!BASE, "KEY:", !!KEY);
+  const token = await getToken();
+  if (!token) {
+    console.error("[admin/productos GET] No se pudo obtener token de Medusa");
     return NextResponse.json({ products: [] });
   }
   try {
-    const res = await fetch(`${BASE}/admin/products?fields=id,title,description,thumbnail,status,+metadata&limit=100`, {
-      headers: headers(),
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${BASE}/admin/products?fields=id,title,description,thumbnail,status,+metadata&limit=100`,
+      { headers: authHeaders(token), cache: "no-store" }
+    );
     if (!res.ok) {
       console.error("[admin/productos GET] Medusa error:", res.status, await res.text());
       return NextResponse.json({ products: [] });
@@ -30,11 +49,11 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  if (!BASE || !KEY) return NextResponse.json({ error: "No configurado" }, { status: 500 });
+  const token = await getToken();
+  if (!token) return NextResponse.json({ error: "No configurado" }, { status: 500 });
   try {
     const { id, title, description, stock, precio, categoria, badge } = await req.json();
 
-    // Actualizar metadata y campos del producto
     const body: Record<string, unknown> = {};
     if (title !== undefined) body.title = title;
     if (description !== undefined) body.description = description;
@@ -48,39 +67,35 @@ export async function PATCH(req: NextRequest) {
 
     const res = await fetch(`${BASE}/admin/products/${id}`, {
       method: "POST",
-      headers: headers(),
+      headers: authHeaders(token),
       body: JSON.stringify(body),
     });
     if (!res.ok) return NextResponse.json({ error: "Error al actualizar" }, { status: 400 });
 
-    // Actualizar precio si viene
     if (precio !== undefined) {
       const prodRes = await fetch(`${BASE}/admin/products/${id}?fields=*variants`, {
-        headers: headers(),
+        headers: authHeaders(token),
       });
       if (prodRes.ok) {
         const { product } = await prodRes.json();
         const variantId = product.variants?.[0]?.id;
         if (variantId) {
-          // Obtener precios actuales del variant
           const vRes = await fetch(`${BASE}/admin/variants/${variantId}?fields=*prices`, {
-            headers: headers(),
+            headers: authHeaders(token),
           });
           if (vRes.ok) {
             const { variant } = await vRes.json();
             const clpPrice = variant.prices?.find((p: { currency_code: string }) => p.currency_code === "clp");
             if (clpPrice) {
-              // Actualizar precio existente
               await fetch(`${BASE}/admin/prices/${clpPrice.id}`, {
                 method: "POST",
-                headers: headers(),
+                headers: authHeaders(token),
                 body: JSON.stringify({ amount: Number(precio) }),
               });
             } else {
-              // Crear precio CLP
               await fetch(`${BASE}/admin/variants/${variantId}/prices/batch`, {
                 method: "POST",
-                headers: headers(),
+                headers: authHeaders(token),
                 body: JSON.stringify({ create: [{ currency_code: "clp", amount: Number(precio) }] }),
               });
             }
@@ -93,6 +108,55 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(updated);
   } catch (err) {
     console.error("[admin/productos PATCH]", err);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const token = await getToken();
+  if (!token) return NextResponse.json({ error: "No configurado" }, { status: 500 });
+  try {
+    const { title, description, stock, precio, categoria, badge, thumbnail } = await req.json();
+
+    // Crear producto
+    const prodRes = await fetch(`${BASE}/admin/products`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({
+        title,
+        description,
+        status: "published",
+        ...(thumbnail && { thumbnail }),
+        metadata: {
+          stock: Number(stock ?? 0),
+          ...(categoria && { categoria }),
+          ...(badge && { badge }),
+        },
+      }),
+    });
+    if (!prodRes.ok) {
+      const err = await prodRes.text();
+      console.error("[admin/productos POST] create product error:", err);
+      return NextResponse.json({ error: "Error al crear producto" }, { status: 400 });
+    }
+    const { product } = await prodRes.json();
+
+    // Crear variante con precio CLP
+    const varRes = await fetch(`${BASE}/admin/products/${product.id}/variants`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({
+        title: "Default",
+        prices: precio ? [{ currency_code: "clp", amount: Number(precio) }] : [],
+      }),
+    });
+    if (!varRes.ok) {
+      console.error("[admin/productos POST] variant error:", await varRes.text());
+    }
+
+    return NextResponse.json({ product });
+  } catch (err) {
+    console.error("[admin/productos POST]", err);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
