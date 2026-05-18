@@ -5,7 +5,7 @@ function mapProduct(p: any): Producto {
   const variant = p.variants?.[0];
   const precio  = variant?.prices?.[0]?.amount ?? 0;
 
-  const stock = typeof p.metadata?.stock === "number" ? p.metadata.stock : 10;
+  const stock = typeof p.metadata?.stock === "number" ? p.metadata.stock : 0;
 
   const badge   = (p.metadata?.badge as "" | "bestseller" | "nuevo") ?? "";
 
