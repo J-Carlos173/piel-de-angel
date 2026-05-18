@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
 import { sendOrderConfirmationToClient, sendOrderNotificationToAdmin } from "@/lib/email";
 import { confirmOrder, getOrder } from "@/lib/db";
+import { decrementProductStock } from "@/lib/medusa-admin";
 
 const COMMERCE_CODE = process.env.TRANSBANK_COMMERCE_CODE!;
 const API_KEY = process.env.TRANSBANK_API_KEY!;
@@ -44,6 +45,14 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
       try {
         await confirmOrder({ buyOrder, amount, authCode, cardLast4: card, tokenWs });
         orderData = await getOrder(buyOrder);
+
+        // Descontar stock en Medusa por cada producto vendido
+        if (orderData?.items) {
+          const stockItems = (orderData.items as { id: string; qty: number }[])
+            .filter((i) => i.id && i.qty)
+            .map((i) => ({ id: i.id, qty: i.qty }));
+          decrementProductStock(stockItems).catch(() => {});
+        }
       } catch (dbErr) {
         console.error("[checkout/confirm/db]", dbErr);
       }
