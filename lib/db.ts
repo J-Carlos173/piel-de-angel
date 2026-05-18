@@ -6,7 +6,7 @@ export function getDb() {
   return neon(url);
 }
 
-export type OrderItem = { nombre: string; precio: number; qty: number };
+export type OrderItem = { id: string; nombre: string; precio: number; qty: number };
 
 export type OrderCustomer = {
   nombre: string;
