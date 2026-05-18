@@ -87,12 +87,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Compartir con el email de la tienda
-    const storeEmail = (process.env.STORE_EMAIL || "").trim() || "pieldeangel.contacto@gmail.com";
+    // Hacer el archivo accesible a cualquiera con el link
     await drive.permissions.create({
       fileId: spreadsheetId,
-      requestBody: { role: "writer", type: "user", emailAddress: storeEmail },
-      sendNotificationEmail: false,
+      requestBody: { role: "writer", type: "anyone" },
     });
 
     const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`;
