@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const webpayFormRef = useRef<HTMLFormElement>(null);
   const [webpay, setWebpay] = useState<{ url: string; token: string } | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [terminos, setTerminos] = useState(false);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, []);
   useEffect(() => { setHydrated(true); }, []);
@@ -162,13 +163,30 @@ export default function CheckoutPage() {
                 </label>
               </div>
 
+              {/* Términos y condiciones */}
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginTop: 4 }}>
+                <input
+                  type="checkbox"
+                  checked={terminos}
+                  onChange={(e) => setTerminos(e.target.checked)}
+                  style={{ marginTop: 3, accentColor: "var(--rosa-deep)", width: 16, height: 16, flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 13, color: "var(--texto-soft)", lineHeight: 1.5 }}>
+                  He leído y acepto los{" "}
+                  <Link href="/terminos" target="_blank" style={{ color: "var(--rosa-deep)", textDecoration: "underline" }}>
+                    Términos y Condiciones
+                  </Link>
+                  {" "}y la política de despacho y devoluciones.
+                </span>
+              </label>
+
               {error && (
                 <p className="checkout-error">
                   <i className="fa-solid fa-circle-exclamation" /> {error}
                 </p>
               )}
 
-              <button type="submit" className="btn-webpay" disabled={loading}>
+              <button type="submit" className="btn-webpay" disabled={loading || !terminos}>
                 {loading ? (
                   <><i className="fa-solid fa-spinner fa-spin" /> Preparando pedido...</>
                 ) : (
