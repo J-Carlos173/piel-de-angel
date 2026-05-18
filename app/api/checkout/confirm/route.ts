@@ -18,6 +18,9 @@ function getTransaction() {
 }
 
 async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
+  if (tbkToken && tokenWs) {
+    return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=error`);
+  }
   if (tbkToken && !tokenWs) {
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=cancelled`);
   }
@@ -39,7 +42,7 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
       // Actualizar estado en Neon y recuperar datos completos del pedido
       let orderData: Record<string, unknown> | null = null;
       try {
-        await confirmOrder({ buyOrder, amount, authCode, cardLast4: card });
+        await confirmOrder({ buyOrder, amount, authCode, cardLast4: card, tokenWs });
         orderData = await getOrder(buyOrder);
       } catch (dbErr) {
         console.error("[checkout/confirm/db]", dbErr);

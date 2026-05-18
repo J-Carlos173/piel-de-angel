@@ -40,10 +40,12 @@ export async function ensureOrdersTable() {
       amount          INTEGER,
       auth_code       VARCHAR(50),
       card_last4      VARCHAR(10),
+      token_ws        VARCHAR(200),
       created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       confirmed_at    TIMESTAMPTZ
     )
   `;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS token_ws VARCHAR(200)`;
 }
 
 export async function saveOrderPending(data: {
@@ -76,15 +78,17 @@ export async function confirmOrder(data: {
   amount: number;
   authCode: string;
   cardLast4: string;
+  tokenWs?: string;
 }) {
   const sql = getDb();
-  const { buyOrder, amount, authCode, cardLast4 } = data;
+  const { buyOrder, amount, authCode, cardLast4, tokenWs } = data;
   await sql`
     UPDATE orders
     SET status = 'confirmed',
         amount = ${amount},
         auth_code = ${authCode},
         card_last4 = ${cardLast4},
+        token_ws = ${tokenWs ?? null},
         confirmed_at = NOW()
     WHERE buy_order = ${buyOrder}
   `;

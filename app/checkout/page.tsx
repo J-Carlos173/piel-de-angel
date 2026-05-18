@@ -28,8 +28,10 @@ export default function CheckoutPage() {
   const [zona, setZona] = useState<"santiago" | "regiones">("santiago");
   const webpayFormRef = useRef<HTMLFormElement>(null);
   const [webpay, setWebpay] = useState<{ url: string; token: string } | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, []);
+  useEffect(() => { setHydrated(true); }, []);
 
   const subtotal = totalAmount();
   const envio = calcularEnvio(subtotal, zona);
@@ -95,6 +97,8 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   }
+
+  if (!hydrated) return null;
 
   if (items.length === 0) {
     return (
