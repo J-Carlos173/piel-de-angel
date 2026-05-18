@@ -10,8 +10,10 @@ type Producto = {
   description: string;
   thumbnail: string;
   status: string;
-  metadata: { stock?: number; categoria?: string; badge?: string } | null;
-  variants?: { prices?: { currency_code: string; amount: number }[] }[];
+  precio: number;
+  stock: number;
+  categoria: string;
+  badge: string;
 };
 
 type NuevoForm = {
@@ -72,12 +74,11 @@ export default function ProductosAdminClient() {
         setProductos(prods);
         const initialForm: typeof form = {};
         prods.forEach((p: Producto) => {
-          const clpPrice = p.variants?.[0]?.prices?.find((pr) => pr.currency_code === "clp");
           initialForm[p.id] = {
-            stock: String(p.metadata?.stock ?? 0),
-            precio: clpPrice ? String(clpPrice.amount) : "",
-            categoria: p.metadata?.categoria ?? "",
-            badge: p.metadata?.badge ?? "",
+            stock: String(p.stock ?? 0),
+            precio: p.precio ? String(p.precio) : "",
+            categoria: p.categoria ?? "",
+            badge: p.badge ?? "",
             title: p.title ?? "",
             description: p.description ?? "",
           };
@@ -125,7 +126,7 @@ export default function ProductosAdminClient() {
         p.id === id
           ? { ...p, title: f.title, description: f.description,
               ...(thumbnail && { thumbnail }),
-              metadata: { ...p.metadata, stock: Number(f.stock), categoria: f.categoria, badge: f.badge } }
+              stock: Number(f.stock), categoria: f.categoria, badge: f.badge }
           : p
       )
     );
@@ -199,15 +200,14 @@ export default function ProductosAdminClient() {
       if (!res.ok || !data.product) { setCreateError("Error al crear el producto. Intenta de nuevo."); return; }
 
       const p = data.product;
-      const clpPrice = p.variants?.[0]?.prices?.find((pr: { currency_code: string }) => pr.currency_code === "clp");
       setProductos((prev) => [p, ...prev]);
       setForm((prev) => ({
         ...prev,
         [p.id]: {
-          stock: nuevoForm.stock,
-          precio: clpPrice ? String(clpPrice.amount) : nuevoForm.precio,
-          categoria: nuevoForm.categoria,
-          badge: nuevoForm.badge,
+          stock: String(p.stock ?? nuevoForm.stock),
+          precio: p.precio ? String(p.precio) : nuevoForm.precio,
+          categoria: p.categoria ?? nuevoForm.categoria,
+          badge: p.badge ?? nuevoForm.badge,
           title: p.title,
           description: p.description ?? "",
         },
@@ -223,13 +223,13 @@ export default function ProductosAdminClient() {
     }
   }
 
-  const categorias = Array.from(new Set(productos.map((p) => p.metadata?.categoria).filter(Boolean))) as string[];
+  const categorias = Array.from(new Set(productos.map((p) => p.categoria).filter(Boolean)));
 
   const productosFiltrados = productos.filter((p) => {
     const f = form[p.id];
-    const stock = Number(f?.stock ?? p.metadata?.stock ?? 0);
+    const stock = Number(f?.stock ?? p.stock ?? 0);
     if (busqueda && !p.title.toLowerCase().includes(busqueda.toLowerCase())) return false;
-    if (filtroCat && (f?.categoria || p.metadata?.categoria || "") !== filtroCat) return false;
+    if (filtroCat && (f?.categoria || p.categoria || "") !== filtroCat) return false;
     if (filtroEstado === "stock" && stock <= 0) return false;
     if (filtroEstado === "agotado" && stock > 0) return false;
     return true;

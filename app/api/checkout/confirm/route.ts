@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
 import { sendOrderConfirmationToClient, sendOrderNotificationToAdmin } from "@/lib/email";
 import { confirmOrder, getOrder } from "@/lib/db";
-import { decrementProductStock } from "@/lib/medusa-admin";
+import { decrementProductStock } from "@/lib/products-db";
 
 const COMMERCE_CODE = process.env.TRANSBANK_COMMERCE_CODE!;
 const API_KEY = process.env.TRANSBANK_API_KEY!;

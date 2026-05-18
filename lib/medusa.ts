@@ -2,22 +2,14 @@ import { Producto } from "@/data/productos";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapProduct(p: any): Producto {
-  const variant   = p.variants?.[0];
-  const clpPrice  = variant?.prices?.find((pr: { currency_code: string }) => pr.currency_code === "clp");
-  const precio    = clpPrice?.amount ?? 0;
-
-  const stock = typeof p.metadata?.stock === "number" ? p.metadata.stock : 0;
-
-  const badge   = (p.metadata?.badge as "" | "bestseller" | "nuevo") ?? "";
-
   return {
     id:          p.id,
     nombre:      p.title ?? "",
-    categoria:   p.metadata?.categoria ?? "",
+    categoria:   p.categoria ?? "",
     descripcion: p.description ?? "",
-    precio,
-    stock,
-    badge,
+    precio:      Number(p.precio ?? 0),
+    stock:       Number(p.stock ?? 0),
+    badge:       (p.badge as "" | "bestseller" | "nuevo") ?? "",
     img:         p.thumbnail ?? "",
   };
 }
