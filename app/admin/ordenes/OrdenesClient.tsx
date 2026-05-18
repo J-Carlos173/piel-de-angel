@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useThemeStore } from "@/store/themeStore";
 
 function fmtPrecio(n: number) {
   return "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -54,6 +55,7 @@ function isInPeriod(dateStr: string, period: string) {
 
 export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const router = useRouter();
+  const { dark, toggle } = useThemeStore();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [periodoFilter, setPeriodoFilter] = useState("all");
@@ -108,78 +110,79 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const confirmedFiltered = filtered.filter((o) => o.status === "confirmed");
   const totalFiltrado = confirmedFiltered.reduce((s, o) => s + (o.amount || o.total || 0), 0);
 
-  const inputStyle: React.CSSProperties = {
-    background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)",
-    borderRadius: 8, padding: "8px 12px", color: "#fff", fontSize: 13,
-    outline: "none", fontFamily: "Georgia, serif",
+  const bg = dark ? "#1a1218" : "#f7f0ee";
+  const cardBg = dark ? "#2a1f24" : "#fff";
+  const cardBorder = dark ? "#3d2d33" : "#ecddd9";
+  const textMain = dark ? "#f0e0e8" : "#333";
+  const textMuted = dark ? "#a08888" : "#888";
+  const inputBg = dark ? "#2a1f24" : "#fff";
+  const inputBorder = dark ? "#4a3540" : "#e8d5cc";
+
+  const selStyle: React.CSSProperties = {
+    background: inputBg, border: `1.5px solid ${inputBorder}`, borderRadius: 10,
+    padding: "9px 14px", color: textMain, fontSize: 13, outline: "none",
+    fontFamily: "Georgia, serif", cursor: "pointer", flex: 1, minWidth: 130,
   };
-  const selectStyle: React.CSSProperties = { ...inputStyle, cursor: "pointer", appearance: "none" as const };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f7f0ee", fontFamily: "Georgia, serif" }}>
+    <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
 
       {/* Header */}
-      <div style={{ background: "linear-gradient(135deg, #8B6F6F 0%, #C68A95 60%, #D8A7B1 100%)", padding: "36px 32px 28px" }}>
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
-            <div>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase" }}>Panel interno</p>
-              <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 28, fontWeight: "normal" }}>Historial de Órdenes</h1>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13 }}>Piel de Ángel · Estética & Skincare Premium</p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button
-                onClick={() => exportCSV(filtered)}
-                style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.4)", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <i className="fa-solid fa-file-csv" /> CSV ({filtered.length})
-              </button>
-              <button
-                onClick={handleExportSheets}
-                disabled={sheetsLoading}
-                style={{ background: sheetsLoading ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, cursor: sheetsLoading ? "not-allowed" : "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
-              >
-                {sheetsLoading
-                  ? <><i className="fa-solid fa-spinner fa-spin" /> Creando…</>
-                  : <><i className="fa-brands fa-google" /> Google Sheets</>}
-              </button>
-              <button
-                onClick={handleLogout}
-                style={{ background: "rgba(0,0,0,0.15)", border: "1.5px solid rgba(255,255,255,0.3)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.8)", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <i className="fa-solid fa-right-from-bracket" /> Salir
-              </button>
-            </div>
+      <div style={{ background: "linear-gradient(135deg, #8B6F6F 0%, #C68A95 60%, #D8A7B1 100%)", padding: "32px 32px 28px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" }}>Panel interno</p>
+            <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 26, fontWeight: "normal" }}>Historial de Órdenes</h1>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13 }}>Piel de Ángel · Estética & Skincare Premium</p>
           </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button onClick={toggle} title={dark ? "Modo claro" : "Modo oscuro"}
+              style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.35)", borderRadius: 10, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
+              <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
+            </button>
+            <button onClick={() => exportCSV(filtered)}
+              style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.35)", borderRadius: 10, padding: "9px 16px", color: "#fff", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 7 }}>
+              <i className="fa-solid fa-file-csv" /> CSV ({filtered.length})
+            </button>
+            <button onClick={handleExportSheets} disabled={sheetsLoading}
+              style={{ background: "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.45)", borderRadius: 10, padding: "9px 16px", color: "#fff", fontSize: 13, cursor: sheetsLoading ? "not-allowed" : "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 7, opacity: sheetsLoading ? 0.7 : 1 }}>
+              {sheetsLoading ? <><i className="fa-solid fa-spinner fa-spin" /> Creando…</> : <><i className="fa-brands fa-google" /> Sheets</>}
+            </button>
+            <button onClick={handleLogout}
+              style={{ background: "rgba(0,0,0,0.2)", border: "1.5px solid rgba(255,255,255,0.25)", borderRadius: 10, padding: "9px 14px", color: "rgba(255,255,255,0.85)", fontSize: 13, cursor: "pointer", fontFamily: "Georgia, serif", display: "flex", alignItems: "center", gap: 7 }}>
+              <i className="fa-solid fa-right-from-bracket" /> Salir
+            </button>
+          </div>
+        </div>
+      </div>
 
-          {/* Filtros */}
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <div style={{ position: "relative", flex: 2, minWidth: 200 }}>
-              <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.6)", fontSize: 13 }} />
-              <input
-                type="text" placeholder="Buscar por nombre, email, teléfono u orden…"
-                value={search} onChange={(e) => setSearch(e.target.value)}
-                style={{ ...inputStyle, width: "100%", paddingLeft: 36, boxSizing: "border-box" }}
-              />
-            </div>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={{ ...selectStyle, flex: 1, minWidth: 130 }}>
-              <option value="all">Todos los estados</option>
-              <option value="confirmed">Solo pagados</option>
-              <option value="pending">Solo pendientes</option>
-            </select>
-            <select value={periodoFilter} onChange={(e) => setPeriodoFilter(e.target.value)} style={{ ...selectStyle, flex: 1, minWidth: 130 }}>
-              <option value="all">Todo el tiempo</option>
-              <option value="today">Hoy</option>
-              <option value="week">Últimos 7 días</option>
-              <option value="month">Últimos 30 días</option>
-            </select>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ ...selectStyle, flex: 1, minWidth: 150 }}>
-              <option value="newest">Más recientes primero</option>
-              <option value="oldest">Más antiguos primero</option>
-              <option value="amount_desc">Mayor monto primero</option>
-              <option value="amount_asc">Menor monto primero</option>
-            </select>
+      {/* Barra de filtros — fondo propio para que los selects se vean natural */}
+      <div style={{ background: dark ? "#231820" : "#fff", borderBottom: `1px solid ${cardBorder}`, padding: "14px 32px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ position: "relative", flex: 2, minWidth: 220 }}>
+            <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: textMuted, fontSize: 13 }} />
+            <input type="text" placeholder="Buscar por nombre, email, teléfono u orden…"
+              value={search} onChange={(e) => setSearch(e.target.value)}
+              style={{ background: inputBg, border: `1.5px solid ${inputBorder}`, borderRadius: 10, padding: "9px 12px 9px 36px", color: textMain, fontSize: 13, outline: "none", fontFamily: "Georgia, serif", width: "100%", boxSizing: "border-box" }}
+            />
           </div>
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={selStyle}>
+            <option value="all">Todos los estados</option>
+            <option value="confirmed">Solo pagados</option>
+            <option value="pending">Solo pendientes</option>
+          </select>
+          <select value={periodoFilter} onChange={(e) => setPeriodoFilter(e.target.value)} style={selStyle}>
+            <option value="all">Todo el tiempo</option>
+            <option value="today">Hoy</option>
+            <option value="week">Últimos 7 días</option>
+            <option value="month">Últimos 30 días</option>
+          </select>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ ...selStyle, minWidth: 180 }}>
+            <option value="newest">Más recientes primero</option>
+            <option value="oldest">Más antiguos primero</option>
+            <option value="amount_desc">Mayor monto primero</option>
+            <option value="amount_asc">Menor monto primero</option>
+          </select>
         </div>
       </div>
 
@@ -193,9 +196,9 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
             { icon: "fa-clock", label: "Pendientes", value: filtered.filter(o => o.status === "pending").length, color: "#e0a800" },
             { icon: "fa-filter", label: "Mostrando", value: filtered.length, color: "#8B6F6F" },
           ].map((card) => (
-            <div key={card.label} style={{ flex: 1, minWidth: 130, background: "#fff", borderRadius: 14, padding: "18px 20px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: "1px solid #ecddd9" }}>
+            <div key={card.label} style={{ flex: 1, minWidth: 130, background: cardBg, borderRadius: 14, padding: "18px 20px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: `1px solid ${cardBorder}` }}>
               <i className={`fa-solid ${card.icon}`} style={{ fontSize: 20, color: card.color, marginBottom: 6, display: "block" }} />
-              <p style={{ margin: "0 0 3px", fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.1em" }}>{card.label}</p>
+              <p style={{ margin: "0 0 3px", fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: "0.1em" }}>{card.label}</p>
               <p style={{ margin: 0, fontSize: 22, fontWeight: "bold", color: card.color }}>{card.value}</p>
             </div>
           ))}
@@ -217,7 +220,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
             const itemTotal = order.amount || order.total;
 
             return (
-              <div key={order.buy_order} style={{ background: "#fff", borderRadius: 14, boxShadow: "0 2px 14px rgba(0,0,0,0.06)", border: `1.5px solid ${isConfirmed ? "#ecddd9" : "#f5e6a0"}`, overflow: "hidden" }}>
+              <div key={order.buy_order} style={{ background: cardBg, borderRadius: 14, boxShadow: "0 2px 14px rgba(0,0,0,0.08)", border: `1.5px solid ${isConfirmed ? cardBorder : "#f5e6a0"}`, overflow: "hidden" }}>
 
                 {/* Fila compacta (siempre visible) */}
                 <button
@@ -229,7 +232,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
                   <span style={{ padding: "2px 10px", borderRadius: 20, fontSize: 10, fontWeight: "bold", background: isConfirmed ? "#e8f5e9" : "#fff8e1", color: isConfirmed ? "#388e3c" : "#f9a825", textTransform: "uppercase" }}>
                     {isConfirmed ? "Pagado" : "Pendiente"}
                   </span>
-                  <span style={{ color: "#888", fontSize: 13, flex: 1 }}>{order.customer_nombre || "—"}</span>
+                  <span style={{ color: textMuted, fontSize: 13, flex: 1 }}>{order.customer_nombre || "—"}</span>
                   <span style={{ fontWeight: "bold", color: "#C68A95", fontSize: 17, marginLeft: "auto" }}>{fmtPrecio(itemTotal)}</span>
                   <span style={{ color: "#aaa", fontSize: 12, minWidth: 130, textAlign: "right" }}>{fmtFecha(order.created_at)}</span>
                   <i className={`fa-solid fa-chevron-${isOpen ? "up" : "down"}`} style={{ color: "#ccc", fontSize: 12, flexShrink: 0 }} />
@@ -237,19 +240,19 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
 
                 {/* Detalle expandible */}
                 {isOpen && (
-                  <div style={{ borderTop: "1px solid #f0e8e4", display: "flex", flexWrap: "wrap" }}>
+                  <div style={{ borderTop: `1px solid ${cardBorder}`, display: "flex", flexWrap: "wrap" }}>
 
                     {/* Cliente */}
-                    <div style={{ flex: "0 0 260px", padding: "20px 24px", borderRight: "1px solid #f0e8e4" }}>
-                      <p style={{ margin: "0 0 12px", fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                    <div style={{ flex: "0 0 260px", padding: "20px 24px", borderRight: `1px solid ${cardBorder}` }}>
+                      <p style={{ margin: "0 0 12px", fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: "0.12em" }}>
                         <i className="fa-solid fa-user" style={{ marginRight: 6 }} />Cliente
                       </p>
-                      <p style={{ margin: "0 0 8px", fontSize: 15, fontWeight: "bold", color: "#333" }}>{order.customer_nombre || "—"}</p>
-                      <p style={{ margin: "0 0 4px", fontSize: 13, color: "#888" }}><i className="fa-regular fa-envelope" style={{ marginRight: 6, width: 14 }} />{order.customer_email}</p>
-                      <p style={{ margin: "0 0 4px", fontSize: 13, color: "#888" }}><i className="fa-solid fa-phone" style={{ marginRight: 6, width: 14 }} />{order.customer_tel}</p>
-                      {direccion && <p style={{ margin: "8px 0 0", fontSize: 12, color: "#aaa", lineHeight: 1.5 }}><i className="fa-solid fa-location-dot" style={{ marginRight: 6 }} />{direccion}</p>}
+                      <p style={{ margin: "0 0 8px", fontSize: 15, fontWeight: "bold", color: textMain }}>{order.customer_nombre || "—"}</p>
+                      <p style={{ margin: "0 0 4px", fontSize: 13, color: textMuted }}><i className="fa-regular fa-envelope" style={{ marginRight: 6, width: 14 }} />{order.customer_email}</p>
+                      <p style={{ margin: "0 0 4px", fontSize: 13, color: textMuted }}><i className="fa-solid fa-phone" style={{ marginRight: 6, width: 14 }} />{order.customer_tel}</p>
+                      {direccion && <p style={{ margin: "8px 0 0", fontSize: 12, color: textMuted, lineHeight: 1.5 }}><i className="fa-solid fa-location-dot" style={{ marginRight: 6 }} />{direccion}</p>}
                       {order.zona && (
-                        <span style={{ display: "inline-block", marginTop: 10, padding: "3px 10px", background: "#f7f0ee", borderRadius: 20, fontSize: 11, color: "#8B6F6F" }}>
+                        <span style={{ display: "inline-block", marginTop: 10, padding: "3px 10px", background: dark ? "#3d2d33" : "#f7f0ee", borderRadius: 20, fontSize: 11, color: "#C68A95" }}>
                           <i className="fa-solid fa-truck" style={{ marginRight: 4 }} />
                           {order.zona === "santiago" ? "Santiago (RM)" : "Regiones"}
                         </span>
@@ -258,33 +261,33 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
 
                     {/* Productos */}
                     <div style={{ flex: 1, minWidth: 240, padding: "20px 24px" }}>
-                      <p style={{ margin: "0 0 12px", fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                      <p style={{ margin: "0 0 12px", fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: "0.12em" }}>
                         <i className="fa-solid fa-bag-shopping" style={{ marginRight: 6 }} />Productos
                       </p>
                       {order.items && order.items.length > 0 ? (
                         <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
                           <tbody>
                             {order.items.map((item, i) => (
-                              <tr key={i} style={{ borderBottom: "1px solid #f7f0ee" }}>
-                                <td style={{ padding: "6px 0", color: "#444" }}>{item.nombre} <span style={{ color: "#ccc" }}>×{item.qty}</span></td>
-                                <td style={{ padding: "6px 0", textAlign: "right", color: "#666" }}>{fmtPrecio(item.precio * item.qty)}</td>
+                              <tr key={i} style={{ borderBottom: `1px solid ${cardBorder}` }}>
+                                <td style={{ padding: "6px 0", color: textMain }}>{item.nombre} <span style={{ color: textMuted }}>×{item.qty}</span></td>
+                                <td style={{ padding: "6px 0", textAlign: "right", color: textMuted }}>{fmtPrecio(item.precio * item.qty)}</td>
                               </tr>
                             ))}
-                            <tr style={{ borderTop: "1px solid #ecddd9" }}>
-                              <td style={{ padding: "6px 0", color: "#aaa", fontSize: 12 }}>Envío</td>
-                              <td style={{ padding: "6px 0", textAlign: "right", color: "#aaa", fontSize: 12 }}>{order.envio === 0 ? "Gratis" : fmtPrecio(order.envio)}</td>
+                            <tr style={{ borderTop: `1px solid ${cardBorder}` }}>
+                              <td style={{ padding: "6px 0", color: textMuted, fontSize: 12 }}>Envío</td>
+                              <td style={{ padding: "6px 0", textAlign: "right", color: textMuted, fontSize: 12 }}>{order.envio === 0 ? "Gratis" : fmtPrecio(order.envio)}</td>
                             </tr>
                             <tr>
-                              <td style={{ padding: "6px 0", fontWeight: "bold", color: "#333" }}>Total</td>
+                              <td style={{ padding: "6px 0", fontWeight: "bold", color: textMain }}>Total</td>
                               <td style={{ padding: "6px 0", textAlign: "right", fontWeight: "bold", fontSize: 20, color: "#C68A95" }}>{fmtPrecio(itemTotal)}</td>
                             </tr>
                           </tbody>
                         </table>
                       ) : (
-                        <p style={{ color: "#ccc", fontStyle: "italic", fontSize: 13 }}>Sin detalle</p>
+                        <p style={{ color: textMuted, fontStyle: "italic", fontSize: 13 }}>Sin detalle</p>
                       )}
                       {order.auth_code && (
-                        <p style={{ margin: "12px 0 0", fontSize: 11, color: "#ddd" }}>
+                        <p style={{ margin: "12px 0 0", fontSize: 11, color: textMuted }}>
                           <i className="fa-solid fa-credit-card" style={{ marginRight: 6 }} />
                           **** {order.card_last4} · Auth: {order.auth_code}
                         </p>
