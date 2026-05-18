@@ -128,13 +128,15 @@ export default function Agenda() {
               {step === "date" && (
                 <div className="agenda-date-picker">
                   <p className="agenda-hint">Selecciona el día de tu cita</p>
-                  <input
-                    type="date"
-                    min={addDays(today, 1)}
-                    max={maxDate}
-                    className="agenda-date-input"
-                    onChange={(e) => e.target.value && handleDateSelect(e.target.value)}
-                  />
+                  <div className="agenda-date-wrapper">
+                    <input
+                      type="date"
+                      min={addDays(today, 1)}
+                      max={maxDate}
+                      className="agenda-date-input"
+                      onChange={(e) => e.target.value && handleDateSelect(e.target.value)}
+                    />
+                  </div>
                 </div>
               )}
 
