@@ -73,33 +73,22 @@ export async function PATCH(req: NextRequest) {
     if (!res.ok) return NextResponse.json({ error: "Error al actualizar" }, { status: 400 });
 
     if (precio !== undefined) {
-      const prodRes = await fetch(`${BASE}/admin/products/${id}?fields=*variants`, {
+      const prodRes = await fetch(`${BASE}/admin/products/${id}?fields=*variants,*variants.prices`, {
         headers: authHeaders(token),
       });
       if (prodRes.ok) {
         const { product } = await prodRes.json();
-        const variantId = product.variants?.[0]?.id;
-        if (variantId) {
-          const vRes = await fetch(`${BASE}/admin/variants/${variantId}?fields=*prices`, {
+        const variant = product.variants?.[0];
+        if (variant) {
+          const clpPrice = variant.prices?.find((p: { currency_code: string }) => p.currency_code === "clp");
+          const pricesPayload = clpPrice
+            ? [{ id: clpPrice.id, currency_code: "clp", amount: Number(precio) }]
+            : [{ currency_code: "clp", amount: Number(precio) }];
+          await fetch(`${BASE}/admin/products/${id}/variants/${variant.id}`, {
+            method: "POST",
             headers: authHeaders(token),
+            body: JSON.stringify({ prices: pricesPayload }),
           });
-          if (vRes.ok) {
-            const { variant } = await vRes.json();
-            const clpPrice = variant.prices?.find((p: { currency_code: string }) => p.currency_code === "clp");
-            if (clpPrice) {
-              await fetch(`${BASE}/admin/prices/${clpPrice.id}`, {
-                method: "POST",
-                headers: authHeaders(token),
-                body: JSON.stringify({ amount: Number(precio) }),
-              });
-            } else {
-              await fetch(`${BASE}/admin/variants/${variantId}/prices/batch`, {
-                method: "POST",
-                headers: authHeaders(token),
-                body: JSON.stringify({ create: [{ currency_code: "clp", amount: Number(precio) }] }),
-              });
-            }
-          }
         }
       }
     }
