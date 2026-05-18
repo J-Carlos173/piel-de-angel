@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
 
@@ -10,13 +10,16 @@ type Producto = {
   description: string;
   thumbnail: string;
   status: string;
-  metadata: {
-    stock?: number;
-    categoria?: string;
-    badge?: string;
-  } | null;
+  metadata: { stock?: number; categoria?: string; badge?: string } | null;
   variants?: { prices?: { currency_code: string; amount: number }[] }[];
 };
+
+type NuevoForm = {
+  title: string; description: string; precio: string;
+  stock: string; categoria: string; badge: string;
+};
+
+const BLANK_NUEVO: NuevoForm = { title: "", description: "", precio: "", stock: "0", categoria: "", badge: "" };
 
 function fmtPrecio(n: number) {
   return "$" + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -32,12 +35,21 @@ export default function ProductosAdminClient() {
   const [saved, setSaved] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, { stock: string; precio: string; categoria: string; badge: string; title: string; description: string }>>({});
 
-  const bg      = dark ? "#160f13" : "#f5eeec";
-  const cardBg  = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
-  const border  = dark ? "#3a2830" : "#ecddd9";
-  const textMain= dark ? "#f0dde6" : "#2e1e24";
+  // Nuevo producto
+  const [creando, setCreando] = useState(false);
+  const [nuevoForm, setNuevoForm] = useState<NuevoForm>(BLANK_NUEVO);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [creatingProduct, setCreatingProduct] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const bg       = dark ? "#160f13" : "#f5eeec";
+  const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
+  const border   = dark ? "#3a2830" : "#ecddd9";
+  const textMain = dark ? "#f0dde6" : "#2e1e24";
   const textMuted= dark ? "#9a7c86" : "#9a8486";
-  const inputBg = dark ? "rgba(255,255,255,0.06)" : "#fdf8f7";
+  const inputBg  = dark ? "rgba(255,255,255,0.06)" : "#fdf8f7";
   const MONO: React.CSSProperties = { fontFamily: "Montserrat, sans-serif" };
 
   useEffect(() => {
@@ -71,30 +83,21 @@ export default function ProductosAdminClient() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id,
-        title: f.title,
-        description: f.description,
+        id, title: f.title, description: f.description,
         stock: Number(f.stock),
         precio: f.precio ? Number(f.precio) : undefined,
-        categoria: f.categoria,
-        badge: f.badge,
+        categoria: f.categoria, badge: f.badge,
       }),
     });
     setSaving(null);
     setSaved(id);
     setEditando(null);
     setTimeout(() => setSaved(null), 2500);
-
-    // Refrescar el producto en la lista local
     setProductos((prev) =>
       prev.map((p) =>
         p.id === id
-          ? {
-              ...p,
-              title: f.title,
-              description: f.description,
-              metadata: { ...p.metadata, stock: Number(f.stock), categoria: f.categoria, badge: f.badge },
-            }
+          ? { ...p, title: f.title, description: f.description,
+              metadata: { ...p.metadata, stock: Number(f.stock), categoria: f.categoria, badge: f.badge } }
           : p
       )
     );
@@ -104,27 +107,77 @@ export default function ProductosAdminClient() {
     setForm((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    background: inputBg,
-    border: `1px solid ${border}`,
-    borderRadius: 10,
-    padding: "9px 12px",
-    color: textMain,
-    fontSize: 13,
-    fontFamily: "Montserrat, sans-serif",
-    outline: "none",
-    boxSizing: "border-box",
-  };
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
 
+  async function crear() {
+    if (!nuevoForm.title.trim()) { setCreateError("El nombre es obligatorio."); return; }
+    setCreatingProduct(true);
+    setCreateError(null);
+    try {
+      let thumbnail: string | undefined;
+      if (imageFile) {
+        const fd = new FormData();
+        fd.append("file", imageFile);
+        const upRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
+        if (upRes.ok) {
+          const upData = await upRes.json();
+          thumbnail = upData.url;
+        }
+      }
+      const res = await fetch("/api/admin/productos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: nuevoForm.title,
+          description: nuevoForm.description,
+          precio: nuevoForm.precio ? Number(nuevoForm.precio) : undefined,
+          stock: Number(nuevoForm.stock),
+          categoria: nuevoForm.categoria,
+          badge: nuevoForm.badge,
+          thumbnail,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.product) { setCreateError("Error al crear el producto. Intenta de nuevo."); return; }
+
+      const p = data.product;
+      const clpPrice = p.variants?.[0]?.prices?.find((pr: { currency_code: string }) => pr.currency_code === "clp");
+      setProductos((prev) => [p, ...prev]);
+      setForm((prev) => ({
+        ...prev,
+        [p.id]: {
+          stock: nuevoForm.stock,
+          precio: clpPrice ? String(clpPrice.amount) : nuevoForm.precio,
+          categoria: nuevoForm.categoria,
+          badge: nuevoForm.badge,
+          title: p.title,
+          description: p.description ?? "",
+        },
+      }));
+      setNuevoForm(BLANK_NUEVO);
+      setImageFile(null);
+      setImagePreview(null);
+      setCreando(false);
+    } catch {
+      setCreateError("Error de conexión. Intenta de nuevo.");
+    } finally {
+      setCreatingProduct(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: inputBg, border: `1px solid ${border}`,
+    borderRadius: 10, padding: "9px 12px", color: textMain,
+    fontSize: 13, fontFamily: "Montserrat, sans-serif", outline: "none", boxSizing: "border-box",
+  };
   const labelStyle: React.CSSProperties = {
-    fontSize: 11,
-    color: textMuted,
-    fontFamily: "Montserrat, sans-serif",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    marginBottom: 4,
-    display: "block",
+    fontSize: 11, color: textMuted, fontFamily: "Montserrat, sans-serif",
+    letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4, display: "block",
   };
 
   return (
@@ -141,14 +194,119 @@ export default function ProductosAdminClient() {
             <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Gestión de Productos</p>
             <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Productos</h1>
           </div>
-          <button onClick={toggle} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.32)", borderRadius: 12, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
-            <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
-          </button>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <button
+              onClick={() => { setCreando((v) => !v); setCreateError(null); }}
+              style={{ background: creando ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 12, padding: "9px 18px", color: "#fff", fontSize: 13, cursor: "pointer", ...MONO, display: "flex", alignItems: "center", gap: 7 }}
+            >
+              <i className={`fa-solid ${creando ? "fa-xmark" : "fa-plus"}`} />
+              {creando ? "Cancelar" : "Nuevo Producto"}
+            </button>
+            <button onClick={toggle} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px solid rgba(255,255,255,0.32)", borderRadius: 12, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
+              <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
+            </button>
+          </div>
         </div>
       </div>
 
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 16px 60px" }}>
 
+        {/* Formulario Nuevo Producto */}
+        {creando && (
+          <div style={{ background: cardBg, border: `1.5px solid #C68A95`, borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 30px rgba(198,138,149,0.18)", marginBottom: 28 }}>
+            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
+              <i className="fa-solid fa-box-open" style={{ color: "#C68A95", fontSize: 16 }} />
+              <span style={{ fontSize: 16, color: textMain, fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Nuevo Producto</span>
+            </div>
+
+            <div style={{ padding: "24px", display: "flex", gap: 24, flexWrap: "wrap" }}>
+
+              {/* Columna imagen */}
+              <div style={{ flexShrink: 0 }}>
+                <label style={labelStyle}>Imagen</label>
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ width: 140, height: 140, borderRadius: 14, border: `2px dashed ${imagePreview ? "#C68A95" : border}`, background: imagePreview ? "transparent" : inputBg, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", overflow: "hidden", position: "relative" }}
+                >
+                  {imagePreview
+                    ? <img src={imagePreview} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <div style={{ textAlign: "center", color: textMuted }}>
+                        <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 28, display: "block", marginBottom: 6 }} />
+                        <span style={{ fontSize: 11, ...MONO }}>Subir imagen</span>
+                      </div>
+                  }
+                </div>
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
+                {imagePreview && (
+                  <button onClick={() => { setImageFile(null); setImagePreview(null); }} style={{ marginTop: 6, fontSize: 11, color: textMuted, background: "none", border: "none", cursor: "pointer", ...MONO }}>
+                    <i className="fa-solid fa-trash" style={{ marginRight: 4 }} />Quitar imagen
+                  </button>
+                )}
+              </div>
+
+              {/* Columna campos */}
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 14 }}>
+
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label style={labelStyle}>Nombre del producto *</label>
+                    <input type="text" placeholder="Ej: Sérum Vitamina C" value={nuevoForm.title} onChange={(e) => setNuevoForm((f) => ({ ...f, title: e.target.value }))} style={inputStyle} />
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Precio CLP</label>
+                    <input type="number" min="0" placeholder="19990" value={nuevoForm.precio} onChange={(e) => setNuevoForm((f) => ({ ...f, precio: e.target.value }))} style={inputStyle} />
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Stock (unidades)</label>
+                    <input type="number" min="0" value={nuevoForm.stock} onChange={(e) => setNuevoForm((f) => ({ ...f, stock: e.target.value }))} style={inputStyle} />
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Categoría</label>
+                    <input type="text" placeholder="Serums" value={nuevoForm.categoria} onChange={(e) => setNuevoForm((f) => ({ ...f, categoria: e.target.value }))} style={inputStyle} />
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Badge</label>
+                    <select value={nuevoForm.badge} onChange={(e) => setNuevoForm((f) => ({ ...f, badge: e.target.value }))} style={inputStyle}>
+                      <option value="">Sin badge</option>
+                      <option value="nuevo">Nuevo</option>
+                      <option value="bestseller">Bestseller</option>
+                    </select>
+                  </div>
+
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label style={labelStyle}>Descripción</label>
+                    <textarea placeholder="Describe el producto..." value={nuevoForm.description} onChange={(e) => setNuevoForm((f) => ({ ...f, description: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+                  </div>
+
+                </div>
+
+                {createError && (
+                  <p style={{ marginTop: 10, fontSize: 12, color: "#e57373", ...MONO }}>
+                    <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 5 }} />{createError}
+                  </p>
+                )}
+
+                <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                  <button
+                    onClick={crear}
+                    disabled={creatingProduct}
+                    style={{ background: "linear-gradient(135deg, #C68A95, #8B5E6A)", border: "none", borderRadius: 10, padding: "10px 28px", color: "#fff", fontSize: 13, cursor: creatingProduct ? "wait" : "pointer", ...MONO, display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    {creatingProduct
+                      ? <><i className="fa-solid fa-spinner fa-spin" /> Creando...</>
+                      : <><i className="fa-solid fa-sparkles" /> Crear Producto</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Lista de productos */}
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: textMuted, ...MONO }}>
             <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 28, marginBottom: 12, display: "block" }} />
@@ -170,10 +328,8 @@ export default function ProductosAdminClient() {
 
               return (
                 <div key={p.id} style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
-                  {/* Fila principal */}
                   <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px" }}>
 
-                    {/* Imagen */}
                     <div style={{ width: 64, height: 64, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "rgba(198,138,149,0.1)", border: `1px solid ${border}` }}>
                       {p.thumbnail
                         ? <img src={p.thumbnail} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -183,7 +339,6 @@ export default function ProductosAdminClient() {
                       }
                     </div>
 
-                    {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ margin: "0 0 2px", fontSize: 16, color: textMain, fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: "normal" }}>{p.title}</p>
                       <p style={{ margin: 0, fontSize: 11, color: textMuted, ...MONO }}>
@@ -191,19 +346,16 @@ export default function ProductosAdminClient() {
                       </p>
                     </div>
 
-                    {/* Stock badge */}
                     <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                       <span style={{ fontSize: 11, ...MONO, color: agotado ? "#e57373" : "#81c784", fontWeight: 700 }}>
                         <i className="fa-solid fa-circle" style={{ fontSize: 7, marginRight: 5 }} />
                         {agotado ? "Agotado" : `${stock} uds.`}
                       </span>
-
                       {wasSaved && (
                         <span style={{ fontSize: 11, color: "#81c784", ...MONO }}>
                           <i className="fa-solid fa-check" /> Guardado
                         </span>
                       )}
-
                       <button
                         onClick={() => setEditando(isEditing ? null : p.id)}
                         style={{ background: isEditing ? "rgba(198,138,149,0.15)" : "transparent", border: `1px solid ${border}`, borderRadius: 8, padding: "6px 14px", color: "#C68A95", fontSize: 12, cursor: "pointer", ...MONO }}
@@ -213,26 +365,21 @@ export default function ProductosAdminClient() {
                     </div>
                   </div>
 
-                  {/* Panel de edición */}
                   {isEditing && (
                     <div style={{ borderTop: `1px solid ${border}`, padding: "20px 24px", background: dark ? "rgba(0,0,0,0.15)" : "rgba(198,138,149,0.04)" }}>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
-
                         <div>
                           <label style={labelStyle}>Stock (unidades)</label>
                           <input type="number" min="0" value={f.stock} onChange={(e) => updateField(p.id, "stock", e.target.value)} style={inputStyle} />
                         </div>
-
                         <div>
                           <label style={labelStyle}>Precio CLP</label>
                           <input type="number" min="0" value={f.precio} onChange={(e) => updateField(p.id, "precio", e.target.value)} placeholder="19990" style={inputStyle} />
                         </div>
-
                         <div>
                           <label style={labelStyle}>Categoría</label>
                           <input type="text" value={f.categoria} onChange={(e) => updateField(p.id, "categoria", e.target.value)} placeholder="Serums" style={inputStyle} />
                         </div>
-
                         <div>
                           <label style={labelStyle}>Badge</label>
                           <select value={f.badge} onChange={(e) => updateField(p.id, "badge", e.target.value)} style={inputStyle}>
@@ -241,19 +388,15 @@ export default function ProductosAdminClient() {
                             <option value="bestseller">Bestseller</option>
                           </select>
                         </div>
-
                         <div style={{ gridColumn: "1 / -1" }}>
                           <label style={labelStyle}>Nombre del producto</label>
                           <input type="text" value={f.title} onChange={(e) => updateField(p.id, "title", e.target.value)} style={inputStyle} />
                         </div>
-
                         <div style={{ gridColumn: "1 / -1" }}>
                           <label style={labelStyle}>Descripción</label>
                           <textarea value={f.description} onChange={(e) => updateField(p.id, "description", e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                         </div>
-
                       </div>
-
                       <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
                         <button
                           onClick={() => guardar(p.id)}
