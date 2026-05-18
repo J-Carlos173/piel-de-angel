@@ -45,6 +45,11 @@ export default function ProductosAdminClient() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Cambio de imagen en edición
+  const [editImageFile, setEditImageFile] = useState<Record<string, File>>({});
+  const [editImagePreview, setEditImagePreview] = useState<Record<string, string>>({});
+  const editFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   const bg       = dark ? "#160f13" : "#f5eeec";
   const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
   const border   = dark ? "#3a2830" : "#ecddd9";
@@ -80,6 +85,18 @@ export default function ProductosAdminClient() {
   async function guardar(id: string) {
     setSaving(id);
     const f = form[id];
+
+    let thumbnail: string | undefined;
+    if (editImageFile[id]) {
+      const fd = new FormData();
+      fd.append("file", editImageFile[id]);
+      const upRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (upRes.ok) {
+        const upData = await upRes.json();
+        thumbnail = upData.url;
+      }
+    }
+
     await fetch("/api/admin/productos", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -88,16 +105,20 @@ export default function ProductosAdminClient() {
         stock: Number(f.stock),
         precio: f.precio ? Number(f.precio) : undefined,
         categoria: f.categoria, badge: f.badge,
+        ...(thumbnail && { thumbnail }),
       }),
     });
     setSaving(null);
     setSaved(id);
     setEditando(null);
+    setEditImageFile((prev) => { const n = { ...prev }; delete n[id]; return n; });
+    setEditImagePreview((prev) => { const n = { ...prev }; delete n[id]; return n; });
     setTimeout(() => setSaved(null), 2500);
     setProductos((prev) =>
       prev.map((p) =>
         p.id === id
           ? { ...p, title: f.title, description: f.description,
+              ...(thumbnail && { thumbnail }),
               metadata: { ...p.metadata, stock: Number(f.stock), categoria: f.categoria, badge: f.badge } }
           : p
       )
@@ -392,6 +413,46 @@ export default function ProductosAdminClient() {
 
                   {isEditing && (
                     <div style={{ borderTop: `1px solid ${border}`, padding: "20px 24px", background: dark ? "rgba(0,0,0,0.15)" : "rgba(198,138,149,0.04)" }}>
+
+                      {/* Cambiar imagen */}
+                      <div style={{ marginBottom: 18, display: "flex", alignItems: "center", gap: 14 }}>
+                        <div
+                          onClick={() => editFileRefs.current[p.id]?.click()}
+                          style={{ width: 72, height: 72, borderRadius: 10, overflow: "hidden", border: `2px dashed ${editImagePreview[p.id] ? "#C68A95" : border}`, background: inputBg, cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+                        >
+                          {editImagePreview[p.id]
+                            ? <img src={editImagePreview[p.id]} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : p.thumbnail
+                              ? <img src={p.thumbnail} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              : <i className="fa-solid fa-image" style={{ color: textMuted, fontSize: 22 }} />
+                          }
+                        </div>
+                        <div>
+                          <button
+                            onClick={() => editFileRefs.current[p.id]?.click()}
+                            style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, padding: "6px 14px", color: textMuted, fontSize: 12, cursor: "pointer", ...MONO, display: "flex", alignItems: "center", gap: 6 }}
+                          >
+                            <i className="fa-solid fa-cloud-arrow-up" /> {editImagePreview[p.id] ? "Cambiar imagen" : "Subir nueva imagen"}
+                          </button>
+                          {editImagePreview[p.id] && (
+                            <button onClick={() => { setEditImageFile((v) => { const n={...v}; delete n[p.id]; return n; }); setEditImagePreview((v) => { const n={...v}; delete n[p.id]; return n; }); }} style={{ marginTop: 4, fontSize: 11, color: "#e57373", background: "none", border: "none", cursor: "pointer", ...MONO }}>
+                              <i className="fa-solid fa-xmark" style={{ marginRight: 3 }} />Quitar
+                            </button>
+                          )}
+                        </div>
+                        <input
+                          type="file" accept="image/*"
+                          ref={(el) => { editFileRefs.current[p.id] = el; }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setEditImageFile((prev) => ({ ...prev, [p.id]: file }));
+                            setEditImagePreview((prev) => ({ ...prev, [p.id]: URL.createObjectURL(file) }));
+                          }}
+                          style={{ display: "none" }}
+                        />
+                      </div>
+
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
                         <div>
                           <label style={labelStyle}>Stock (unidades)</label>

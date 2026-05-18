@@ -52,11 +52,12 @@ export async function PATCH(req: NextRequest) {
   const token = await getToken();
   if (!token) return NextResponse.json({ error: "No configurado" }, { status: 500 });
   try {
-    const { id, title, description, stock, precio, categoria, badge } = await req.json();
+    const { id, title, description, stock, precio, categoria, badge, thumbnail } = await req.json();
 
     const body: Record<string, unknown> = {};
     if (title !== undefined) body.title = title;
     if (description !== undefined) body.description = description;
+    if (thumbnail !== undefined) body.thumbnail = thumbnail;
     if (stock !== undefined || categoria !== undefined || badge !== undefined) {
       body.metadata = {
         ...(stock !== undefined && { stock: Number(stock) }),
