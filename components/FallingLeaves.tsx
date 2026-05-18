@@ -25,19 +25,35 @@ const LEAVES = [
   { id: 10, x: 44, s: 1.15, dur: 11.0, delay: 9.0, v: "A" },
 ];
 
+// Gotas de lluvia: caen más recto y más rápido
+const DROPS = [
+  { id: 1,  x:  8, s: 0.9,  dur: 1.8, delay: 0.0  },
+  { id: 2,  x: 18, s: 1.1,  dur: 2.1, delay: 0.7  },
+  { id: 3,  x: 29, s: 0.7,  dur: 1.5, delay: 1.4  },
+  { id: 4,  x: 41, s: 1.0,  dur: 2.3, delay: 0.3  },
+  { id: 5,  x: 55, s: 0.85, dur: 1.7, delay: 1.9  },
+  { id: 6,  x: 66, s: 1.2,  dur: 2.0, delay: 0.9  },
+  { id: 7,  x: 76, s: 0.75, dur: 1.6, delay: 2.5  },
+  { id: 8,  x: 85, s: 1.05, dur: 2.4, delay: 0.5  },
+  { id: 9,  x: 93, s: 0.65, dur: 1.9, delay: 1.1  },
+  { id: 10, x: 48, s: 0.95, dur: 2.2, delay: 3.0  },
+  { id: 11, x: 33, s: 0.80, dur: 1.4, delay: 2.2  },
+  { id: 12, x: 61, s: 1.15, dur: 2.6, delay: 1.6  },
+];
+
 const COLORS: Record<Season, string[]> = {
   autumn: ["#C45E1A", "#B5651D", "#CD853F", "#A0522D", "#D2691E", "#8B4513"],
   spring: ["#7FA882", "#5B7E64", "#A8D5A2", "#9ACA9E", "#C8E6C9"],
   summer: ["#4A6B52", "#5B7E64", "#3D5940", "#6B9E72", "#4E7A55"],
-  winter: ["#9AAAB8", "#8898A8", "#B2C4D2", "#7A8E9E"],
+  winter: ["#A8C0CE", "#8FAFC0", "#C4D8E4", "#7A9EB2", "#B0CCDA"],
 };
-const OPACITY: Record<Season, number> = { autumn: 0.35, spring: 0.30, summer: 0.28, winter: 0.18 };
+const OPACITY: Record<Season, number> = { autumn: 0.35, spring: 0.30, summer: 0.28, winter: 0.55 };
 
 const SEASON_META: { key: Season; icon: string; label: string }[] = [
   { key: "spring", icon: "fa-seedling", label: "Primavera" },
   { key: "summer", icon: "fa-sun",      label: "Verano"    },
   { key: "autumn", icon: "fa-leaf",     label: "Otoño"     },
-  { key: "winter", icon: "fa-snowflake",label: "Invierno"  },
+  { key: "winter", icon: "fa-cloud-rain", label: "Invierno" },
 ];
 
 function LeafPath({ fill }: { fill: string }) {
@@ -55,6 +71,21 @@ function LeafPath({ fill }: { fill: string }) {
   );
 }
 
+function DropPath({ fill }: { fill: string }) {
+  return (
+    <svg viewBox="0 0 6 14" width={5} height={12} style={{ display: "block" }}>
+      {/* Gota: punta arriba, abombada abajo */}
+      <path
+        d="M3,0 C3,0 6,5.5 6,8.5 C6,11.5 4.7,14 3,14 C1.3,14 0,11.5 0,8.5 C0,5.5 3,0 3,0 Z"
+        fill={fill}
+        opacity={0.75}
+      />
+      {/* Reflejo */}
+      <ellipse cx="4.2" cy="7.5" rx="0.7" ry="1.4" fill="rgba(255,255,255,0.45)" />
+    </svg>
+  );
+}
+
 export default function FallingLeaves() {
   const [season, setSeason] = useState<Season>(getAutoSeason);
   const [open, setOpen] = useState(false);
@@ -62,14 +93,15 @@ export default function FallingLeaves() {
   const palette = COLORS[season];
   const op = OPACITY[season];
   const current = SEASON_META.find((s) => s.key === season)!;
+  const isWinter = season === "winter";
 
   return (
     <>
       <style>{`
         @keyframes fall-A {
           0%   { transform: translateY(-70px) translateX(0px)   rotate(-15deg); opacity: 0; }
-          8%   { opacity: ${op}; }
-          88%  { opacity: ${op * 0.75}; }
+          8%   { opacity: ${isWinter ? op : op}; }
+          88%  { opacity: ${isWinter ? op * 0.8 : op * 0.75}; }
           100% { transform: translateY(108vh) translateX(28px)  rotate(210deg); opacity: 0; }
         }
         @keyframes fall-B {
@@ -84,9 +116,15 @@ export default function FallingLeaves() {
           88%  { opacity: ${op * 0.75}; }
           100% { transform: translateY(108vh) translateX(10px)  rotate(260deg); opacity: 0; }
         }
+        @keyframes rain-fall {
+          0%   { transform: translateY(-20px) translateX(0px); opacity: 0; }
+          6%   { opacity: ${op}; }
+          90%  { opacity: ${op * 0.85}; }
+          100% { transform: translateY(108vh) translateX(8px); opacity: 0; }
+        }
       `}</style>
 
-      {/* Hojas */}
+      {/* Partículas */}
       <div
         aria-hidden
         style={{
@@ -97,22 +135,39 @@ export default function FallingLeaves() {
           overflow: "hidden",
         }}
       >
-        {LEAVES.map((leaf, i) => (
-          <div
-            key={`${season}-${leaf.id}`}
-            style={{
-              position: "absolute",
-              left: `${leaf.x}%`,
-              top: 0,
-              transform: `scale(${leaf.s})`,
-              transformOrigin: "top left",
-            }}
-          >
-            <div style={{ animation: `fall-${leaf.v} ${leaf.dur}s ease-in ${leaf.delay}s infinite` }}>
-              <LeafPath fill={palette[i % palette.length]} />
-            </div>
-          </div>
-        ))}
+        {isWinter
+          ? DROPS.map((drop, i) => (
+              <div
+                key={`winter-${drop.id}`}
+                style={{
+                  position: "absolute",
+                  left: `${drop.x}%`,
+                  top: 0,
+                  transform: `scale(${drop.s})`,
+                  transformOrigin: "top left",
+                }}
+              >
+                <div style={{ animation: `rain-fall ${drop.dur}s linear ${drop.delay}s infinite` }}>
+                  <DropPath fill={palette[i % palette.length]} />
+                </div>
+              </div>
+            ))
+          : LEAVES.map((leaf, i) => (
+              <div
+                key={`${season}-${leaf.id}`}
+                style={{
+                  position: "absolute",
+                  left: `${leaf.x}%`,
+                  top: 0,
+                  transform: `scale(${leaf.s})`,
+                  transformOrigin: "top left",
+                }}
+              >
+                <div style={{ animation: `fall-${leaf.v} ${leaf.dur}s ease-in ${leaf.delay}s infinite` }}>
+                  <LeafPath fill={palette[i % palette.length]} />
+                </div>
+              </div>
+            ))}
       </div>
 
       {/* Selector de estación */}
@@ -128,7 +183,6 @@ export default function FallingLeaves() {
           gap: 6,
         }}
       >
-        {/* Opciones (visibles cuando open) */}
         {open && SEASON_META.filter((s) => s.key !== season).map((s) => (
           <button
             key={s.key}
@@ -154,7 +208,6 @@ export default function FallingLeaves() {
           </button>
         ))}
 
-        {/* Botón principal (estación activa) */}
         <button
           onClick={() => setOpen((v) => !v)}
           title={current.label}
