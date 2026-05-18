@@ -83,6 +83,15 @@ export default function DashboardClient({
       disabled: true,
     },
     {
+      icon: "fa-globe",
+      title: "Ver Sitio",
+      desc: "Abrir la tienda como la ve el cliente",
+      href: "/",
+      external: true,
+      accent: "#7A9E8A",
+      glow: "rgba(122,158,138,0.22)",
+    },
+    {
       icon: "fa-box-open",
       title: "Productos",
       desc: "Gestionar catálogo, stock, precios y categorías",
