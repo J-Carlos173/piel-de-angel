@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAllOrders } from "@/lib/db";
 
 function fmtPrecio(n: number) {

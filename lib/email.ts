@@ -219,56 +219,71 @@ export async function sendOrderNotificationToAdmin(data: {
   const zonaLabel = data.zona === "santiago" ? "Santiago (RM)" : "Regiones";
 
   const clienteSection = c
-    ? `<h3 style="color:#8B6F6F;font-size:13px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.06em;">Datos del cliente</h3>
-       <table style="width:100%;font-size:14px;color:#444;">
-         <tr><td style="padding:4px 0;color:#888;width:120px;">Nombre</td><td><strong>${c.nombre}</strong></td></tr>
-         <tr><td style="padding:4px 0;color:#888;">Email</td><td>${c.email || data.clientEmail}</td></tr>
-         <tr><td style="padding:4px 0;color:#888;">Teléfono</td><td>${c.telefono}</td></tr>
-         <tr><td style="padding:4px 0;color:#888;">Dirección</td><td>${direccion}</td></tr>
-         <tr><td style="padding:4px 0;color:#888;">Zona envío</td><td>${zonaLabel}</td></tr>
+    ? `<table style="width:100%;font-size:14px;color:#444;">
+         <tr><td style="padding:5px 0;color:#888;width:120px;">Nombre</td><td><strong>${c.nombre}</strong></td></tr>
+         <tr><td style="padding:5px 0;color:#888;">Email</td><td>${c.email || data.clientEmail}</td></tr>
+         <tr><td style="padding:5px 0;color:#888;">Teléfono</td><td>${c.telefono}</td></tr>
+         <tr><td style="padding:5px 0;color:#888;">Dirección</td><td>${direccion}</td></tr>
+         <tr><td style="padding:5px 0;color:#888;">Zona envío</td><td>${zonaLabel}</td></tr>
        </table>`
-    : `<p style="color:#666;font-size:14px;">Email cliente: ${data.clientEmail}</p>`;
+    : `<p style="color:#666;font-size:14px;margin:0;">Email cliente: ${data.clientEmail}</p>`;
 
   const productosSection = hasItems
-    ? `<h3 style="color:#8B6F6F;font-size:13px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.06em;">Productos</h3>
-       <table style="width:100%;font-size:14px;border-collapse:collapse;border-top:1px solid #e8d5cc;">
+    ? `<table style="width:100%;font-size:14px;border-collapse:collapse;">
          ${tablaItemsHtml(data.items!)}
-         <tr style="border-top:1px solid #e8d5cc;">
+         <tr style="border-top:1px solid #f0e8e4;">
            <td style="padding:6px 0;color:#888;">Envío</td>
            <td style="padding:6px 0;text-align:right;color:#888;">${data.envio === 0 ? "Gratis" : fmtPrecio(data.envio ?? 0)}</td>
          </tr>
          <tr>
-           <td style="padding:6px 0;font-weight:bold;color:#444;">Total recibido</td>
-           <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:20px;color:#8B6F6F;">${fmtPrecio(data.amount)}</td>
+           <td style="padding:6px 0;font-weight:bold;color:#444;font-size:15px;">Total recibido</td>
+           <td style="padding:6px 0;text-align:right;font-weight:bold;font-size:20px;color:#C68A95;">${fmtPrecio(data.amount)}</td>
          </tr>
        </table>`
-    : `<p style="color:#666;">Total: <strong>${fmtPrecio(data.amount)}</strong></p>`;
+    : `<p style="color:#666;margin:0;">Total: <strong>${fmtPrecio(data.amount)}</strong></p>`;
 
   await getTransport().sendMail({
     from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
     to: STORE_EMAIL,
     subject: `🛍️ Nueva venta — ${fmtPrecio(data.amount)} — ${data.buyOrder}`,
     html: `
-      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #fdf9f7; border-radius: 12px;">
-        <h2 style="color: #8B6F6F; margin-bottom: 4px;">¡Nueva venta confirmada! 🎉</h2>
-        <p style="color: #666; margin-top: 0;">Se procesó un pago exitoso en la tienda.</p>
-        <hr style="border: 1px solid #e8d5cc; margin: 20px 0;" />
+    <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #fdf9f7;">
 
-        <div style="background:#fff;border:1.5px solid #e8d5cc;border-radius:10px;padding:16px 20px;margin-bottom:4px;">
-          <p style="margin:0 0 4px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;">Orden</p>
-          <p style="margin:0;font-size:18px;font-weight:bold;color:#C68A95;">${data.buyOrder}</p>
+      <div style="background: linear-gradient(135deg, #8B6F6F, #C68A95); padding: 36px 32px; text-align: center; border-radius: 12px 12px 0 0;">
+        <p style="margin: 0; color: rgba(255,255,255,0.85); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;">Piel de Ángel · Panel de ventas</p>
+        <h1 style="margin: 12px 0 0; color: #fff; font-size: 26px; font-weight: normal;">¡Nueva venta confirmada! 🎉</h1>
+      </div>
+
+      <div style="padding: 32px;">
+
+        <div style="background:#fff;border:1.5px solid #e8d5cc;border-radius:12px;padding:18px 24px;margin-bottom:24px;text-align:center;">
+          <p style="margin:0 0 4px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;">Número de orden</p>
+          <p style="margin:0;font-size:22px;font-weight:bold;color:#C68A95;">${data.buyOrder}</p>
         </div>
 
-        ${clienteSection}
-        ${productosSection}
+        <p style="margin:0 0 6px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;">Datos del cliente</p>
+        <div style="background:#fff;border:1px solid #f0e8e4;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
+          ${clienteSection}
+        </div>
 
-        <div style="margin-top: 24px; background: #fff3cd; border-radius: 10px; padding: 16px;">
+        <p style="margin:0 0 6px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;">Productos</p>
+        <div style="background:#fff;border:1px solid #f0e8e4;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
+          ${productosSection}
+        </div>
+
+        <div style="background: #fff8e1; border-left: 4px solid #f9a825; border-radius: 0 10px 10px 0; padding: 16px 20px;">
           <p style="margin: 0; color: #444; font-size: 14px;">
-            📦 <strong>Acción:</strong> Contactar al cliente para coordinar el despacho.
+            📦 <strong>Acción requerida:</strong> Contactar al cliente para coordinar el despacho.
           </p>
         </div>
-        <p style="margin-top: 24px; font-size: 12px; color: #aaa;">Piel de Ángel · Sistema de ventas · Tarjeta: **** ${data.card} · Auth: ${data.authCode}</p>
+
       </div>
+
+      <div style="background: #f0e8e4; padding: 16px 32px; border-radius: 0 0 12px 12px; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #a08888;">Piel de Ángel · Sistema de ventas · Tarjeta: **** ${data.card} · Auth: ${data.authCode}</p>
+      </div>
+
+    </div>
     `,
   });
 }
