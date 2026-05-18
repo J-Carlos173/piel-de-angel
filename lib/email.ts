@@ -124,7 +124,7 @@ export async function sendOrderConfirmationToClient(data: {
   items?: ItemPedidoSimple[];
   customer?: CustomerInfo;
 }) {
-  const WA = `https://wa.me/56977031461?text=${encodeURIComponent(`Hola Tere, ya pagué mi pedido *${data.buyOrder}*. ¿Puedes confirmarme el despacho? 🌸`)}`;
+  const WA = `https://wa.me/56977031461?text=${encodeURIComponent(`Hola, ya pagué mi pedido *${data.buyOrder}* en Piel de Ángel. ¿Pueden confirmarme el despacho? 🌸`)}`;
   const hasItems = data.items && data.items.length > 0;
   const nombre = data.customer?.nombre || "";
 
@@ -184,7 +184,7 @@ export async function sendOrderConfirmationToClient(data: {
 
         <div style="text-align: center; margin-top: 24px;">
           <a href="${WA}" style="display: inline-block; background: #25d366; color: #fff; font-size: 15px; font-weight: bold; padding: 14px 32px; border-radius: 50px; text-decoration: none;">
-            💬 Escribir a Tere por WhatsApp
+            💬 Escríbenos por WhatsApp
           </a>
           <p style="margin: 10px 0 0; font-size: 12px; color: #bbb;">Menciona tu número de orden: ${data.buyOrder}</p>
         </div>

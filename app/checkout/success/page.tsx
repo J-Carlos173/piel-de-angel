@@ -20,7 +20,7 @@ function SuccessContent() {
   }, []);
 
   const waText = encodeURIComponent(
-    `Hola Tere, ya pagué mi pedido *${order}*. ¿Puedes confirmarme el despacho? 🌸`
+    `Hola, ya pagué mi pedido *${order}* en Piel de Ángel. ¿Pueden confirmarme el despacho? 🌸`
   );
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${waText}`;
 
@@ -66,11 +66,11 @@ function SuccessContent() {
         <div className="result-next-steps">
           <p className="result-next-title">¿Qué sigue?</p>
           <p className="result-next-text">
-            Escríbele a Tere por WhatsApp indicando tu número de orden para coordinar el despacho más rápido.
+            Escríbenos por WhatsApp con tu número de orden para coordinar el despacho más rápido.
           </p>
           <a href={waUrl} target="_blank" rel="noopener noreferrer" className="btn-whatsapp-success">
             <i className="fa-brands fa-whatsapp" />
-            Escribir a Tere — {order}
+            Escríbenos por WhatsApp — {order}
           </a>
         </div>
 
