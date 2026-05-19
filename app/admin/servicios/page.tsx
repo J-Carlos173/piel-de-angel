@@ -1,7 +1,6 @@
-import { requireAdmin } from "@/lib/auth";
+export const dynamic = "force-dynamic";
 import ServiciosAdminClient from "./ServiciosAdminClient";
 
-export default async function ServiciosAdminPage() {
-  await requireAdmin();
+export default function ServiciosAdminPage() {
   return <ServiciosAdminClient />;
 }
