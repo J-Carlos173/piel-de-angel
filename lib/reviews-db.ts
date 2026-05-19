@@ -48,7 +48,7 @@ export async function createReview(nombre: string, texto: string, corazones: num
   return rows[0] as unknown as Review;
 }
 
-export async function updateReviewStatus(id: string, estado: "approved" | "rejected"): Promise<void> {
+export async function updateReviewStatus(id: string, estado: "approved" | "rejected" | "pending"): Promise<void> {
   const sql = getDb();
   await sql`UPDATE reviews SET estado = ${estado} WHERE id = ${id}`;
 }
