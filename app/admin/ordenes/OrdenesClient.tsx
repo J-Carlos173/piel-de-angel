@@ -127,10 +127,10 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const inputBorder = dark ? "#4a3040" : "#e5d0cc";
 
   const glassBtn: React.CSSProperties = {
-    background: dark ? "rgba(255,255,255,0.07)" : "rgba(91,126,100,0.10)",
-    border: `1.5px solid ${dark ? "#3a2830" : "#c5dcc6"}`,
+    background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)",
+    border: `1.5px solid ${dark ? "#3a2830" : "#ecddd9"}`,
     borderRadius: 12, padding: "9px 16px",
-    color: dark ? "#c8a8b4" : "#4A6B52", fontSize: 13, cursor: "pointer",
+    color: dark ? "#c8a8b4" : "#C68A95", fontSize: 13, cursor: "pointer",
     fontFamily: "Montserrat, sans-serif", fontWeight: 500,
     display: "flex", alignItems: "center", gap: 7,
     transition: "background 0.18s, border-color 0.18s",
@@ -152,20 +152,20 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
       <div style={{
         background: dark
           ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
-          : "linear-gradient(160deg, #ffffff 0%, #f6fbf7 60%, #eef7ef 100%)",
+          : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
         padding: "36px 32px 32px", position: "relative", overflow: "hidden",
-        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #c5dcc6",
+        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
       }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
         <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 160, pointerEvents: "none" }} viewBox="0 0 220 320">
-          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#4A6B52"/>
-          <path d="M110,10 C105,80 108,175 108,268" stroke="#2E4D35" strokeWidth="2" fill="none" opacity={0.4}/>
-          <path d="M110,50 C140,65 175,60 200,50" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.3}/>
+          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#C68A95"/>
+          <path d="M110,10 C105,80 108,175 108,268" stroke="#8B6F6F" strokeWidth="2" fill="none" opacity={0.4}/>
+          <path d="M110,50 C140,65 175,60 200,50" stroke="#8B6F6F" strokeWidth="1" fill="none" opacity={0.3}/>
         </svg>
 
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
           <div>
-            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#7A9E8A", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
+            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
             <h1 style={{ margin: "8px 0 3px", color: dark ? "#f0dde6" : "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Historial de Órdenes</h1>
             <p style={{ margin: 0, color: dark ? "#9a7c86" : "#9a8486", fontSize: 12, letterSpacing: "0.05em" }}>Estética & Skincare Premium</p>
           </div>
