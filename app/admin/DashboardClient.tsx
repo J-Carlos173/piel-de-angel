@@ -115,6 +115,14 @@ export default function DashboardClient({
       accent: "#7A6B8A",
       glow: "rgba(122,107,138,0.22)",
     },
+    {
+      icon: "fa-heart",
+      title: "Reseñas",
+      desc: "Moderar las reseñas de clientas antes de publicarlas en el sitio",
+      href: "/admin/reviews",
+      accent: "#C68A95",
+      glow: "rgba(198,138,149,0.22)",
+    },
   ];
 
   async function handleLogout() {
