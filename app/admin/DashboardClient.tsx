@@ -123,6 +123,14 @@ export default function DashboardClient({
       accent: "#C68A95",
       glow: "rgba(198,138,149,0.22)",
     },
+    {
+      icon: "fa-wand-magic-sparkles",
+      title: "Asistente IA",
+      desc: "Pídele a Claude que gestione reseñas, servicios, agenda y más con lenguaje natural",
+      href: "/admin/ai",
+      accent: "#9B6E7A",
+      glow: "rgba(155,110,122,0.22)",
+    },
   ];
 
   async function handleLogout() {
