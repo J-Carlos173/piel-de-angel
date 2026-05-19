@@ -67,6 +67,13 @@ export default function ReviewsAdminClient() {
     setActing(null);
   }
 
+  async function ocultar(id: string) {
+    setActing(id + "-hide");
+    await fetch("/api/admin/reviews", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, estado: "pending" }) });
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, estado: "pending" } : r));
+    setActing(null);
+  }
+
   async function eliminar(id: string) {
     if (!confirm("¿Eliminar esta reseña definitivamente?")) return;
     setActing(id + "-delete");
@@ -177,7 +184,16 @@ export default function ReviewsAdminClient() {
                         {acting === r.id + "-approve" ? <i className="fa-solid fa-spinner fa-spin" /> : <><i className="fa-solid fa-check" /> Publicar</>}
                       </button>
                     )}
-                    {r.estado !== "rejected" && (
+                    {r.estado === "approved" && (
+                      <button
+                        onClick={() => ocultar(r.id)}
+                        disabled={acting === r.id + "-hide"}
+                        style={{ border: `1.5px solid ${border}`, borderRadius: 10, padding: "7px 16px", background: "transparent", color: textMuted, fontSize: 12, cursor: "pointer", ...MONO, display: "flex", alignItems: "center", gap: 6 }}
+                      >
+                        {acting === r.id + "-hide" ? <i className="fa-solid fa-spinner fa-spin" /> : <><i className="fa-solid fa-eye-slash" /> Ocultar</>}
+                      </button>
+                    )}
+                    {r.estado === "pending" && (
                       <button
                         onClick={() => rechazar(r.id)}
                         disabled={acting === r.id + "-reject"}
