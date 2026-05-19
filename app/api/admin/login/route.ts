@@ -1,21 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting } from "@/lib/db";
 
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS   = 15 * 60 * 1000; // 15 min
+
+const attempts = new Map<string, { count: number; resetAt: number }>();
+
+function getIP(req: NextRequest) {
+  return req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+}
+
 export async function POST(req: NextRequest) {
-  const { password } = await req.json();
-  const envPass = process.env.ADMIN_PASSWORD || "pieldeangel2024";
+  const ip  = getIP(req);
+  const now = Date.now();
 
-  // Primero chequeamos si hay contraseña guardada en BD, si no, usamos env var
-  const dbPass = await getSetting("admin_password").catch(() => null);
-  const validPassword = dbPass ?? envPass;
-
-  if (password !== validPassword) {
-    return NextResponse.json({ ok: false, error: "Contraseña incorrecta" }, { status: 401 });
+  const entry = attempts.get(ip);
+  if (entry) {
+    if (now < entry.resetAt && entry.count >= MAX_ATTEMPTS) {
+      const mins = Math.ceil((entry.resetAt - now) / 60000);
+      return NextResponse.json(
+        { ok: false, error: `Demasiados intentos. Espera ${mins} min.` },
+        { status: 429 }
+      );
+    }
+    if (now >= entry.resetAt) attempts.delete(ip);
   }
 
-  // El cookie siempre se basa en el env var (el middleware no cambia)
+  const { password } = await req.json();
+  const envPass = process.env.ADMIN_PASSWORD || "pieldeangel2024";
+  const dbPass  = await getSetting("admin_password").catch(() => null);
+  const valid   = dbPass ?? envPass;
+
+  if (password !== valid) {
+    const cur = attempts.get(ip) ?? { count: 0, resetAt: now + LOCKOUT_MS };
+    attempts.set(ip, { count: cur.count + 1, resetAt: cur.resetAt });
+    const left = MAX_ATTEMPTS - (cur.count + 1);
+    const msg  = left > 0 ? `Contraseña incorrecta (${left} intentos restantes)` : `Bloqueado 15 min.`;
+    return NextResponse.json({ ok: false, error: msg }, { status: 401 });
+  }
+
+  attempts.delete(ip);
   const token = Buffer.from(envPass).toString("base64");
-  const res = NextResponse.json({ ok: true });
+  const res   = NextResponse.json({ ok: true });
   res.cookies.set("admin_auth", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
