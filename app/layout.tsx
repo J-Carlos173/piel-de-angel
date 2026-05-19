@@ -101,7 +101,16 @@ const jsonLd = {
         contactType: "customer service",
         availableLanguage: "Spanish",
       },
-      sameAs: ["https://www.instagram.com/pieldeangel.cl"],
+      telephone: "+56977031461",
+      openingHoursSpecification: [
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Tuesday", "Wednesday"], opens: "16:00", closes: "20:00" },
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Thursday", "Friday"],   opens: "16:00", closes: "22:00" },
+        { "@type": "OpeningHoursSpecification", dayOfWeek: ["Saturday"],             opens: "09:30", closes: "15:00" },
+      ],
+      sameAs: [
+        "https://www.instagram.com/pieldeangel.ls",
+        "https://www.instagram.com/pieldeangel.cosmetica",
+      ],
     },
     {
       "@type": "WebSite",
@@ -124,11 +133,40 @@ const jsonLd = {
       "@id": `${SITE_URL}/#store`,
       name: `${SITE_NAME} — Tienda Online`,
       url: `${SITE_URL}/#productos`,
-      description:
-        "Tienda online de skincare premium. Sérums, cremas, limpiadores y protección solar con envío a todo Chile.",
+      description: "Tienda online de skincare premium. Sérums, cremas, limpiadores y protección solar con envío a todo Chile.",
       currenciesAccepted: "CLP",
       paymentAccepted: "WebPay, Transbank",
       areaServed: "Chile",
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Skincare & Cosmética",
+        itemListElement: [
+          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Sérums con ácido hialurónico", category: "Skincare" } },
+          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Vitamina C sérum", category: "Skincare" } },
+          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Protector solar facial", category: "Protección Solar" } },
+          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Crema hidratante", category: "Hidratación" } },
+          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Limpiador facial", category: "Limpieza" } },
+        ],
+      },
+    },
+    {
+      "@type": "Service",
+      "@id": `${SITE_URL}/#servicios`,
+      name: "Tratamientos y Servicios de Estética",
+      provider: { "@id": `${SITE_URL}/#business` },
+      areaServed: "Santiago, Chile",
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Servicios de Estética Piel de Ángel",
+        itemListElement: [
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Limpieza Facial Profunda",    description: "Purificación profunda que elimina impurezas y devuelve luminosidad al rostro." } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Lifting de Pestañas",         description: "Efecto curvado natural y duradero sin extensiones." } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Hidratación Facial",          description: "Restaura la hidratación profunda con activos premium." } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Tratamiento Anti-edad",       description: "Protocolos personalizados anti-edad y revitalizantes." } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Ritual de Bienestar",         description: "Experiencia completa de relajación: masaje facial y aromaterapia." } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Diseño y depilación de cejas", description: "Definición y cuidado profesional de cejas." } },
+        ],
+      },
     },
   ],
 };
