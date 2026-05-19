@@ -17,11 +17,11 @@ export default async function AnalyticsPage() {
     )
   `.catch(() => {});
 
-  // Visitas diarias últimos 30 días
+  // Visitas diarias últimos 30 días (zona Chile)
   const daily = await sql`
     SELECT date::text, SUM(views)::int AS views
     FROM page_views
-    WHERE date >= CURRENT_DATE - INTERVAL '30 days'
+    WHERE date >= (NOW() AT TIME ZONE 'America/Santiago')::date - INTERVAL '30 days'
     GROUP BY date
     ORDER BY date ASC
   `.catch(() => []);
@@ -35,13 +35,13 @@ export default async function AnalyticsPage() {
     LIMIT 10
   `.catch(() => []);
 
-  // Totales
+  // Totales usando fecha Chile
   const totals = await sql`
     SELECT
-      SUM(views) FILTER (WHERE date = CURRENT_DATE)::int          AS today,
-      SUM(views) FILTER (WHERE date >= CURRENT_DATE - 6)::int     AS week,
-      SUM(views) FILTER (WHERE date >= DATE_TRUNC('month', NOW()))::int AS month,
-      SUM(views)::int                                              AS total
+      SUM(views) FILTER (WHERE date = (NOW() AT TIME ZONE 'America/Santiago')::date)::int                                       AS today,
+      SUM(views) FILTER (WHERE date >= (NOW() AT TIME ZONE 'America/Santiago')::date - 6)::int                                  AS week,
+      SUM(views) FILTER (WHERE date >= DATE_TRUNC('month', NOW() AT TIME ZONE 'America/Santiago')::date)::int                   AS month,
+      SUM(views)::int                                                                                                            AS total
     FROM page_views
   `.catch(() => [{}]);
 

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     `;
     await sql`
       INSERT INTO page_views (path, date, views)
-      VALUES (${path}, CURRENT_DATE, 1)
+      VALUES (${path}, (NOW() AT TIME ZONE 'America/Santiago')::date, 1)
       ON CONFLICT (path, date)
       DO UPDATE SET views = page_views.views + 1
     `;
