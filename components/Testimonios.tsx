@@ -93,7 +93,7 @@ export default function Testimonios() {
 
         <div className="testimonios-grid">
           {reviews.map((r) => (
-            <div className="testimonio-card reveal" key={r.id}>
+            <div className="testimonio-card" key={r.id}>
               <div className="testimonio-quote">&quot;</div>
               <div className="testimonio-stars">
                 <Hearts n={r.corazones} />

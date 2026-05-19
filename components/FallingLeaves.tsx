@@ -13,32 +13,22 @@ function getAutoSeason(): Season {
 }
 
 const LEAVES = [
-  { id: 1,  x:  5, s: 0.80, dur: 9.0,  delay: 0.0, v: "A" },
-  { id: 2,  x: 14, s: 1.10, dur: 11.5, delay: 2.4, v: "C" },
-  { id: 3,  x: 27, s: 0.70, dur: 8.5,  delay: 5.0, v: "B" },
-  { id: 4,  x: 38, s: 1.00, dur: 10.0, delay: 1.2, v: "A" },
-  { id: 5,  x: 52, s: 0.85, dur: 9.5,  delay: 6.8, v: "C" },
-  { id: 6,  x: 63, s: 0.75, dur: 12.0, delay: 3.5, v: "B" },
-  { id: 7,  x: 74, s: 1.05, dur: 8.0,  delay: 0.8, v: "A" },
-  { id: 8,  x: 83, s: 0.90, dur: 10.5, delay: 4.2, v: "C" },
-  { id: 9,  x: 91, s: 0.65, dur: 7.5,  delay: 7.5, v: "B" },
-  { id: 10, x: 44, s: 1.15, dur: 11.0, delay: 9.0, v: "A" },
+  { id: 1, x:  5, s: 0.80, dur: 9.0,  delay: 0.0, v: "A" },
+  { id: 2, x: 22, s: 1.10, dur: 11.5, delay: 2.4, v: "C" },
+  { id: 3, x: 38, s: 0.70, dur: 8.5,  delay: 5.0, v: "B" },
+  { id: 4, x: 55, s: 1.00, dur: 10.0, delay: 1.2, v: "A" },
+  { id: 5, x: 72, s: 0.85, dur: 9.5,  delay: 6.8, v: "C" },
+  { id: 6, x: 88, s: 0.75, dur: 12.0, delay: 3.5, v: "B" },
 ];
 
-// Gotas de lluvia: caen más recto y más rápido
+// Gotas de lluvia
 const DROPS = [
-  { id: 1,  x:  8, s: 0.9,  dur: 1.8, delay: 0.0  },
-  { id: 2,  x: 18, s: 1.1,  dur: 2.1, delay: 0.7  },
-  { id: 3,  x: 29, s: 0.7,  dur: 1.5, delay: 1.4  },
-  { id: 4,  x: 41, s: 1.0,  dur: 2.3, delay: 0.3  },
-  { id: 5,  x: 55, s: 0.85, dur: 1.7, delay: 1.9  },
-  { id: 6,  x: 66, s: 1.2,  dur: 2.0, delay: 0.9  },
-  { id: 7,  x: 76, s: 0.75, dur: 1.6, delay: 2.5  },
-  { id: 8,  x: 85, s: 1.05, dur: 2.4, delay: 0.5  },
-  { id: 9,  x: 93, s: 0.65, dur: 1.9, delay: 1.1  },
-  { id: 10, x: 48, s: 0.95, dur: 2.2, delay: 3.0  },
-  { id: 11, x: 33, s: 0.80, dur: 1.4, delay: 2.2  },
-  { id: 12, x: 61, s: 1.15, dur: 2.6, delay: 1.6  },
+  { id: 1, x:  8, s: 0.9,  dur: 1.8, delay: 0.0 },
+  { id: 2, x: 25, s: 1.1,  dur: 2.1, delay: 0.7 },
+  { id: 3, x: 42, s: 0.7,  dur: 1.5, delay: 1.4 },
+  { id: 4, x: 58, s: 1.0,  dur: 2.3, delay: 0.3 },
+  { id: 5, x: 74, s: 0.85, dur: 1.7, delay: 1.9 },
+  { id: 6, x: 90, s: 1.2,  dur: 2.0, delay: 0.9 },
 ];
 
 const COLORS: Record<Season, string[]> = {
