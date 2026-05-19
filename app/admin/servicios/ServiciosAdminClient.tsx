@@ -225,6 +225,13 @@ export default function ServiciosAdminClient() {
 
   return (
     <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .admin-card-row { flex-wrap: wrap !important; }
+          .admin-card-actions { width: 100% !important; flex-wrap: wrap !important; }
+          .admin-header-pad { padding: 20px 16px 18px !important; }
+        }
+      `}</style>
 
       {/* Header */}
       <div style={{
@@ -233,7 +240,7 @@ export default function ServiciosAdminClient() {
           : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
         padding: "32px 32px 28px", position: "relative", overflow: "hidden",
         borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
-      }}>
+      }} className="admin-header-pad">
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
         <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 150, pointerEvents: "none" }} viewBox="0 0 220 320">
           <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#C68A95"/>
@@ -406,7 +413,7 @@ export default function ServiciosAdminClient() {
 
               return (
                 <div key={s.id} style={{ background: cardBg, border: `1.5px solid ${isPublished ? border : textMuted}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)", opacity: isPublished ? 1 : 0.6 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px" }}>
+                  <div className="admin-card-row" style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px 24px" }}>
 
                     {/* Imagen */}
                     <div style={{ width: 64, height: 64, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "rgba(198,138,149,0.1)", border: `1px solid ${border}` }}>
@@ -429,7 +436,7 @@ export default function ServiciosAdminClient() {
                     </div>
 
                     {/* Acciones */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                    <div className="admin-card-actions" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                       {wasSaved && <span style={{ fontSize: 11, color: "#81c784", ...MONO }}><i className="fa-solid fa-check" /> Guardado</span>}
                       <button
                         onClick={() => toggleStatus(s.id, s.status)}
