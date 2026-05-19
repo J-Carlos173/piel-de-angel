@@ -86,8 +86,8 @@ export default function Footer() {
         <div className="footer-bottom">
           © 2026 Piel de Ángel · Diseñado con <span>♡</span> para realzar tu
           belleza natural
-          <a href="/admin/login" className="footer-admin-link">
-            <i className="fa-solid fa-lock" /> Staff
+          <a href="/admin/login" className="footer-admin-link" aria-label="Staff">
+            <i className="fa-solid fa-lock" />
           </a>
         </div>
       </div>

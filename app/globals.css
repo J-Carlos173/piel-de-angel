@@ -1654,22 +1654,16 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
 .footer-admin-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-left: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
-  color: #C68A95;
+  margin-left: 10px;
+  font-size: 10px;
+  color: currentColor;
   text-decoration: none;
-  letter-spacing: 0.06em;
-  border: 1px solid rgba(198, 138, 149, 0.45);
-  border-radius: 20px;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  opacity: 0.18;
+  transition: opacity 0.3s;
   vertical-align: middle;
 }
 .footer-admin-link:hover {
-  color: #fff;
-  border-color: #C68A95;
-  background: rgba(198, 138, 149, 0.25);
+  opacity: 0.55;
 }
 
 /* ============ WHATSAPP FLOTANTE ============ */
