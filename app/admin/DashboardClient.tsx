@@ -125,6 +125,14 @@ export default function DashboardClient({
       glow: "rgba(198,138,149,0.22)",
     },
     {
+      icon: "fa-pen-to-square",
+      title: "Editor Web",
+      desc: "Editar textos e imágenes del inicio y 'Sobre Nosotros'. 4 plantillas a elegir",
+      href: "/admin/contenido",
+      accent: "#7A8FA0",
+      glow: "rgba(122,143,160,0.22)",
+    },
+    {
       icon: "fa-wand-magic-sparkles",
       title: "Asistente IA",
       desc: "Pídele a Claude que gestione reseñas, servicios, agenda y más con lenguaje natural",

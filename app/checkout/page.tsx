@@ -288,7 +288,7 @@ export default function CheckoutPage() {
             {zona === "santiago" && !sabado && (
               <div className="checkout-envio-banner sabado">
                 <i className="fa-solid fa-calendar-day" />
-                Despacho en Santiago solo los <strong>sábados</strong>. Tu pedido llegará el próximo sábado.
+                Despacho gratis en Santiago todos los <strong>sábados</strong>. Te contactaremos por WhatsApp para coordinar.
               </div>
             )}
             {zona === "santiago" && sabado && faltaParaGratis > 0 && (
