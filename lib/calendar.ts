@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { getBlockedSlots } from "./blocked-slots-db";
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "krlos173173@gmail.com";
 
@@ -39,6 +40,15 @@ export function isWorkingDay(dateStr: string): boolean {
 }
 
 export async function getBusySlots(dateStr: string): Promise<string[]> {
+  const busySlots = new Set<string>();
+
+  // 1. Bloqueos manuales desde la DB
+  try {
+    const manualBlocks = await getBlockedSlots(dateStr);
+    manualBlocks.forEach((b) => busySlots.add(b.time));
+  } catch { /* no bloquea si falla la DB */ }
+
+  // 2. Eventos del Google Calendar
   try {
     const auth = getAuth();
     const calendar = google.calendar({ version: "v3", auth });
@@ -56,7 +66,6 @@ export async function getBusySlots(dateStr: string): Promise<string[]> {
     });
 
     const busy = res.data.calendars?.[CALENDAR_ID]?.busy ?? [];
-    const busySlots: string[] = [];
 
     for (const slot of getAllSlots(dateStr)) {
       const slotStart = new Date(`${dateStr}T${slot}:00`);
@@ -67,13 +76,11 @@ export async function getBusySlots(dateStr: string): Promise<string[]> {
         return slotStart < new Date(end) && slotEnd > new Date(start);
       });
 
-      if (occupied) busySlots.push(slot);
+      if (occupied) busySlots.add(slot);
     }
+  } catch { /* si Google falla, se devuelven solo los bloqueos manuales */ }
 
-    return busySlots;
-  } catch {
-    return [];
-  }
+  return [...busySlots];
 }
 
 export async function createCalendarEvent(data: {
