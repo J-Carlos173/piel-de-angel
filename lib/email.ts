@@ -391,6 +391,39 @@ export async function sendPendingOrderToAdmin(data: {
   });
 }
 
+export async function sendSecurityAlert(ip: string) {
+  const now = new Date().toLocaleString("es-CL", { timeZone: "America/Santiago", dateStyle: "full", timeStyle: "short" });
+  await getTransport().sendMail({
+    from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
+    to: ADMIN_EMAIL,
+    subject: `⚠️ Alerta de seguridad — 5 intentos fallidos de acceso al panel`,
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 580px; margin: 0 auto; background: #fdf9f7; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #8B4513, #c0392b); padding: 28px 32px; text-align: center;">
+          <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;">Piel de Ángel · Seguridad</p>
+          <h1 style="margin: 10px 0 0; color: #fff; font-size: 22px; font-weight: normal;">⚠️ Intento de acceso sospechoso</h1>
+        </div>
+        <div style="padding: 32px;">
+          <p style="color: #555; font-size: 15px; margin: 0 0 20px;">Se detectaron <strong>5 intentos fallidos consecutivos</strong> de acceso al panel de administración. La IP fue bloqueada por 15 minutos.</p>
+          <div style="background: #fff; border: 1.5px solid #e8d5cc; border-radius: 10px; padding: 18px 22px; margin-bottom: 20px;">
+            <table style="width: 100%; font-size: 14px; color: #444;">
+              <tr><td style="padding: 5px 0; color: #888; width: 120px;">Fecha y hora</td><td><strong>${now}</strong></td></tr>
+              <tr><td style="padding: 5px 0; color: #888;">IP bloqueada</td><td><strong>${ip}</strong></td></tr>
+              <tr><td style="padding: 5px 0; color: #888;">Bloqueo hasta</td><td>15 minutos desde el último intento</td></tr>
+            </table>
+          </div>
+          <div style="background: #fff8e1; border-left: 4px solid #f9a825; border-radius: 0 10px 10px 0; padding: 16px 20px;">
+            <p style="margin: 0; color: #555; font-size: 14px;">Si fuiste tú olvidando la contraseña, espera 15 minutos e intenta de nuevo. Si no reconoces este acceso, considera cambiar tu contraseña desde el panel.</p>
+          </div>
+        </div>
+        <div style="background: #f0e8e4; padding: 14px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #a08888;">Piel de Ángel · Sistema de seguridad automático</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
 export async function sendDeclineToClient(data: {
   name: string;
   email: string;

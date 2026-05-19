@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting } from "@/lib/db";
+import { sendSecurityAlert } from "@/lib/email";
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS   = 15 * 60 * 1000; // 15 min
@@ -32,10 +33,14 @@ export async function POST(req: NextRequest) {
   const valid   = dbPass ?? envPass;
 
   if (password !== valid) {
-    const cur = attempts.get(ip) ?? { count: 0, resetAt: now + LOCKOUT_MS };
-    attempts.set(ip, { count: cur.count + 1, resetAt: cur.resetAt });
-    const left = MAX_ATTEMPTS - (cur.count + 1);
-    const msg  = left > 0 ? `Contraseña incorrecta (${left} intentos restantes)` : `Bloqueado 15 min.`;
+    const cur      = attempts.get(ip) ?? { count: 0, resetAt: now + LOCKOUT_MS };
+    const newCount = cur.count + 1;
+    attempts.set(ip, { count: newCount, resetAt: cur.resetAt });
+    const left = MAX_ATTEMPTS - newCount;
+    if (newCount === MAX_ATTEMPTS) {
+      sendSecurityAlert(ip).catch(() => {});
+    }
+    const msg = left > 0 ? `Contraseña incorrecta (${left} intentos restantes)` : `Bloqueado 15 min.`;
     return NextResponse.json({ ok: false, error: msg }, { status: 401 });
   }
 
