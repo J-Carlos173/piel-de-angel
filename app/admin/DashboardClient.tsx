@@ -18,6 +18,7 @@ type Card = {
   accent: string;
   glow: string;
   disabled?: boolean;
+  disabledLabel?: string;
 };
 
 export default function DashboardClient({
@@ -130,6 +131,8 @@ export default function DashboardClient({
       href: "/admin/ai",
       accent: "#9B6E7A",
       glow: "rgba(155,110,122,0.22)",
+      disabled: true,
+      disabledLabel: "Requiere API Key",
     },
   ];
 
@@ -265,7 +268,7 @@ function DashboardCard({ card, cardBg, border, textMain, textMuted, onClick }: {
         <i className={card.external ? "fa-solid fa-arrow-up-right-from-square" : "fa-solid fa-arrow-right"} style={{ position: "absolute", bottom: 28, right: 28, color: card.accent, fontSize: 14, opacity: 0.6 }} />
       )}
       {card.disabled && (
-        <span style={{ position: "absolute", bottom: 22, right: 22, fontSize: 10, color: textMuted, fontFamily: "Montserrat, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", background: `${card.accent}18`, padding: "3px 10px", borderRadius: 20 }}>Próximamente</span>
+        <span style={{ position: "absolute", bottom: 22, right: 22, fontSize: 10, color: textMuted, fontFamily: "Montserrat, sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", background: `${card.accent}18`, padding: "3px 10px", borderRadius: 20 }}>{card.disabledLabel ?? "Próximamente"}</span>
       )}
     </button>
   );
