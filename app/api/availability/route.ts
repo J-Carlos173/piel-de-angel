@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllSlots, getBusySlots } from "@/lib/calendar";
+import { getAllSlots, getBusySlots, isWorkingDay } from "@/lib/calendar";
 
 export async function GET(req: NextRequest) {
   const date = req.nextUrl.searchParams.get("date");
@@ -7,8 +7,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid date" }, { status: 400 });
   }
 
-  const dayOfWeek = new Date(date + "T12:00:00").getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
+  if (!isWorkingDay(date)) {
     return NextResponse.json({ slots: [] });
   }
 
