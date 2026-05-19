@@ -28,7 +28,7 @@ function fmtFecha(s: string) {
   return new Date(s).toLocaleDateString("es-CL", { day: "numeric", month: "short", year: "numeric" });
 }
 
-type Tab = "pending" | "approved" | "rejected";
+type Tab = "pending" | "approved";
 
 export default function ReviewsAdminClient() {
   const router = useRouter();
@@ -61,9 +61,10 @@ export default function ReviewsAdminClient() {
   }
 
   async function rechazar(id: string) {
+    if (!confirm("¿Rechazar y eliminar esta reseña? No se podrá recuperar.")) return;
     setActing(id + "-reject");
-    await fetch("/api/admin/reviews", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, estado: "rejected" }) });
-    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, estado: "rejected" } : r));
+    await fetch("/api/admin/reviews", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    setReviews((prev) => prev.filter((r) => r.id !== id));
     setActing(null);
   }
 
@@ -84,13 +85,11 @@ export default function ReviewsAdminClient() {
 
   const pending  = reviews.filter((r) => r.estado === "pending");
   const approved = reviews.filter((r) => r.estado === "approved");
-  const rejected = reviews.filter((r) => r.estado === "rejected");
-  const visible  = tab === "pending" ? pending : tab === "approved" ? approved : rejected;
+  const visible  = tab === "pending" ? pending : approved;
 
   const TABS: { key: Tab; label: string; icon: string; count: number; color: string }[] = [
-    { key: "pending",  label: "Pendientes", icon: "fa-clock",       count: pending.length,  color: "#e6a817" },
-    { key: "approved", label: "Publicadas",  icon: "fa-circle-check",count: approved.length, color: "#66bb6a" },
-    { key: "rejected", label: "Rechazadas",  icon: "fa-ban",         count: rejected.length, color: "#e57373" },
+    { key: "pending",  label: "Pendientes", icon: "fa-clock",        count: pending.length,  color: "#e6a817" },
+    { key: "approved", label: "Publicadas",  icon: "fa-circle-check", count: approved.length, color: "#66bb6a" },
   ];
 
   return (
@@ -159,7 +158,7 @@ export default function ReviewsAdminClient() {
           <div style={{ textAlign: "center", padding: "60px 0", color: textMuted }}>
             <i className="fa-regular fa-heart" style={{ fontSize: 36, display: "block", marginBottom: 14, opacity: 0.3 }} />
             <p style={{ ...MONO, fontSize: 13 }}>
-              {tab === "pending" ? "No hay reseñas pendientes" : tab === "approved" ? "No hay reseñas publicadas aún" : "No hay reseñas rechazadas"}
+              {tab === "pending" ? "No hay reseñas pendientes" : "No hay reseñas publicadas aún"}
             </p>
           </div>
         ) : (
