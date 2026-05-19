@@ -392,10 +392,11 @@ export async function sendPendingOrderToAdmin(data: {
 }
 
 export async function sendSecurityAlert(ip: string) {
+  const STORE_EMAIL = (process.env.STORE_EMAIL || "").trim() || "pieldeangel.contacto@gmail.com";
   const now = new Date().toLocaleString("es-CL", { timeZone: "America/Santiago", dateStyle: "full", timeStyle: "short" });
   await getTransport().sendMail({
     from: `"Piel de Ángel" <${process.env.GMAIL_USER}>`,
-    to: ADMIN_EMAIL,
+    to: STORE_EMAIL,
     subject: `⚠️ Alerta de seguridad — 5 intentos fallidos de acceso al panel`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 580px; margin: 0 auto; background: #fdf9f7; border-radius: 12px; overflow: hidden;">
