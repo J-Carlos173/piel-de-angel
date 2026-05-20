@@ -48,6 +48,13 @@ export async function POST(req: NextRequest) {
     const tx = getTransaction();
     const response = await tx.create(buyOrder, sessionId, total, returnUrl);
 
+    // Guardar token desde creación para recuperarlo en cualquier escenario
+    try {
+      const { getDb } = await import("@/lib/db");
+      const sql = getDb();
+      await sql`UPDATE orders SET token_ws = ${response.token} WHERE buy_order = ${buyOrder}`;
+    } catch {}
+
     return NextResponse.json({ url: response.url, token: response.token, buyOrder });
   } catch (err) {
     console.error("[checkout/create]", err);

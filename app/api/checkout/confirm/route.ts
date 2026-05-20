@@ -19,12 +19,13 @@ function getTransaction() {
   return new WebpayPlus.Transaction(options);
 }
 
-async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
+async function handleConfirm(tokenWs: string | null, tbkToken: string | null, tbkOrder: string | null) {
   if (tbkToken && tokenWs) {
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=error`);
   }
   if (tbkToken && !tokenWs) {
-    return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=cancelled`);
+    const qs = tbkOrder ? `&order=${tbkOrder}` : "";
+    return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=cancelled${qs}`);
   }
   if (!tokenWs) {
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=timeout`);
@@ -132,12 +133,12 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
-  return handleConfirm(sp.get("token_ws"), sp.get("TBK_TOKEN"));
+  return handleConfirm(sp.get("token_ws"), sp.get("TBK_TOKEN"), sp.get("TBK_ORDEN_COMPRA"));
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.formData().catch(() => null);
   const get = (k: string) =>
     (body?.get(k) as string | null) ?? req.nextUrl.searchParams.get(k);
-  return handleConfirm(get("token_ws"), get("TBK_TOKEN"));
+  return handleConfirm(get("token_ws"), get("TBK_TOKEN"), get("TBK_ORDEN_COMPRA"));
 }
