@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
 import { sendOrderConfirmationToClient, sendOrderNotificationToAdmin } from "@/lib/email";
-import { confirmOrder, getOrder, getSetting } from "@/lib/db";
+import { confirmOrder, getOrder, getSetting, getDb } from "@/lib/db";
 import { decrementProductStock } from "@/lib/products-db";
 import { incrementPromoUsage } from "@/lib/promos-db";
 
@@ -118,7 +118,12 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
       return NextResponse.redirect(`${SITE_URL}/checkout/success?${qs}`);
     }
 
-    return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=rejected`);
+    // Guardar token incluso en rechazo para poder recuperarlo (ej: certificación Transbank)
+    try {
+      const sql = getDb();
+      await sql`UPDATE orders SET token_ws = ${tokenWs} WHERE buy_order = ${result.buy_order}`;
+    } catch {}
+    return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=rejected&order=${result.buy_order}`);
   } catch (err) {
     console.error("[checkout/confirm]", err);
     return NextResponse.redirect(`${SITE_URL}/checkout/failed?reason=error`);
