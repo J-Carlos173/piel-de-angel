@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { sendBookingRequestToAdmin } from "@/lib/email";
+import { getSetting } from "@/lib/db";
 
 const SECRET = process.env.BOOKING_SECRET || "piel-de-angel-secret";
 
@@ -17,7 +18,10 @@ export async function POST(req: NextRequest) {
       expiresIn: "7d",
     });
 
-    await sendBookingRequestToAdmin({ name, email, phone, service, date, time, token });
+    const citasOff = await getSetting("notif_citas").catch(() => null);
+    if (citasOff !== "false") {
+      await sendBookingRequestToAdmin({ name, email, phone, service, date, time, token });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {

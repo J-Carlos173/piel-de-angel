@@ -68,6 +68,14 @@ export default function DashboardClient({
       glow: "rgba(176,122,133,0.22)",
     },
     {
+      icon: "fa-bell",
+      title: "Notificaciones",
+      desc: "Activar o desactivar correos de compras, citas y alertas de seguridad",
+      href: "/admin/notificaciones",
+      accent: "#A07A60",
+      glow: "rgba(160,122,96,0.22)",
+    },
+    {
       icon: "fa-chart-line",
       title: "Visitas",
       desc: "Tráfico del sitio, páginas populares y tendencias",

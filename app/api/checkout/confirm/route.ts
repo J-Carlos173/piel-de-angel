@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebpayPlus, Environment, Options } from "transbank-sdk";
 import { sendOrderConfirmationToClient, sendOrderNotificationToAdmin } from "@/lib/email";
-import { confirmOrder, getOrder } from "@/lib/db";
+import { confirmOrder, getOrder, getSetting } from "@/lib/db";
 import { decrementProductStock } from "@/lib/products-db";
 import { incrementPromoUsage } from "@/lib/promos-db";
 
@@ -77,6 +77,7 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
           : null;
         const envio = Number(orderData?.envio ?? 0);
         const zona = String(orderData?.zona ?? "santiago");
+        const comprasOff = await getSetting("notif_compras").catch(() => null);
 
         await Promise.all([
           clientEmail
@@ -90,17 +91,19 @@ async function handleConfirm(tokenWs: string | null, tbkToken: string | null) {
                 customer,
               })
             : Promise.resolve(),
-          sendOrderNotificationToAdmin({
-            clientEmail,
-            buyOrder,
-            amount,
-            authCode,
-            card,
-            items,
-            customer,
-            envio,
-            zona,
-          }),
+          comprasOff !== "false"
+            ? sendOrderNotificationToAdmin({
+                clientEmail,
+                buyOrder,
+                amount,
+                authCode,
+                card,
+                items,
+                customer,
+                envio,
+                zona,
+              })
+            : Promise.resolve(),
         ]);
       } catch (emailErr) {
         console.error("[checkout/emails]", emailErr);

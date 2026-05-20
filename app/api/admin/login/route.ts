@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
     attempts.set(ip, { count: newCount, resetAt: cur.resetAt });
     const left = MAX_ATTEMPTS - newCount;
     if (newCount === MAX_ATTEMPTS) {
-      sendSecurityAlert(ip).catch(() => {});
+      getSetting("notif_seguridad").then((v) => {
+        if (v !== "false") sendSecurityAlert(ip).catch(() => {});
+      }).catch(() => sendSecurityAlert(ip).catch(() => {}));
     }
     const msg = left > 0 ? `Contraseña incorrecta (${left} intentos restantes)` : `Bloqueado 15 min.`;
     return NextResponse.json({ ok: false, error: msg }, { status: 401 });
