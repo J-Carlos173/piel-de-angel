@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div>
             <div className="footer-logo">
-              Piel de <span>Ángel</span>
+              <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ height: 70, objectFit: "contain", borderRadius: 4 }} />
             </div>
             <p className="footer-desc">
               Un refugio de bienestar y belleza donde cada detalle está pensado para

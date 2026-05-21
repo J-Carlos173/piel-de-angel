@@ -23,7 +23,7 @@ export default function Navbar() {
     <nav className={`navbar${scrolled ? " scrolled" : ""}`} id="navbar">
       <div className="container nav-wrapper">
         <a href="#inicio" className="logo">
-          Piel de <span>Ángel</span>
+          <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ height: 44, width: 44, objectFit: "contain", borderRadius: 4 }} />
         </a>
 
         <ul className={`nav-links${menuOpen ? " active" : ""}`} id="navLinks">
