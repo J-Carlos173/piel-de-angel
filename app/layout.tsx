@@ -105,8 +105,8 @@ const jsonLd = {
       },
       address: {
         "@type": "PostalAddress",
-        streetAddress: "La Paloma 1982",
-        addressLocality: "La Pintana",
+        streetAddress: "Omar Herrera Gutiérrez 1556",
+        addressLocality: "Puente Alto",
         addressRegion: "Región Metropolitana",
         addressCountry: "CL",
       },
