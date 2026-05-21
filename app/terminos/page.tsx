@@ -33,7 +33,7 @@ export default function TerminosPage() {
               Santiago, Región Metropolitana, Chile.
             </p>
             <p>
-              El uso del sitio web <strong>piel-de-angel.vercel.app</strong> y la realización de
+              El uso del sitio web <strong>www.pieldeangel.cl</strong> y la realización de
               compras implica la aceptación íntegra de los presentes Términos y Condiciones.
             </p>
           </Section>

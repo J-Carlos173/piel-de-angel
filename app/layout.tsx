@@ -4,7 +4,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import { Analytics } from "@vercel/analytics/next";
 import PageTracker from "@/components/PageTracker";
 
-const SITE_URL = "https://piel-de-angel.vercel.app";
+const SITE_URL = "https://www.pieldeangel.cl";
 const SITE_NAME = "Piel de Ángel";
 const DESCRIPTION =
   "Skincare premium y estética facial en Santiago. Sérums con ácido hialurónico, vitamina C, retinol y protección solar. Rutinas K-beauty y tratamientos faciales profesionales. Envío a todo Chile.";
