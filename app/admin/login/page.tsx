@@ -103,7 +103,7 @@ function LoginForm() {
             </div>
           </div>
 
-          <p style={{ margin: "0 0 5px", fontSize: 10, color: "#7A9E8A", letterSpacing: "0.28em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>
+          <p style={{ margin: "0 0 5px", fontSize: 10, color: "#C68A95", letterSpacing: "0.28em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>
             Piel de Ángel
           </p>
           <h1 style={{ margin: "0 0 5px", fontSize: 26, color: "#2e1e24", fontWeight: 400 }}>
