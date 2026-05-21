@@ -79,10 +79,10 @@ function LoginForm() {
         boxShadow: "0 24px 70px rgba(100,60,70,0.12), 0 0 0 1px rgba(198,138,149,0.18)",
         position: "relative",
       }}>
-        {/* Stripe botánica superior */}
+        {/* Stripe superior */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: 3, borderRadius: "28px 28px 0 0",
-          background: "linear-gradient(90deg, transparent, #7FA882, #5B7E64, #7FA882, transparent)",
+          background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)",
         }} />
 
         {/* Header */}
