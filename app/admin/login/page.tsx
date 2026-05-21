@@ -93,13 +93,13 @@ function LoginForm() {
               background: "radial-gradient(circle, rgba(198,138,149,0.20) 0%, transparent 70%)",
             }} />
             <div style={{
-              width: 68, height: 68, borderRadius: "50%",
-              background: "linear-gradient(145deg, #D8A7B1 0%, #C68A95 50%, #8B6F6F 100%)",
+              width: 80, height: 80, borderRadius: "50%",
+              background: "#fff",
               display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 8px 26px rgba(198,138,149,0.42), inset 0 1px 0 rgba(255,255,255,0.3)",
-              position: "relative",
+              boxShadow: "0 8px 26px rgba(198,138,149,0.42)",
+              position: "relative", overflow: "hidden",
             }}>
-              <i className="fa-solid fa-leaf" style={{ color: "#fff", fontSize: 24 }} />
+              <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ width: 72, height: 72, objectFit: "contain" }} />
             </div>
           </div>
 
