@@ -39,6 +39,22 @@ export default function Navbar() {
               </a>
             </li>
           ))}
+
+          {/* Extras visibles solo en el menú móvil */}
+          <li className="mobile-menu-extras">
+            <a href="#agenda" onClick={closeMenu} className="nav-cta mobile-cta">
+              Reservar Hora
+            </a>
+            <div className="mobile-menu-icons">
+              <button className="theme-toggle" onClick={toggle} aria-label={dark ? "Modo claro" : "Modo oscuro"}>
+                <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
+              </button>
+              <button className="cart-toggle" onClick={() => { open(); closeMenu(); }} aria-label="Abrir carrito">
+                <i className="fa-solid fa-bag-shopping" />
+                <span className={`cart-badge${count > 0 ? " active" : ""}`}>{count}</span>
+              </button>
+            </div>
+          </li>
         </ul>
 
         <div className="nav-actions">
@@ -46,14 +62,14 @@ export default function Navbar() {
             Reservar Hora
           </a>
           <button
-            className="theme-toggle"
+            className="theme-toggle desktop-only"
             onClick={toggle}
             aria-label={dark ? "Modo claro" : "Modo oscuro"}
           >
             <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
           </button>
           <button
-            className="cart-toggle"
+            className="cart-toggle desktop-only"
             onClick={open}
             aria-label="Abrir carrito"
           >

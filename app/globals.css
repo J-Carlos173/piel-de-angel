@@ -203,6 +203,7 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   font-weight: 400;
 }
 .nav-links { display: flex; gap: 36px; list-style: none; }
+.mobile-menu-extras { display: none; }
 .nav-links a {
   font-size: 0.78rem;
   text-transform: uppercase;
@@ -1762,6 +1763,33 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
   .menu-toggle { display: block; }
   .logo { font-size: 1.2rem; }
   .nav-actions { gap: 10px; }
+  .desktop-only { display: none !important; }
+  .mobile-menu-extras {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 32px;
+    border-top: 1px solid rgba(198,138,149,0.2);
+    list-style: none;
+  }
+  .mobile-cta {
+    display: flex;
+    justify-content: center;
+    padding: 14px 24px;
+    background: var(--rosa);
+    color: #fff;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .mobile-menu-icons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+  .nav-links { display: flex; }
   .hero-buttons { flex-direction: column; }
   .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
   .hero-badge { left: 10px; padding: 16px 22px; }
