@@ -1760,6 +1760,8 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
   }
   .nav-links.active { right: 0; }
   .menu-toggle { display: block; }
+  .logo { font-size: 1.2rem; }
+  .nav-actions { gap: 10px; }
   .hero-buttons { flex-direction: column; }
   .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
   .hero-badge { left: 10px; padding: 16px 22px; }
