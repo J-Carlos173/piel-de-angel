@@ -22,8 +22,8 @@ export default function Navbar() {
   return (
     <nav className={`navbar${scrolled ? " scrolled" : ""}`} id="navbar">
       <div className="container nav-wrapper">
-        <a href="#inicio" className="logo" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ height: 40, width: 40, objectFit: "contain", borderRadius: 4 }} />
+        <a href="#inicio" className="logo" style={{ display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+          <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ height: 40, width: 40, objectFit: "contain", borderRadius: 4, flexShrink: 0 }} />
           Piel de <span>Ángel</span>
         </a>
 
