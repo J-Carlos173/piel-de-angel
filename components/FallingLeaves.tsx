@@ -37,7 +37,7 @@ const COLORS: Record<Season, string[]> = {
   summer: ["#4A6B52", "#5B7E64", "#3D5940", "#6B9E72", "#4E7A55"],
   winter: ["#A8C0CE", "#8FAFC0", "#C4D8E4", "#7A9EB2", "#B0CCDA"],
 };
-const OPACITY: Record<Season, number> = { autumn: 0.35, spring: 0.30, summer: 0.28, winter: 0.55 };
+const OPACITY: Record<Season, number> = { autumn: 0.18, spring: 0.15, summer: 0.14, winter: 0.22 };
 
 const SEASON_META: { key: Season; icon: string; label: string }[] = [
   { key: "spring", icon: "fa-seedling", label: "Primavera" },
@@ -121,7 +121,7 @@ export default function FallingLeaves() {
           position: "fixed",
           inset: 0,
           pointerEvents: "none",
-          zIndex: 0,
+          zIndex: 2,
           overflow: "hidden",
         }}
       >
