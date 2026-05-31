@@ -121,7 +121,7 @@ export default function FallingLeaves() {
           position: "fixed",
           inset: 0,
           pointerEvents: "none",
-          zIndex: -1,
+          zIndex: 0,
           overflow: "hidden",
         }}
       >
