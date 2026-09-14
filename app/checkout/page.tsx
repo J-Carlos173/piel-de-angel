@@ -192,6 +192,87 @@ export default function CheckoutPage() {
                 </label>
               </div>
 
+              {/* Selector zona */}
+              <div className="checkout-zona">
+                <p className="checkout-zona-label">¿Dónde te lo enviamos?</p>
+                <div className="checkout-zona-btns">
+                  <button type="button" className={`zona-btn${zona === "santiago" ? " active" : ""}`} onClick={() => setZona("santiago")}>
+                    <i className="fa-solid fa-city" /> Santiago
+                  </button>
+                  <button type="button" className={`zona-btn${zona === "regiones" ? " active" : ""}`} onClick={() => setZona("regiones")}>
+                    <i className="fa-solid fa-map-location-dot" /> Regiones
+                  </button>
+                </div>
+                {zona === "santiago" && (
+                  <p className="checkout-zona-info">
+                    Solo Santiago Urbano · círculo Américo Vespucio
+                    {!sabado && <> · <strong>Despacho los sábados</strong></>}
+                  </p>
+                )}
+                {zona === "regiones" && (
+                  <p className="checkout-zona-info">
+                    Blue Express o Starken · Copiapó hasta Puerto Montt
+                  </p>
+                )}
+              </div>
+
+              {/* Banners de envío */}
+              {zona === "santiago" && !sabado && (
+                <div className="checkout-envio-banner sabado">
+                  <i className="fa-solid fa-calendar-day" />
+                  Despacho gratis en Santiago todos los <strong>sábados</strong>. Te contactaremos por WhatsApp para coordinar.
+                </div>
+              )}
+              {zona === "santiago" && sabado && faltaParaGratis > 0 && (
+                <div className="checkout-envio-banner">
+                  <i className="fa-solid fa-truck" />
+                  Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis
+                </div>
+              )}
+              {envio === 0 && (
+                <div className="checkout-envio-banner gratis">
+                  <i className="fa-solid fa-circle-check" /> ¡Envío gratis aplicado!
+                </div>
+              )}
+
+              {/* Código de descuento */}
+              <div style={{ margin: "4px 0 0", padding: "14px", background: "rgba(198,138,149,0.06)", borderRadius: 12, border: "1px solid rgba(198,138,149,0.2)" }}>
+                <p style={{ margin: "0 0 8px", fontSize: 12, color: "var(--texto-soft)", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  <i className="fa-solid fa-tag" style={{ marginRight: 6 }} />Código de descuento <span className="label-opcional">(opcional)</span>
+                </p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    type="text"
+                    placeholder="MESDELAMAMA"
+                    value={promoInput}
+                    disabled={!!promoValido}
+                    onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
+                    onKeyDown={(e) => e.key === "Enter" && aplicarPromo()}
+                    style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--borde-suave, #e0d0d0)", fontSize: 13, fontFamily: "Montserrat, sans-serif", outline: "none", background: promoValido ? "#f0f9f0" : "white", color: "#333" }}
+                  />
+                  {promoValido ? (
+                    <button
+                      type="button"
+                      onClick={() => { setPromoValido(null); setPromoInput(""); setPromoError(""); }}
+                      style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e57373", background: "transparent", color: "#e57373", fontSize: 12, cursor: "pointer", fontFamily: "Montserrat, sans-serif" }}
+                    >
+                      Quitar
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={aplicarPromo}
+                      disabled={promoLoading || !promoInput.trim()}
+                      style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "var(--rosa-deep, #C68A95)", color: "white", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", opacity: promoLoading || !promoInput.trim() ? 0.6 : 1 }}
+                    >
+                      {promoLoading ? <i className="fa-solid fa-spinner fa-spin" /> : "Aplicar"}
+                    </button>
+                  )}
+                </div>
+                {promoError && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#e57373", fontFamily: "Montserrat, sans-serif" }}><i className="fa-solid fa-circle-exclamation" style={{ marginRight: 4 }} />{promoError}</p>}
+                {promoValido && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#4caf50", fontFamily: "Montserrat, sans-serif" }}><i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} />¡Código aplicado! −{formatPrecio(promoValido.discount)}</p>}
+              </div>
+
               {/* Términos y condiciones */}
               <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginTop: 4 }}>
                 <input
@@ -239,30 +320,6 @@ export default function CheckoutPage() {
           <section className="checkout-summary">
             <h2>Resumen del pedido</h2>
 
-            {/* Selector zona */}
-            <div className="checkout-zona">
-              <p className="checkout-zona-label">¿Dónde te lo enviamos?</p>
-              <div className="checkout-zona-btns">
-                <button type="button" className={`zona-btn${zona === "santiago" ? " active" : ""}`} onClick={() => setZona("santiago")}>
-                  <i className="fa-solid fa-city" /> Santiago
-                </button>
-                <button type="button" className={`zona-btn${zona === "regiones" ? " active" : ""}`} onClick={() => setZona("regiones")}>
-                  <i className="fa-solid fa-map-location-dot" /> Regiones
-                </button>
-              </div>
-              {zona === "santiago" && (
-                <p className="checkout-zona-info">
-                  Solo Santiago Urbano · círculo Américo Vespucio
-                  {!sabado && <> · <strong>Despacho los sábados</strong></>}
-                </p>
-              )}
-              {zona === "regiones" && (
-                <p className="checkout-zona-info">
-                  Blue Express o Starken · Copiapó hasta Puerto Montt
-                </p>
-              )}
-            </div>
-
             {/* Items */}
             <div className="checkout-items">
               {lineItems.map((item) => (
@@ -282,63 +339,6 @@ export default function CheckoutPage() {
                   : <span className="checkout-item-price">{formatPrecio(envio)}</span>
                 }
               </div>
-            </div>
-
-            {/* Banners */}
-            {zona === "santiago" && !sabado && (
-              <div className="checkout-envio-banner sabado">
-                <i className="fa-solid fa-calendar-day" />
-                Despacho gratis en Santiago todos los <strong>sábados</strong>. Te contactaremos por WhatsApp para coordinar.
-              </div>
-            )}
-            {zona === "santiago" && sabado && faltaParaGratis > 0 && (
-              <div className="checkout-envio-banner">
-                <i className="fa-solid fa-truck" />
-                Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis
-              </div>
-            )}
-            {envio === 0 && (
-              <div className="checkout-envio-banner gratis">
-                <i className="fa-solid fa-circle-check" /> ¡Envío gratis aplicado!
-              </div>
-            )}
-
-            {/* Código de descuento */}
-            <div style={{ margin: "12px 0", padding: "14px", background: "rgba(198,138,149,0.06)", borderRadius: 12, border: "1px solid rgba(198,138,149,0.2)" }}>
-              <p style={{ margin: "0 0 8px", fontSize: 12, color: "var(--texto-soft)", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                <i className="fa-solid fa-tag" style={{ marginRight: 6 }} />Código de descuento
-              </p>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  type="text"
-                  placeholder="MESDELAMAMA"
-                  value={promoInput}
-                  disabled={!!promoValido}
-                  onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
-                  onKeyDown={(e) => e.key === "Enter" && aplicarPromo()}
-                  style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--borde-suave, #e0d0d0)", fontSize: 13, fontFamily: "Montserrat, sans-serif", outline: "none", background: promoValido ? "#f0f9f0" : "white", color: "#333" }}
-                />
-                {promoValido ? (
-                  <button
-                    type="button"
-                    onClick={() => { setPromoValido(null); setPromoInput(""); setPromoError(""); }}
-                    style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e57373", background: "transparent", color: "#e57373", fontSize: 12, cursor: "pointer", fontFamily: "Montserrat, sans-serif" }}
-                  >
-                    Quitar
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={aplicarPromo}
-                    disabled={promoLoading || !promoInput.trim()}
-                    style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "var(--rosa-deep, #C68A95)", color: "white", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", opacity: promoLoading || !promoInput.trim() ? 0.6 : 1 }}
-                  >
-                    {promoLoading ? <i className="fa-solid fa-spinner fa-spin" /> : "Aplicar"}
-                  </button>
-                )}
-              </div>
-              {promoError && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#e57373", fontFamily: "Montserrat, sans-serif" }}><i className="fa-solid fa-circle-exclamation" style={{ marginRight: 4 }} />{promoError}</p>}
-              {promoValido && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#4caf50", fontFamily: "Montserrat, sans-serif" }}><i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} />¡Código aplicado! −{formatPrecio(promoValido.discount)}</p>}
             </div>
 
             {descuento > 0 && (
