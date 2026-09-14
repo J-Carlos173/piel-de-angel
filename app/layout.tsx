@@ -7,7 +7,7 @@ import PageTracker from "@/components/PageTracker";
 const SITE_URL = "https://www.pieldeangel.cl";
 const SITE_NAME = "Piel de Ángel";
 const DESCRIPTION =
-  "Skincare premium y estética facial en Santiago. Sérums con ácido hialurónico, vitamina C, retinol y protección solar. Rutinas K-beauty y tratamientos faciales profesionales. Envío a todo Chile.";
+  "Skincare premium y estética facial en Santiago Oriente — Vitacura, Lo Barnechea, Providencia, Las Condes y Ñuñoa. Sérums con ácido hialurónico, vitamina C, retinol y protección solar. Rutinas K-beauty y tratamientos faciales profesionales. Envío a todo Chile.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -48,6 +48,12 @@ export const metadata: Metadata = {
     "reservar hora estética Santiago",
     "agenda online estética Santiago",
     "cita facial Santiago online",
+    "skincare premium Vitacura",
+    "estética facial Providencia",
+    "spa facial Las Condes",
+    "cosmética coreana Lo Barnechea",
+    "tratamientos faciales Ñuñoa",
+    "salón de belleza Santiago Oriente",
   ],
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -99,10 +105,13 @@ const jsonLd = {
       priceRange: "$$",
       currenciesAccepted: "CLP",
       paymentAccepted: "Tarjeta de crédito, débito, WebPay, WhatsApp",
-      areaServed: {
-        "@type": "Country",
-        name: "Chile",
-      },
+      areaServed: [
+        { "@type": "City", name: "Vitacura" },
+        { "@type": "City", name: "Lo Barnechea" },
+        { "@type": "City", name: "Providencia" },
+        { "@type": "City", name: "Las Condes" },
+        { "@type": "City", name: "Ñuñoa" },
+      ],
       address: {
         "@type": "PostalAddress",
         streetAddress: "Omar Herrera Gutiérrez 1556",
