@@ -2330,12 +2330,24 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
   .checkout-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .checkout-grid { grid-template-columns: 1fr; gap: 20px; }
+  .checkout-grid { grid-template-columns: 1fr; gap: 0; }
   .checkout-container { padding: 16px; }
   .checkout-page { padding: 24px 0 60px; }
   .checkout-header { margin-bottom: 20px; }
   .checkout-header h1 { font-size: 1.5rem; }
-  .checkout-form-section, .checkout-summary { padding: 22px 18px; border-radius: 14px; }
+  /* Una sola tarjeta continua: form arriba, resumen abajo, sin espacio ni sombra duplicada entre ambos */
+  .checkout-form-section, .checkout-summary { padding: 22px 18px; }
+  .checkout-form-section {
+    border-radius: 14px 14px 0 0;
+    box-shadow: none;
+    padding-bottom: 24px;
+  }
+  .checkout-summary {
+    border-radius: 0 0 14px 14px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  [data-theme="dark"] .checkout-summary { border-top-color: rgba(255,255,255,0.08); }
   .checkout-form-section h2, .checkout-summary h2 { font-size: 1.1rem; margin-bottom: 16px; }
   .btn-webpay { font-size: 0.92rem; padding: 14px 20px; }
   .checkout-result-card { padding: 36px 24px; }
