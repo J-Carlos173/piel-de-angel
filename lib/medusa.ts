@@ -8,6 +8,7 @@ function mapProduct(p: any): Producto {
     categoria:   p.categoria ?? "",
     descripcion: p.description ?? "",
     precio:      Number(p.precio ?? 0),
+    precio_oferta: p.precio_oferta != null ? Number(p.precio_oferta) : null,
     stock:       Number(p.stock ?? 0),
     badge:       (p.badge as "" | "bestseller" | "nuevo") ?? "",
     img:         p.thumbnail ?? "",

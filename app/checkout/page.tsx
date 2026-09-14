@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useProductsStore } from "@/store/productsStore";
-import { formatPrecio } from "@/data/productos";
+import { formatPrecio, precioFinal } from "@/data/productos";
 import Link from "next/link";
 
 const COSTO_ENVIO = 2990;
@@ -16,8 +16,9 @@ function esSabado(): boolean {
 }
 
 function calcularEnvio(subtotal: number, zona: "santiago" | "regiones"): number {
-  if (zona === "santiago" && esSabado() && subtotal >= GRATIS_SANTIAGO) return 0;
-  return COSTO_ENVIO;
+  // Regiones: no se cobra en el checkout, se paga directo al transportista al recibirlo
+  if (zona === "regiones") return 0;
+  return subtotal >= GRATIS_SANTIAGO ? 0 : COSTO_ENVIO;
 }
 
 export default function CheckoutPage() {
@@ -43,7 +44,7 @@ export default function CheckoutPage() {
   const descuento = promoValido?.discount ?? 0;
   const total = Math.max(0, subtotal + envio - descuento);
   const sabado = esSabado();
-  const faltaParaGratis = zona === "santiago" && sabado
+  const faltaParaGratis = zona === "santiago"
     ? Math.max(0, GRATIS_SANTIAGO - subtotal)
     : -1;
 
@@ -51,7 +52,7 @@ export default function CheckoutPage() {
     .map((item) => {
       const prod = products.find((p) => p.id === item.id);
       if (!prod) return null;
-      return { ...prod, qty: item.qty };
+      return { ...prod, precio: precioFinal(prod), qty: item.qty };
     })
     .filter(Boolean) as Array<{ id: string; nombre: string; precio: number; qty: number }>;
 
@@ -211,27 +212,27 @@ export default function CheckoutPage() {
                 )}
                 {zona === "regiones" && (
                   <p className="checkout-zona-info">
-                    Blue Express o Starken · Copiapó hasta Puerto Montt
+                    Blue Express o Starken · Copiapó hasta Puerto Montt · <strong>envío por pagar</strong>
                   </p>
                 )}
               </div>
 
               {/* Banners de envío */}
-              {zona === "santiago" && !sabado && (
-                <div className="checkout-envio-banner sabado">
-                  <i className="fa-solid fa-calendar-day" />
-                  Despacho gratis en Santiago todos los <strong>sábados</strong>. Te contactaremos por WhatsApp para coordinar.
-                </div>
-              )}
-              {zona === "santiago" && sabado && faltaParaGratis > 0 && (
+              {zona === "santiago" && faltaParaGratis > 0 && (
                 <div className="checkout-envio-banner">
                   <i className="fa-solid fa-truck" />
                   Te faltan <strong>{formatPrecio(faltaParaGratis)}</strong> para envío gratis
                 </div>
               )}
-              {envio === 0 && (
+              {zona === "santiago" && envio === 0 && (
                 <div className="checkout-envio-banner gratis">
                   <i className="fa-solid fa-circle-check" /> ¡Envío gratis aplicado!
+                </div>
+              )}
+              {zona === "regiones" && (
+                <div className="checkout-envio-banner">
+                  <i className="fa-solid fa-truck-fast" />
+                  El despacho a regiones se paga directo al transportista (Blue Express o Starken) cuando te llega tu pedido — no se cobra aquí.
                 </div>
               )}
 
@@ -334,9 +335,11 @@ export default function CheckoutPage() {
                 <span className="checkout-item-name">
                   <i className="fa-solid fa-truck" /> Envío
                 </span>
-                {envio === 0
-                  ? <span className="checkout-envio-gratis">¡Gratis!</span>
-                  : <span className="checkout-item-price">{formatPrecio(envio)}</span>
+                {zona === "regiones"
+                  ? <span className="checkout-item-porpagar">Por pagar</span>
+                  : envio === 0
+                    ? <span className="checkout-envio-gratis">¡Gratis!</span>
+                    : <span className="checkout-item-price">{formatPrecio(envio)}</span>
                 }
               </div>
             </div>

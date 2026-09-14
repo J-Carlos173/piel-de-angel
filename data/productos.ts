@@ -4,9 +4,17 @@ export interface Producto {
   categoria: string;
   descripcion: string;
   precio: number;
+  precio_oferta?: number | null;
   stock: number;
   badge: "bestseller" | "nuevo" | "";
   img: string;
+}
+
+/** Precio que realmente se cobra: el de oferta si está activo y es menor al normal. */
+export function precioFinal(p: Producto): number {
+  return p.precio_oferta && p.precio_oferta > 0 && p.precio_oferta < p.precio
+    ? p.precio_oferta
+    : p.precio;
 }
 
 export const PRODUCTOS: Producto[] = [

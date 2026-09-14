@@ -11,17 +11,18 @@ type Producto = {
   thumbnail: string;
   status: string;
   precio: number;
+  precio_oferta: number | null;
   stock: number;
   categoria: string;
   badge: string;
 };
 
 type NuevoForm = {
-  title: string; description: string; precio: string;
+  title: string; description: string; precio: string; precioOferta: string;
   stock: string; categoria: string; badge: string;
 };
 
-const BLANK_NUEVO: NuevoForm = { title: "", description: "", precio: "", stock: "0", categoria: "", badge: "" };
+const BLANK_NUEVO: NuevoForm = { title: "", description: "", precio: "", precioOferta: "", stock: "0", categoria: "", badge: "" };
 
 function fmtPrecio(n: number) {
   return "$" + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -35,7 +36,7 @@ export default function ProductosAdminClient() {
   const [editando, setEditando] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
-  const [form, setForm] = useState<Record<string, { stock: string; precio: string; categoria: string; badge: string; title: string; description: string }>>({});
+  const [form, setForm] = useState<Record<string, { stock: string; precio: string; precioOferta: string; categoria: string; badge: string; title: string; description: string }>>({});
 
   // Nuevo producto
   const [creando, setCreando] = useState(false);
@@ -77,6 +78,7 @@ export default function ProductosAdminClient() {
           initialForm[p.id] = {
             stock: String(p.stock ?? 0),
             precio: p.precio ? String(p.precio) : "",
+            precioOferta: p.precio_oferta != null ? String(p.precio_oferta) : "",
             categoria: p.categoria ?? "",
             badge: p.badge ?? "",
             title: p.title ?? "",
@@ -111,6 +113,7 @@ export default function ProductosAdminClient() {
         id, title: f.title, description: f.description,
         stock: Number(f.stock),
         precio: f.precio ? Number(f.precio) : undefined,
+        precio_oferta: f.precioOferta ? Number(f.precioOferta) : null,
         categoria: f.categoria, badge: f.badge,
         ...(thumbnail && { thumbnail }),
       }),
@@ -126,7 +129,8 @@ export default function ProductosAdminClient() {
         p.id === id
           ? { ...p, title: f.title, description: f.description,
               ...(thumbnail && { thumbnail }),
-              stock: Number(f.stock), categoria: f.categoria, badge: f.badge }
+              stock: Number(f.stock), categoria: f.categoria, badge: f.badge,
+              precio_oferta: f.precioOferta ? Number(f.precioOferta) : null }
           : p
       )
     );
@@ -190,6 +194,7 @@ export default function ProductosAdminClient() {
           title: nuevoForm.title,
           description: nuevoForm.description,
           precio: nuevoForm.precio ? Number(nuevoForm.precio) : undefined,
+          precio_oferta: nuevoForm.precioOferta ? Number(nuevoForm.precioOferta) : null,
           stock: Number(nuevoForm.stock),
           categoria: nuevoForm.categoria,
           badge: nuevoForm.badge,
@@ -206,6 +211,7 @@ export default function ProductosAdminClient() {
         [p.id]: {
           stock: String(p.stock ?? nuevoForm.stock),
           precio: p.precio ? String(p.precio) : nuevoForm.precio,
+          precioOferta: p.precio_oferta != null ? String(p.precio_oferta) : nuevoForm.precioOferta,
           categoria: p.categoria ?? nuevoForm.categoria,
           badge: p.badge ?? nuevoForm.badge,
           title: p.title,
@@ -338,6 +344,11 @@ export default function ProductosAdminClient() {
                   <div>
                     <label style={labelStyle}>Precio CLP</label>
                     <input type="number" min="0" placeholder="19990" value={nuevoForm.precio} onChange={(e) => setNuevoForm((f) => ({ ...f, precio: e.target.value }))} style={inputStyle} />
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Precio oferta (opcional)</label>
+                    <input type="number" min="0" placeholder="Dejar vacío = sin oferta" value={nuevoForm.precioOferta} onChange={(e) => setNuevoForm((f) => ({ ...f, precioOferta: e.target.value }))} style={inputStyle} />
                   </div>
 
                   <div>
@@ -480,6 +491,9 @@ export default function ProductosAdminClient() {
                       <p style={{ margin: "0 0 2px", fontSize: 16, color: textMain, fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: "normal" }}>{p.title}</p>
                       <p style={{ margin: 0, fontSize: 11, color: textMuted, ...MONO }}>
                         {f.categoria || "Sin categoría"} · {f.precio ? fmtPrecio(Number(f.precio)) : "Sin precio"}
+                        {f.precioOferta && Number(f.precioOferta) > 0 && Number(f.precioOferta) < Number(f.precio) && (
+                          <span style={{ color: "#C0392B", fontWeight: 700 }}> → {fmtPrecio(Number(f.precioOferta))} (oferta)</span>
+                        )}
                       </p>
                     </div>
 
@@ -565,6 +579,10 @@ export default function ProductosAdminClient() {
                         <div>
                           <label style={labelStyle}>Precio CLP</label>
                           <input type="number" min="0" value={f.precio} onChange={(e) => updateField(p.id, "precio", e.target.value)} placeholder="19990" style={inputStyle} />
+                        </div>
+                        <div>
+                          <label style={labelStyle}>Precio oferta (opcional)</label>
+                          <input type="number" min="0" value={f.precioOferta} onChange={(e) => updateField(p.id, "precioOferta", e.target.value)} placeholder="Dejar vacío = sin oferta" style={inputStyle} />
                         </div>
                         <div>
                           <label style={labelStyle}>Categoría</label>

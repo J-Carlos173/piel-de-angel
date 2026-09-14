@@ -14,7 +14,7 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, title, description, thumbnail, status, precio, stock, categoria, badge } = body;
+    const { id, title, description, thumbnail, status, precio, precio_oferta, stock, categoria, badge } = body;
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
 
     const updated = await updateProduct(id, {
@@ -23,6 +23,7 @@ export async function PATCH(req: NextRequest) {
       ...(thumbnail !== undefined && { thumbnail }),
       ...(status !== undefined && { status }),
       ...(precio !== undefined && { precio: Number(precio) }),
+      ...(precio_oferta !== undefined && { precio_oferta: precio_oferta === null ? null : Number(precio_oferta) }),
       ...(stock !== undefined && { stock: Number(stock) }),
       ...(categoria !== undefined && { categoria }),
       ...(badge !== undefined && { badge }),
@@ -36,7 +37,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { title, description, precio, stock, categoria, badge, thumbnail } = await req.json();
+    const { title, description, precio, precio_oferta, stock, categoria, badge, thumbnail } = await req.json();
     if (!title?.trim()) return NextResponse.json({ error: "Título requerido" }, { status: 400 });
 
     const product = await createProduct({
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
       thumbnail: thumbnail ?? "",
       status: "published",
       precio: Number(precio ?? 0),
+      precio_oferta: precio_oferta != null ? Number(precio_oferta) : null,
       stock: Number(stock ?? 0),
       categoria: categoria ?? "",
       badge: badge ?? "",

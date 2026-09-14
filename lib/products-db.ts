@@ -7,6 +7,7 @@ export type Product = {
   thumbnail: string;
   status: string;
   precio: number;
+  precio_oferta?: number | null;
   stock: number;
   categoria: string;
   badge: string;
@@ -34,6 +35,7 @@ export async function ensureProductsTable() {
       updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS precio_oferta INTEGER DEFAULT NULL`;
 }
 
 export async function getAllProducts(): Promise<Product[]> {
@@ -60,9 +62,9 @@ export async function createProduct(data: CreateProductData): Promise<Product> {
   const sql = getDb();
   await ensureProductsTable();
   const rows = await sql`
-    INSERT INTO products (title, description, thumbnail, status, precio, stock, categoria, badge)
+    INSERT INTO products (title, description, thumbnail, status, precio, precio_oferta, stock, categoria, badge)
     VALUES (${data.title}, ${data.description ?? ""}, ${data.thumbnail ?? ""},
-            ${data.status ?? "published"}, ${data.precio ?? 0}, ${data.stock ?? 0},
+            ${data.status ?? "published"}, ${data.precio ?? 0}, ${data.precio_oferta ?? null}, ${data.stock ?? 0},
             ${data.categoria ?? ""}, ${data.badge ?? ""})
     RETURNING *
   `;
@@ -78,6 +80,7 @@ export async function updateProduct(id: string, data: UpdateProductData): Promis
       thumbnail   = COALESCE(${data.thumbnail ?? null}, thumbnail),
       status      = COALESCE(${data.status ?? null}, status),
       precio      = COALESCE(${data.precio ?? null}, precio),
+      precio_oferta = CASE WHEN ${data.precio_oferta !== undefined} THEN ${data.precio_oferta ?? null} ELSE precio_oferta END,
       stock       = COALESCE(${data.stock ?? null}, stock),
       categoria   = COALESCE(${data.categoria ?? null}, categoria),
       badge       = COALESCE(${data.badge ?? null}, badge),

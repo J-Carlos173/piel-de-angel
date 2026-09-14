@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { formatPrecio, WHATSAPP_NUMERO } from "@/data/productos";
+import { formatPrecio, precioFinal, WHATSAPP_NUMERO } from "@/data/productos";
 import { useProductsStore } from "./productsStore";
 
 interface CartItem {
@@ -98,7 +98,7 @@ export const useCartStore = create<CartStore>()(
         items.forEach((item) => {
           const prod = getProducts().find((p) => p.id === item.id);
           if (!prod) return;
-          const sub = prod.precio * item.qty;
+          const sub = precioFinal(prod) * item.qty;
           total += sub;
           mensaje += `• ${prod.nombre} x${item.qty} — ${formatPrecio(sub)}\n`;
         });
@@ -111,7 +111,7 @@ export const useCartStore = create<CartStore>()(
       totalAmount: () =>
         get().items.reduce((sum, item) => {
           const prod = getProducts().find((p) => p.id === item.id);
-          return sum + (prod ? prod.precio * item.qty : 0);
+          return sum + (prod ? precioFinal(prod) * item.qty : 0);
         }, 0),
     }),
     {
