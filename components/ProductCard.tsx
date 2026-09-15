@@ -5,16 +5,18 @@ import { createPortal } from "react-dom";
 import { Producto, formatPrecio, precioFinal } from "@/data/productos";
 import { useCartStore } from "@/store/cartStore";
 
+function stockLabel(stock: number): string {
+  if (stock <= 0) return "Agotado";
+  if (stock <= 3) return "¡Pocas unidades!";
+  return "En stock";
+}
+
 function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
   const add = useCartStore((s) => s.add);
   const agotado = p.stock <= 0;
   const stockBajo = p.stock > 0 && p.stock <= 3;
   const stockClass = agotado ? "agotado" : stockBajo ? "bajo" : "";
-  const stockTexto = agotado
-    ? "Agotado"
-    : stockBajo
-    ? `¡Solo ${p.stock} disponibles!`
-    : "En stock";
+  const stockTexto = stockLabel(p.stock);
 
   const precioConDescuento = precioFinal(p);
   const enOferta = precioConDescuento < p.precio;
@@ -96,11 +98,7 @@ export default function ProductCard({ p }: { p: Producto }) {
   const agotado = p.stock <= 0;
   const stockBajo = p.stock > 0 && p.stock <= 3;
   const stockClass = agotado ? "agotado" : stockBajo ? "bajo" : "";
-  const stockTexto = agotado
-    ? "Agotado"
-    : stockBajo
-    ? `¡Solo ${p.stock} disponibles!`
-    : "En stock";
+  const stockTexto = stockLabel(p.stock);
 
   const precioConDescuento = precioFinal(p);
   const enOferta = precioConDescuento < p.precio;
