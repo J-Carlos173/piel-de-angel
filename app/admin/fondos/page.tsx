@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 type Estilo = {
@@ -10,7 +13,7 @@ const ESTILOS: Estilo[] = [
   { id: "malla", nombre: "Malla de gradientes", desc: "Blobs difuminados en movimiento — look premium tipo sitio hecho con IA" },
   { id: "grano", nombre: "Textura de grano", desc: "Grano sutil sobre color plano, aire editorial discreto" },
   { id: "aurora", nombre: "Aurora animada", desc: "Gradiente fluido que se mueve lento de fondo" },
-  { id: "lujo", nombre: "Lujo oscuro", desc: "Fondo oscuro con acentos dorados y rosa — tendencia fuerte en marcas de belleza premium 2026, look regio y de alto contraste" },
+  { id: "lujo", nombre: "Lujo oscuro", desc: "Fondo oscuro con acentos dorados y rosa — pensado para verse igual en modo claro y oscuro" },
   { id: "botanico", nombre: "Patrón botánico sutil", desc: "Hojitas chicas y estáticas en muy baja opacidad — reemplazo elegante de las hojas animadas, sin movimiento" },
   { id: "terracota", nombre: "Terracota cálida", desc: "Tonos tierra y arena — look 'spa natural', tendencia en marcas de skincare con enfoque orgánico" },
   { id: "ondas", nombre: "Ondas suaves", desc: "Curva orgánica en la base de la sección" },
@@ -18,8 +21,10 @@ const ESTILOS: Estilo[] = [
 ];
 
 export default function FondosPage() {
+  const [dark, setDark] = useState(false);
+
   return (
-    <div style={{ minHeight: "100vh", background: "#f5eeec", fontFamily: "Georgia, serif" }}>
+    <div className={dark ? "fondos-page fondos-dark" : "fondos-page"} style={{ minHeight: "100vh", background: dark ? "#1C1917" : "#f5eeec", fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
       <style>{`
         @keyframes fondoBlobFloat {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -38,7 +43,9 @@ export default function FondosPage() {
           justify-content: center;
           overflow: hidden;
           border-top: 1px solid rgba(0,0,0,0.06);
+          transition: background 0.3s;
         }
+        .fondos-dark .fondo-preview { border-top-color: rgba(255,255,255,0.08); }
         .fondo-label {
           position: absolute;
           top: 20px; left: 20px;
@@ -144,7 +151,7 @@ export default function FondosPage() {
           animation: fondoAurora 12s ease infinite;
         }
 
-        /* Lujo oscuro */
+        /* Lujo oscuro (siempre oscuro, con o sin toggle) */
         .bg-lujo { background: #1C1917; }
         .bg-lujo::before, .bg-lujo::after {
           content: "";
@@ -199,33 +206,104 @@ export default function FondosPage() {
         @media (max-width: 640px) {
           .fondo-mock h2 { font-size: 1.7rem; }
         }
+
+        /* ===========================================================
+           MODO OSCURO — como se verían estos fondos con el tema nocturno
+           del sitio. Va al final para ganar el cascade sobre las reglas
+           de arriba en los casos de igual especificidad (ej. terracota).
+           =========================================================== */
+        .fondos-dark .bg-malla { background: #1C1917; }
+        .fondos-dark .bg-malla::before { background: radial-gradient(circle, rgba(216,167,177,0.32) 0%, transparent 65%); }
+        .fondos-dark .bg-malla::after { background: radial-gradient(circle, rgba(212,175,110,0.22) 0%, transparent 65%); }
+
+        .fondos-dark .bg-grano { background: #1C1917; }
+        .fondos-dark .bg-grano::before { opacity: 0.08; }
+
+        .fondos-dark .bg-aurora {
+          background: linear-gradient(120deg, #1C1917 0%, #2E2126 25%, #3D2530 50%, #241B1E 75%, #1C1917 100%);
+          background-size: 300% 300%;
+        }
+
+        .fondos-dark .bg-botanico {
+          background-color: #1C1917;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40,8 C50,5 62,15 63,28 C64,40 55,52 45,58 C42,60 37,60 34,57 C26,51 22,40 25,29 C27,18 33,10 40,8 Z' fill='%23D4AF6E' opacity='0.10'/%3E%3C/svg%3E");
+        }
+
+        .fondos-dark .bg-terracota {
+          background: linear-gradient(160deg, #3D2818 0%, #4A3020 45%, #5C3A22 100%);
+        }
+
+        .fondos-dark .bg-ondas { background: linear-gradient(180deg, #1C1917 0%, #2A1F22 100%); }
+        .fondos-dark .bg-ondas svg path:nth-child(1) { fill: #D4AF6E; opacity: 0.14; }
+        .fondos-dark .bg-ondas svg path:nth-child(2) { fill: #C68A95; opacity: 0.12; }
+
+        .fondos-dark .bg-minimal { background: #1C1917; }
+
+        /* Texto claro sobre cualquier fondo oscuro (menos lujo, que ya es siempre oscuro) */
+        .fondos-dark .fondo-mock .eyebrow { color: #E8B4BC; }
+        .fondos-dark .fondo-mock h2 { color: #F5EDE8; }
+        .fondos-dark .fondo-mock h2 em { color: #E8B4BC; }
+        .fondos-dark .fondo-mock p { color: rgba(245,237,232,0.65); }
+        .fondos-dark .fondo-mock button { background: linear-gradient(135deg, #D4AF6E, #C68A95); box-shadow: 0 10px 30px rgba(212,175,110,0.3); }
+        .fondos-dark .fondo-label { background: rgba(28,25,23,0.82); }
+        .fondos-dark .fondo-label strong { color: #F5EDE8; }
+        .fondos-dark .fondo-label span { color: rgba(245,237,232,0.6); }
       `}</style>
 
       {/* Header */}
       <div style={{
-        background: "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
+        background: dark
+          ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
+          : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
         padding: "32px 32px 28px",
-        borderBottom: "1.5px solid #ecddd9",
+        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
+        transition: "background 0.3s",
       }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <Link href="/admin" style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(198,138,149,0.08)", border: "1px solid #ecddd9",
-            borderRadius: 8, padding: "5px 12px", color: "#C68A95", fontSize: 12,
-            fontFamily: "Montserrat, sans-serif", marginBottom: 12, textDecoration: "none",
-          }}>
-            <i className="fa-solid fa-arrow-left" /> Panel
-          </Link>
-          <p style={{ margin: 0, color: "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>
-            Galería privada
-          </p>
-          <h1 style={{ margin: "6px 0 4px", color: "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-            Diseños de Fondo
-          </h1>
-          <p style={{ margin: 0, color: "#9a8486", fontSize: 13, maxWidth: 560 }}>
-            Página de prueba, no está enlazada desde el sitio público. Desplázate para comparar opciones —
-            nada de esto se aplica al sitio real todavía.
-          </p>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+          <div>
+            <Link href="/admin" style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)",
+              border: `1px solid ${dark ? "#3a2830" : "#ecddd9"}`,
+              borderRadius: 8, padding: "5px 12px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 12,
+              fontFamily: "Montserrat, sans-serif", marginBottom: 12, textDecoration: "none",
+            }}>
+              <i className="fa-solid fa-arrow-left" /> Panel
+            </Link>
+            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>
+              Galería privada
+            </p>
+            <h1 style={{ margin: "6px 0 4px", color: dark ? "#f0dde6" : "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+              Diseños de Fondo
+            </h1>
+            <p style={{ margin: 0, color: dark ? "#9a8486" : "#9a8486", fontSize: 13, maxWidth: 560 }}>
+              Página de prueba, no está enlazada desde el sitio público. Usa el botón de sol/luna para ver
+              cómo se vería cada fondo en modo claro y en modo oscuro del sitio.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setDark((v) => !v)}
+            style={{
+              flexShrink: 0,
+              display: "flex", alignItems: "center", gap: 9,
+              background: dark ? "rgba(212,175,110,0.15)" : "rgba(198,138,149,0.08)",
+              border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`,
+              borderRadius: 100, padding: "10px 18px 10px 10px",
+              color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13,
+              fontFamily: "Montserrat, sans-serif", cursor: "pointer",
+            }}
+          >
+            <span style={{
+              width: 30, height: 30, borderRadius: "50%",
+              background: dark ? "linear-gradient(135deg, #D4AF6E, #C68A95)" : "linear-gradient(135deg, #FCD34D, #FBBF24)",
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 13,
+            }}>
+              <i className={`fa-solid ${dark ? "fa-moon" : "fa-sun"}`} />
+            </span>
+            {dark ? "Modo oscuro" : "Modo claro"}
+          </button>
         </div>
       </div>
 
@@ -253,7 +331,7 @@ export default function FondosPage() {
         </div>
       ))}
 
-      <p style={{ textAlign: "center", padding: "40px 16px", fontSize: 11, color: "#9a8486", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.1em" }}>
+      <p style={{ textAlign: "center", padding: "40px 16px", fontSize: 11, color: dark ? "#9a7c86" : "#9a8486", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.1em" }}>
         ✦ &nbsp; Fin de la galería &nbsp; ✦
       </p>
     </div>
