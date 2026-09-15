@@ -58,3 +58,9 @@ export async function updatePedido(
   `;
   return (rows[0] as unknown as Pedido) ?? null;
 }
+
+export async function deletePedido(id: number): Promise<boolean> {
+  const sql = getDb();
+  await sql`DELETE FROM ia_pedidos WHERE id = ${id}`;
+  return true;
+}

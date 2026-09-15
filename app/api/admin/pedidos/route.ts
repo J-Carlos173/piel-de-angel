@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPedido, getAllPedidos, updatePedido } from "@/lib/pedidos-db";
+import { createPedido, deletePedido, getAllPedidos, updatePedido } from "@/lib/pedidos-db";
 
 function isAuthorized(req: NextRequest): boolean {
   const cookie = req.cookies.get("admin_auth");
@@ -49,6 +49,21 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ pedido });
   } catch (err) {
     console.error("[admin/pedidos PATCH]", err);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  try {
+    const { id } = await req.json();
+    if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
+    await deletePedido(id);
+    return NextResponse.json({ deleted: true });
+  } catch (err) {
+    console.error("[admin/pedidos DELETE]", err);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }

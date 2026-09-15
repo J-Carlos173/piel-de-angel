@@ -25,6 +25,19 @@ function fmtHora(iso: string) {
   return new Date(iso).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
 }
 
+function fmtSeccion(iso: string) {
+  const fecha = new Date(iso);
+  const hoy = new Date();
+  const ayer = new Date(hoy);
+  ayer.setDate(hoy.getDate() - 1);
+  const mismoDia = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+  if (mismoDia(fecha, hoy)) return "Hoy";
+  if (mismoDia(fecha, ayer)) return "Ayer";
+  return fecha.toLocaleDateString("es-CL", { day: "numeric", month: "long", year: hoy.getFullYear() !== fecha.getFullYear() ? "numeric" : undefined });
+}
+
 export default function PedidosClient() {
   const router = useRouter();
   const { dark, toggle } = useThemeStore();
@@ -129,7 +142,7 @@ export default function PedidosClient() {
             <h1 style={{ margin: 0, color: textMain, fontSize: 18, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
               Chat con Claude
             </h1>
-            <p style={{ margin: 0, color: textMuted, fontSize: 11, ...MONO }}>Reviso cada 2 min · nada se sube sin que Carlos lo apruebe</p>
+            <p style={{ margin: 0, color: textMuted, fontSize: 11, ...MONO }}>Reviso en cuanto llega · nada se sube sin que Carlos lo apruebe</p>
           </div>
         </div>
         <button onClick={toggle} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#3a2830" : "#ecddd9"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 15, cursor: "pointer", flexShrink: 0 }}>
@@ -151,10 +164,20 @@ export default function PedidosClient() {
               Escribe tu primer pedido abajo.
             </div>
           ) : (
-            pedidos.map((p) => {
+            pedidos.map((p, idx) => {
               const meta = ESTADO_META[p.estado];
+              const seccion = fmtSeccion(p.created_at);
+              const seccionAnterior = idx > 0 ? fmtSeccion(pedidos[idx - 1].created_at) : null;
+              const mostrarDivisor = seccion !== seccionAnterior;
               return (
                 <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {mostrarDivisor && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "8px 0 4px" }}>
+                      <div style={{ flex: 1, height: 1, background: border }} />
+                      <span style={{ fontSize: 11, color: textMuted, ...MONO, textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>{seccion}</span>
+                      <div style={{ flex: 1, height: 1, background: border }} />
+                    </div>
+                  )}
                   {/* Burbuja: pedido (derecha) */}
                   <div style={{ alignSelf: "flex-end", maxWidth: "82%" }}>
                     <div style={{ background: bubbleMe, color: "white", borderRadius: "18px 18px 4px 18px", padding: "12px 16px", boxShadow: "0 4px 16px rgba(198,138,149,0.25)" }}>
