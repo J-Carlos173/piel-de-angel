@@ -7,11 +7,13 @@ import ProductCard from "./ProductCard";
 import { useReveal } from "@/hooks/useReveal";
 import { PRODUCTOS, type Producto } from "@/data/productos";
 
+type GridSize = "compact" | "mini";
+
 export default function Productos() {
   const { setProducts } = useProductsStore();
   const [allProducts, setAllProducts] = useState<Producto[]>(PRODUCTOS);
   const [activeTab, setActiveTab] = useState("Todos");
-  const [compact, setCompact] = useState(false);
+  const [gridSize, setGridSize] = useState<GridSize>("compact");
   const ref = useReveal([allProducts, activeTab]);
 
   useEffect(() => {
@@ -54,23 +56,23 @@ export default function Productos() {
           </div>
           <div className="grid-size-toggle">
             <button
-              className={`grid-size-btn${!compact ? " active" : ""}`}
-              onClick={() => setCompact(false)}
-              title="Vista normal"
-            >
-              <i className="fa-solid fa-table-cells-large" />
-            </button>
-            <button
-              className={`grid-size-btn${compact ? " active" : ""}`}
-              onClick={() => setCompact(true)}
+              className={`grid-size-btn${gridSize === "compact" ? " active" : ""}`}
+              onClick={() => setGridSize("compact")}
               title="Vista compacta"
             >
               <i className="fa-solid fa-grip" />
             </button>
+            <button
+              className={`grid-size-btn${gridSize === "mini" ? " active" : ""}`}
+              onClick={() => setGridSize("mini")}
+              title="Vista mini"
+            >
+              <i className="fa-solid fa-border-all" />
+            </button>
           </div>
         </div>
 
-        <div className={`productos-grid${compact ? " compact" : ""}`}>
+        <div className={`productos-grid ${gridSize}`}>
           {visible.map((p) => (
             <ProductCard key={p.id} p={p} />
           ))}

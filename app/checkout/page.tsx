@@ -36,8 +36,12 @@ export default function CheckoutPage() {
   const [promoError, setPromoError] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
 
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, []);
   useEffect(() => { setHydrated(true); }, []);
+  // Recién cuando el contenido real ya está montado (no antes, cuando la página
+  // todavía renderiza vacía) tiene efecto llevar el scroll al inicio.
+  useEffect(() => {
+    if (hydrated) window.scrollTo({ top: 0, behavior: "instant" });
+  }, [hydrated]);
 
   const subtotal = totalAmount();
   const envio = calcularEnvio(subtotal, zona);
