@@ -3,6 +3,7 @@ import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Analytics } from "@vercel/analytics/next";
 import PageTracker from "@/components/PageTracker";
+import { getSetting } from "@/lib/db";
 
 const SITE_URL = "https://www.pieldeangel.cl";
 const SITE_NAME = "Piel de Ángel";
@@ -198,9 +199,14 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let fondo: string | null = null;
+  try {
+    fondo = await getSetting("site_background");
+  } catch {}
+
   return (
-    <html lang="es">
+    <html lang="es" data-bg={fondo || undefined}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

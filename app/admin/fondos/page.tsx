@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const STORAGE_KEY = "pieldeangel_fondo_elegido";
-
 type Estilo = {
   id: string;
   nombre: string;
@@ -24,20 +22,41 @@ const ESTILOS: Estilo[] = [
 
 export default function FondosPage() {
   const [dark, setDark] = useState(false);
-  const [elegido, setElegido] = useState<string | null>(null);
+  const [aplicado, setAplicado] = useState<string | null>(null);
+  const [cargando, setCargando] = useState(true);
+  const [aplicando, setAplicando] = useState<string | null>(null);
 
-  // Se lee despues del montaje (no en el render inicial) para que coincida
-  // con el HTML pre-renderizado y no genere un mismatch de hidratacion.
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setElegido(saved);
-    } catch {}
+    fetch("/api/admin/fondo")
+      .then((r) => r.json())
+      .then((data) => setAplicado(data.fondo || null))
+      .catch(() => {})
+      .finally(() => setCargando(false));
   }, []);
 
-  function elegir(id: string) {
-    setElegido(id);
-    try { localStorage.setItem(STORAGE_KEY, id); } catch {}
+  async function aplicar(id: string | null) {
+    const nombre = id ? ESTILOS.find((e) => e.id === id)?.nombre : "el diseño original";
+    const ok = confirm(
+      id
+        ? `¿Aplicar "${nombre}" a todo el sitio en vivo ahora mismo? Lo van a ver todas las visitas.`
+        : `¿Quitar el fondo elegido y volver al diseño original en todo el sitio?`
+    );
+    if (!ok) return;
+
+    setAplicando(id ?? "__quitar__");
+    try {
+      const res = await fetch("/api/admin/fondo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fondo: id }),
+      });
+      if (!res.ok) throw new Error();
+      setAplicado(id);
+    } catch {
+      alert("No se pudo aplicar. Intenta de nuevo.");
+    } finally {
+      setAplicando(null);
+    }
   }
 
   return (
@@ -106,6 +125,8 @@ export default function FondosPage() {
           transition: transform 0.15s, background 0.2s;
         }
         .fondo-elegir-btn:hover { transform: translateY(-1px); background: rgba(198,138,149,0.18); }
+        .fondo-elegir-btn:disabled { cursor: default; }
+        .fondo-elegir-btn:disabled:not(.elegido) { opacity: 0.5; }
         .fondo-elegir-btn.elegido {
           background: #C68A95;
           border-color: #C68A95;
@@ -324,13 +345,26 @@ export default function FondosPage() {
               Diseños de Fondo
             </h1>
             <p style={{ margin: 0, color: dark ? "#9a8486" : "#9a8486", fontSize: 13, maxWidth: 560 }}>
-              Página de prueba, no está enlazada desde el sitio público. Usa el botón de sol/luna para ver
-              cómo se vería cada fondo en modo claro y en modo oscuro del sitio, y &quot;Elegir&quot; para marcar tu favorito.
+              Esta página en sí no está enlazada desde el sitio público, pero el botón &quot;Aplicar al sitio&quot;
+              de cada fondo sí cambia el sitio real para todas las visitas. Usa sol/luna solo para previsualizar.
             </p>
-            {elegido && (
-              <p style={{ margin: "10px 0 0", fontSize: 12, color: dark ? "#e8b4bc" : "#C68A95", fontFamily: "Montserrat, sans-serif" }}>
-                <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
-                Elegido: <strong>{ESTILOS.find((e) => e.id === elegido)?.nombre}</strong>
+            {!cargando && (
+              <p style={{ margin: "10px 0 0", fontSize: 12, color: dark ? "#e8b4bc" : "#C68A95", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                {aplicado ? (
+                  <>
+                    <span><i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />Aplicado ahora en el sitio: <strong>{ESTILOS.find((e) => e.id === aplicado)?.nombre}</strong></span>
+                    <button
+                      type="button"
+                      onClick={() => aplicar(null)}
+                      disabled={aplicando !== null}
+                      style={{ background: "none", border: "none", textDecoration: "underline", color: "inherit", fontSize: 12, cursor: "pointer", fontFamily: "Montserrat, sans-serif" }}
+                    >
+                      Quitar y volver al original
+                    </button>
+                  </>
+                ) : (
+                  <span><i className="fa-solid fa-circle-info" style={{ marginRight: 6 }} />El sitio está con el diseño original (sin fondo especial aplicado)</span>
+                )}
               </p>
             )}
           </div>
@@ -362,20 +396,22 @@ export default function FondosPage() {
 
       {/* Previews */}
       {ESTILOS.map((estilo) => {
-        const isElegido = elegido === estilo.id;
+        const isAplicado = aplicado === estilo.id;
+        const isLoading = aplicando === estilo.id;
         return (
-        <div key={estilo.id} className={`fondo-preview bg-${estilo.id}${isElegido ? " elegido" : ""}`}>
+        <div key={estilo.id} className={`fondo-preview bg-${estilo.id}${isAplicado ? " elegido" : ""}`}>
           <div className="fondo-label">
             <strong>{estilo.nombre}</strong>
             <span>{estilo.desc}</span>
             <br />
             <button
               type="button"
-              className={`fondo-elegir-btn${isElegido ? " elegido" : ""}`}
-              onClick={() => elegir(estilo.id)}
+              className={`fondo-elegir-btn${isAplicado ? " elegido" : ""}`}
+              onClick={() => aplicar(estilo.id)}
+              disabled={isAplicado || aplicando !== null}
             >
-              <i className={`fa-solid ${isElegido ? "fa-check" : "fa-heart"}`} />
-              {isElegido ? "Elegido" : "Elegir este"}
+              <i className={`fa-solid ${isLoading ? "fa-spinner fa-spin" : isAplicado ? "fa-check" : "fa-arrow-up-from-bracket"}`} />
+              {isLoading ? "Aplicando..." : isAplicado ? "Aplicado en el sitio" : "Aplicar al sitio"}
             </button>
           </div>
 

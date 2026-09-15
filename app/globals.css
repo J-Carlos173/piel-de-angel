@@ -2519,3 +2519,122 @@ footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 
   .checkout-result-card { padding: 36px 24px; }
   .checkout-result-card h1 { font-size: 1.5rem; }
 }
+
+/* ================================================================
+   FONDO DEL SITIO — elegido desde /admin/fondos (setting site_background)
+   --crema / --crema-pure ya se usan en TODAS las secciones del sitio
+   (hero, about, servicios, productos, galeria, instagram, testimonios,
+   contacto, agenda...), así que redefinirlas cambia el tono base en
+   todos lados sin tocar cada sección por separado. El detalle
+   decorativo (blobs, grano, patrón) se aplica al Hero, que ya tenía
+   su propio mecanismo ::before/::after para esto.
+   Los temas claros solo se aplican si el visitante NO tiene su propio
+   modo oscuro activado (ese se respeta tal cual). "Lujo" es la
+   excepción: es oscuro a propósito, se ve igual en ambos casos.
+   Va al final del archivo para ganar el cascade sobre :root y
+   [data-theme="dark"], que están arriba.
+   ================================================================ */
+@keyframes siteBlobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, 30px) scale(1.12); }
+}
+@keyframes siteAurora {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Malla de gradientes */
+html[data-bg="malla"]:not([data-theme="dark"]) { --crema: #FBFAF8; --crema-pure: #FBFAF8; }
+html[data-bg="malla"]:not([data-theme="dark"]) .hero::before {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(216,167,177,0.32) 0%, transparent 65%);
+  animation: siteBlobFloat 16s ease-in-out infinite;
+}
+html[data-bg="malla"]:not([data-theme="dark"]) .hero::after {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(139,111,111,0.22) 0%, transparent 65%);
+  animation: siteBlobFloat 20s ease-in-out infinite reverse;
+}
+
+/* Textura de grano — --crema queda semi-transparente a propósito, para que
+   la textura de fondo se note debajo de cada sección en vez de quedar tapada */
+html[data-bg="grano"]:not([data-theme="dark"]) { --crema: rgba(247,245,242,0.95); --crema-pure: rgba(247,245,242,0.95); }
+html[data-bg="grano"]:not([data-theme="dark"]) body { background: #F7F5F2; }
+html[data-bg="grano"]:not([data-theme="dark"]) .hero::before,
+html[data-bg="grano"]:not([data-theme="dark"]) .hero::after { display: none; }
+html[data-bg="grano"]:not([data-theme="dark"]) body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Aurora animada */
+html[data-bg="aurora"]:not([data-theme="dark"]) { --crema: #FBFAF8; --crema-pure: #F4E8E5; }
+html[data-bg="aurora"]:not([data-theme="dark"]) .hero {
+  background: linear-gradient(120deg, #FBFAF8 0%, #F0DCE0 25%, #E8C6CC 50%, #F4E8E5 75%, #FBFAF8 100%);
+  background-size: 300% 300%;
+  animation: siteAurora 14s ease infinite;
+}
+html[data-bg="aurora"]:not([data-theme="dark"]) .hero::before,
+html[data-bg="aurora"]:not([data-theme="dark"]) .hero::after { display: none; }
+
+/* Lujo oscuro — siempre oscuro, con o sin el toggle del visitante */
+html[data-bg="lujo"] {
+  --crema: #1C1917;
+  --crema-pure: #221E1C;
+  --texto: #C4B8B5;
+  --texto-soft: #8A7E7A;
+  --negro-soft: #EEE5E1;
+  --gris-suave: #3D3533;
+}
+html[data-bg="lujo"] .hero::before {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(198,138,149,0.32) 0%, transparent 60%);
+  animation: siteBlobFloat 16s ease-in-out infinite;
+}
+html[data-bg="lujo"] .hero::after {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(212,175,110,0.24) 0%, transparent 60%);
+  animation: siteBlobFloat 20s ease-in-out infinite reverse;
+}
+html[data-bg="lujo"] .hero-title em,
+html[data-bg="lujo"] .section-title em { color: #E8B4BC; }
+html[data-bg="lujo"] .eyebrow { color: #D4AF6E; }
+
+/* Patrón botánico sutil — mismo truco de transparencia que "grano" */
+html[data-bg="botanico"]:not([data-theme="dark"]) { --crema: rgba(251,250,248,0.95); --crema-pure: rgba(251,250,248,0.95); }
+html[data-bg="botanico"]:not([data-theme="dark"]) body { background: #FBFAF8; }
+html[data-bg="botanico"]:not([data-theme="dark"]) .hero::before,
+html[data-bg="botanico"]:not([data-theme="dark"]) .hero::after { display: none; }
+html[data-bg="botanico"]:not([data-theme="dark"]) body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40,8 C50,5 62,15 63,28 C64,40 55,52 45,58 C42,60 37,60 34,57 C26,51 22,40 25,29 C27,18 33,10 40,8 Z' fill='%235B7E64' opacity='0.12'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+/* Terracota cálida */
+html[data-bg="terracota"]:not([data-theme="dark"]) { --crema: #F4E4D4; --crema-pure: #EFD9C3; }
+html[data-bg="terracota"]:not([data-theme="dark"]) .hero {
+  background: linear-gradient(160deg, #F4E4D4 0%, #E8C9A8 45%, #D9A87E 100%);
+}
+html[data-bg="terracota"]:not([data-theme="dark"]) .hero::before,
+html[data-bg="terracota"]:not([data-theme="dark"]) .hero::after { display: none; }
+html[data-bg="terracota"]:not([data-theme="dark"]) .hero-title em,
+html[data-bg="terracota"]:not([data-theme="dark"]) .section-title em { color: #A9713F; }
+
+/* Ondas suaves */
+html[data-bg="ondas"]:not([data-theme="dark"]) { --crema: #FBFAF8; --crema-pure: #F4E8E5; }
+html[data-bg="ondas"]:not([data-theme="dark"]) .hero::before,
+html[data-bg="ondas"]:not([data-theme="dark"]) .hero::after { display: none; }
+html[data-bg="ondas"]:not([data-theme="dark"]) .hero {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 140' preserveAspectRatio='none'%3E%3Cpath d='M0,60 C300,140 900,0 1200,80 L1200,140 L0,140 Z' fill='%23C68A95' opacity='0.10'/%3E%3Cpath d='M0,90 C300,40 900,140 1200,60 L1200,140 L0,140 Z' fill='%238B6F6F' opacity='0.08'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  background-size: 100% 140px;
+}
+
+/* Minimalista: sin overrides, es el look actual del sitio sin decoración extra */
