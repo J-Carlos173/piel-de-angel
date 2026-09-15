@@ -164,7 +164,37 @@ export default function DashboardClient({
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s", position: "relative" }}>
+      <style>{`
+        @keyframes adminBlobFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-24px, 18px) scale(1.08); }
+        }
+        .admin-grain::before {
+          content: "";
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          opacity: ${dark ? 0.05 : 0.03};
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .admin-card {
+          position: relative;
+          overflow: hidden;
+        }
+        .admin-card::before {
+          content: "";
+          position: absolute;
+          top: 0; left: -120%;
+          width: 55%; height: 100%;
+          background: linear-gradient(115deg, transparent, rgba(255,255,255,0.35), transparent);
+          transform: skewX(-20deg);
+          transition: left 0.6s cubic-bezier(0.16,1,0.3,1);
+          pointer-events: none;
+        }
+        .admin-card:hover::before { left: 130%; }
+      `}</style>
+
+      <div className="admin-grain" />
 
       {/* Header */}
       <div style={{
@@ -176,6 +206,19 @@ export default function DashboardClient({
       }}>
         {/* Stripe botánico superior */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
+
+        {/* Malla de gradientes animada, como en el hero del sitio */}
+        <div aria-hidden style={{
+          position: "absolute", top: -120, right: -80, width: 340, height: 340, borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(198,138,149,${dark ? 0.28 : 0.22}) 0%, transparent 65%)`,
+          filter: "blur(6px)", animation: "adminBlobFloat 14s ease-in-out infinite", pointerEvents: "none",
+        }} />
+        <div aria-hidden style={{
+          position: "absolute", bottom: -100, right: 120, width: 220, height: 220, borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(212,175,110,${dark ? 0.22 : 0.16}) 0%, transparent 65%)`,
+          filter: "blur(6px)", animation: "adminBlobFloat 18s ease-in-out infinite reverse", pointerEvents: "none",
+        }} />
+
         {/* Hoja decorativa */}
         <svg aria-hidden style={{ position: "absolute", right: 0, top: -10, opacity: dark ? 0.08 : 0.09, width: 180, pointerEvents: "none" }} viewBox="0 0 220 320">
           <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#C68A95"/>
@@ -238,6 +281,7 @@ function DashboardCard({ card, cardBg, border, textMain, textMuted, onClick }: {
 }) {
   return (
     <button
+      className="admin-card"
       onClick={onClick}
       disabled={card.disabled}
       style={{
@@ -249,16 +293,14 @@ function DashboardCard({ card, cardBg, border, textMain, textMuted, onClick }: {
         cursor: card.disabled ? "default" : "pointer",
         fontFamily: "Georgia, serif",
         boxShadow: `0 4px 24px ${card.glow}`,
-        transition: "transform 0.18s, box-shadow 0.18s",
+        transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s cubic-bezier(0.16,1,0.3,1)",
         opacity: card.disabled ? 0.55 : 1,
-        position: "relative",
-        overflow: "hidden",
         width: "100%",
       }}
       onMouseEnter={(e) => {
         if (card.disabled) return;
-        (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-4px)";
-        (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 12px 40px ${card.glow}`;
+        (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-6px)";
+        (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 18px 46px ${card.glow}`;
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
