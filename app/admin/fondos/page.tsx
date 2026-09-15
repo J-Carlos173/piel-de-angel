@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+const STORAGE_KEY = "pieldeangel_fondo_elegido";
 
 type Estilo = {
   id: string;
@@ -22,6 +24,21 @@ const ESTILOS: Estilo[] = [
 
 export default function FondosPage() {
   const [dark, setDark] = useState(false);
+  const [elegido, setElegido] = useState<string | null>(null);
+
+  // Se lee despues del montaje (no en el render inicial) para que coincida
+  // con el HTML pre-renderizado y no genere un mismatch de hidratacion.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setElegido(saved);
+    } catch {}
+  }, []);
+
+  function elegir(id: string) {
+    setElegido(id);
+    try { localStorage.setItem(STORAGE_KEY, id); } catch {}
+  }
 
   return (
     <div className={dark ? "fondos-page fondos-dark" : "fondos-page"} style={{ minHeight: "100vh", background: dark ? "#1C1917" : "#f5eeec", fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
@@ -71,6 +88,36 @@ export default function FondosPage() {
           color: #7a6b70;
           line-height: 1.4;
         }
+        .fondo-elegir-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 9px;
+          background: rgba(198,138,149,0.1);
+          border: 1px solid rgba(198,138,149,0.4);
+          border-radius: 100px;
+          padding: 6px 13px;
+          font-family: Montserrat, sans-serif;
+          font-size: 10.5px;
+          font-weight: 600;
+          letter-spacing: 0.4px;
+          color: #C68A95;
+          cursor: pointer;
+          transition: transform 0.15s, background 0.2s;
+        }
+        .fondo-elegir-btn:hover { transform: translateY(-1px); background: rgba(198,138,149,0.18); }
+        .fondo-elegir-btn.elegido {
+          background: #C68A95;
+          border-color: #C68A95;
+          color: white;
+        }
+        .fondo-preview.elegido {
+          box-shadow: inset 0 0 0 4px #C68A95;
+        }
+        .fondos-dark .fondo-elegir-btn { background: rgba(212,175,110,0.14); border-color: rgba(212,175,110,0.4); color: #D4AF6E; }
+        .fondos-dark .fondo-elegir-btn:hover { background: rgba(212,175,110,0.24); }
+        .fondos-dark .fondo-elegir-btn.elegido { background: #D4AF6E; border-color: #D4AF6E; color: #1C1917; }
+        .fondos-dark .fondo-preview.elegido { box-shadow: inset 0 0 0 4px #D4AF6E; }
         .fondo-mock {
           position: relative;
           z-index: 2;
@@ -278,8 +325,14 @@ export default function FondosPage() {
             </h1>
             <p style={{ margin: 0, color: dark ? "#9a8486" : "#9a8486", fontSize: 13, maxWidth: 560 }}>
               Página de prueba, no está enlazada desde el sitio público. Usa el botón de sol/luna para ver
-              cómo se vería cada fondo en modo claro y en modo oscuro del sitio.
+              cómo se vería cada fondo en modo claro y en modo oscuro del sitio, y &quot;Elegir&quot; para marcar tu favorito.
             </p>
+            {elegido && (
+              <p style={{ margin: "10px 0 0", fontSize: 12, color: dark ? "#e8b4bc" : "#C68A95", fontFamily: "Montserrat, sans-serif" }}>
+                <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
+                Elegido: <strong>{ESTILOS.find((e) => e.id === elegido)?.nombre}</strong>
+              </p>
+            )}
           </div>
 
           <button
@@ -308,11 +361,22 @@ export default function FondosPage() {
       </div>
 
       {/* Previews */}
-      {ESTILOS.map((estilo) => (
-        <div key={estilo.id} className={`fondo-preview bg-${estilo.id}`}>
+      {ESTILOS.map((estilo) => {
+        const isElegido = elegido === estilo.id;
+        return (
+        <div key={estilo.id} className={`fondo-preview bg-${estilo.id}${isElegido ? " elegido" : ""}`}>
           <div className="fondo-label">
             <strong>{estilo.nombre}</strong>
             <span>{estilo.desc}</span>
+            <br />
+            <button
+              type="button"
+              className={`fondo-elegir-btn${isElegido ? " elegido" : ""}`}
+              onClick={() => elegir(estilo.id)}
+            >
+              <i className={`fa-solid ${isElegido ? "fa-check" : "fa-heart"}`} />
+              {isElegido ? "Elegido" : "Elegir este"}
+            </button>
           </div>
 
           <div className="fondo-mock">
@@ -329,7 +393,8 @@ export default function FondosPage() {
             </svg>
           )}
         </div>
-      ))}
+        );
+      })}
 
       <p style={{ textAlign: "center", padding: "40px 16px", fontSize: 11, color: dark ? "#9a7c86" : "#9a8486", fontFamily: "Montserrat, sans-serif", letterSpacing: "0.1em" }}>
         ✦ &nbsp; Fin de la galería &nbsp; ✦
