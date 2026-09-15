@@ -141,12 +141,12 @@ export default function DashboardClient({
       glow: "rgba(122,143,160,0.22)",
     },
     {
-      icon: "fa-paper-plane",
-      title: "Pedidos para Claude",
-      desc: "Escribe qué necesitas cambiar en la web y queda en cola para que se implemente",
+      icon: "fa-wand-magic-sparkles",
+      title: "Asistente IA",
+      desc: "Chatea con Claude para pedir cambios en la web — texto e imágenes",
       href: "/admin/pedidos",
-      accent: "#8B6F6F",
-      glow: "rgba(139,111,111,0.22)",
+      accent: "#9B6E7A",
+      glow: "rgba(155,110,122,0.22)",
     },
     {
       icon: "fa-palette",
@@ -155,16 +155,6 @@ export default function DashboardClient({
       href: "/admin/fondos",
       accent: "#7FA882",
       glow: "rgba(127,168,130,0.22)",
-    },
-    {
-      icon: "fa-wand-magic-sparkles",
-      title: "Asistente IA",
-      desc: "Pídele a Claude que gestione reseñas, servicios, agenda y más con lenguaje natural",
-      href: "/admin/ai",
-      accent: "#9B6E7A",
-      glow: "rgba(155,110,122,0.22)",
-      disabled: true,
-      disabledLabel: "Requiere API Key",
     },
   ];
 

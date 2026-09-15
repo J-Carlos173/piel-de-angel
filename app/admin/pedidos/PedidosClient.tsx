@@ -1,27 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
 
 type Pedido = {
   id: number;
   texto: string;
+  imagenes: string[];
   estado: "pendiente" | "en_proceso" | "hecho" | "error";
   respuesta: string | null;
   created_at: string;
   completed_at: string | null;
 };
 
-const ESTADO_META: Record<Pedido["estado"], { label: string; color: string; bg: string; icon: string }> = {
-  pendiente:  { label: "Pendiente",  color: "#B08A00", bg: "rgba(176,138,0,0.12)",   icon: "fa-clock" },
-  en_proceso: { label: "En proceso", color: "#3A6FB0", bg: "rgba(58,111,176,0.12)",  icon: "fa-spinner fa-spin" },
-  hecho:      { label: "Hecho",      color: "#4CAF85", bg: "rgba(76,175,133,0.12)",  icon: "fa-circle-check" },
-  error:      { label: "Con error",  color: "#C0524F", bg: "rgba(192,82,79,0.12)",   icon: "fa-triangle-exclamation" },
+const ESTADO_META: Record<Pedido["estado"], { label: string; color: string; icon: string }> = {
+  pendiente:  { label: "Enviado",    color: "#B08A00", icon: "fa-check" },
+  en_proceso: { label: "Trabajando en esto...", color: "#3A6FB0", icon: "fa-spinner fa-spin" },
+  hecho:      { label: "Listo",      color: "#4CAF85", icon: "fa-check-double" },
+  error:      { label: "Con error",  color: "#C0524F", icon: "fa-triangle-exclamation" },
 };
 
-function fmtFecha(iso: string) {
-  return new Date(iso).toLocaleString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+function fmtHora(iso: string) {
+  return new Date(iso).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
 }
 
 export default function PedidosClient() {
@@ -30,11 +31,16 @@ export default function PedidosClient() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
   const [texto, setTexto] = useState("");
+  const [imagenes, setImagenes] = useState<{ file: File; preview: string }[]>([]);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const bg       = dark ? "#160f13" : "#f5eeec";
-  const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
+  const cardBg   = dark ? "rgba(42,28,34,0.95)" : "#ffffff";
+  const bubbleMe = dark ? "linear-gradient(135deg, #C68A95, #8B5E6A)" : "linear-gradient(135deg, #C68A95, #8B5E6A)";
+  const bubbleClaude = dark ? "rgba(255,255,255,0.06)" : "#F5EEEC";
   const border   = dark ? "#3a2830" : "#ecddd9";
   const textMain = dark ? "#f0dde6" : "#2e1e24";
   const textMuted= dark ? "#9a7c86" : "#9a8486";
@@ -45,31 +51,58 @@ export default function PedidosClient() {
     try {
       const res = await fetch("/api/admin/pedidos");
       const data = await res.json();
-      setPedidos(data.pedidos ?? []);
+      setPedidos((data.pedidos ?? []).slice().reverse());
     } catch {}
     setLoading(false);
   }
 
   useEffect(() => {
     cargar();
-    const interval = setInterval(cargar, 15000);
+    const interval = setInterval(cargar, 8000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [pedidos.length]);
+
+  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    setImagenes((prev) => [...prev, ...files.map((file) => ({ file, preview: URL.createObjectURL(file) }))]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function quitarImagen(idx: number) {
+    setImagenes((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   async function enviar() {
     if (!texto.trim()) return;
     setEnviando(true);
     setError("");
     try {
+      const urls: string[] = [];
+      for (const img of imagenes) {
+        const fd = new FormData();
+        fd.append("file", img.file);
+        fd.append("folder", "pedidos");
+        const upRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
+        if (upRes.ok) {
+          const upData = await upRes.json();
+          urls.push(upData.url);
+        }
+      }
+
       const res = await fetch("/api/admin/pedidos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto: texto.trim() }),
+        body: JSON.stringify({ texto: texto.trim(), imagenes: urls }),
       });
       const data = await res.json();
       if (!res.ok || !data.pedido) { setError(data.error || "Error al enviar. Intenta de nuevo."); return; }
-      setPedidos((prev) => [data.pedido, ...prev]);
+      setPedidos((prev) => [...prev, data.pedido]);
       setTexto("");
+      setImagenes([]);
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
     } finally {
@@ -77,103 +110,136 @@ export default function PedidosClient() {
     }
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: "100%", background: inputBg, border: `1px solid ${border}`,
-    borderRadius: 10, padding: "12px 14px", color: textMain,
-    fontSize: 14, fontFamily: "Georgia, serif", outline: "none", boxSizing: "border-box",
-    resize: "vertical", minHeight: 90,
-  };
-
   return (
-    <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s", fontFamily: "Georgia, serif" }}>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: bg, transition: "background 0.3s", fontFamily: "Georgia, serif" }}>
       {/* Header */}
       <div style={{
         background: dark
           ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
           : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
-        padding: "32px 32px 28px",
+        padding: "18px 24px",
         borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
+        display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexShrink: 0,
       }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
-          <div>
-            <button onClick={() => router.push("/admin")} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1px solid ${dark ? "#3a2830" : "#ecddd9"}`, borderRadius: 8, padding: "5px 12px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 12, cursor: "pointer", marginBottom: 10, ...MONO, display: "flex", alignItems: "center", gap: 6 }}>
-              <i className="fa-solid fa-arrow-left" /> Panel
-            </button>
-            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Pedidos para Claude</p>
-            <h1 style={{ margin: "6px 0 4px", color: textMain, fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              ¿Qué necesitas cambiar?
-            </h1>
-            <p style={{ margin: 0, color: textMuted, fontSize: 13, maxWidth: 480 }}>
-              Escribe tu pedido con el mayor detalle posible. Claude lo revisa y lo implementa —
-              vuelve a esta página para ver el estado.
-            </p>
-          </div>
-          <button onClick={toggle} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#3a2830" : "#ecddd9"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 15, cursor: "pointer", flexShrink: 0 }}>
-            <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button onClick={() => router.push("/admin")} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1px solid ${dark ? "#3a2830" : "#ecddd9"}`, borderRadius: 8, padding: "7px 10px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 13, cursor: "pointer", ...MONO }}>
+            <i className="fa-solid fa-arrow-left" />
           </button>
+          <div>
+            <h1 style={{ margin: 0, color: textMain, fontSize: 18, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+              Chat con Claude
+            </h1>
+            <p style={{ margin: 0, color: textMuted, fontSize: 11, ...MONO }}>Reviso cada 2 min · nada se sube sin que Carlos lo apruebe</p>
+          </div>
         </div>
+        <button onClick={toggle} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#3a2830" : "#ecddd9"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 15, cursor: "pointer", flexShrink: 0 }}>
+          <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
+        </button>
       </div>
 
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "28px 16px 60px" }}>
-
-        {/* Formulario */}
-        <div style={{ background: cardBg, border: `1.5px solid #C68A95`, borderRadius: 20, padding: 22, boxShadow: "0 4px 30px rgba(198,138,149,0.14)", marginBottom: 28 }}>
-          <textarea
-            placeholder="Ej: cambia el precio del servicio de lifting de pestañas a $15.000, o agrega un banner de promoción de primavera en la home..."
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            style={inputStyle}
-          />
-          {error && (
-            <p style={{ marginTop: 8, fontSize: 12, color: "#e57373", ...MONO }}>
-              <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 5 }} />{error}
-            </p>
-          )}
-          <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-            <button
-              onClick={enviar}
-              disabled={enviando || !texto.trim()}
-              style={{ background: "linear-gradient(135deg, #C68A95, #8B5E6A)", border: "none", borderRadius: 10, padding: "11px 26px", color: "#fff", fontSize: 13, cursor: enviando ? "wait" : "pointer", opacity: !texto.trim() ? 0.6 : 1, ...MONO, display: "flex", alignItems: "center", gap: 8 }}
-            >
-              {enviando ? <><i className="fa-solid fa-spinner fa-spin" /> Enviando...</> : <><i className="fa-solid fa-paper-plane" /> Enviar pedido</>}
-            </button>
-          </div>
-        </div>
-
-        {/* Lista */}
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: textMuted, ...MONO }}>
-            <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 22, marginBottom: 10, display: "block" }} />
-            Cargando pedidos...
-          </div>
-        ) : pedidos.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: textMuted, fontSize: 13, ...MONO }}>
-            Todavía no hay pedidos.
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {pedidos.map((p) => {
+      {/* Mensajes */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "40px 0", color: textMuted, ...MONO }}>
+              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 20, marginBottom: 8, display: "block" }} />
+              Cargando...
+            </div>
+          ) : pedidos.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "60px 20px", color: textMuted, fontSize: 13, ...MONO }}>
+              <i className="fa-solid fa-comment-dots" style={{ fontSize: 26, marginBottom: 10, display: "block", opacity: 0.5 }} />
+              Escribe tu primer pedido abajo.
+            </div>
+          ) : (
+            pedidos.map((p) => {
               const meta = ESTADO_META[p.estado];
               return (
-                <div key={p.id} style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 16, padding: "18px 20px", boxShadow: "0 2px 14px rgba(0,0,0,0.04)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
-                    <span style={{ background: meta.bg, color: meta.color, borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 700, ...MONO, display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                      <i className={`fa-solid ${meta.icon}`} /> {meta.label}
-                    </span>
-                    <span style={{ fontSize: 11, color: textMuted, ...MONO, flexShrink: 0 }}>{fmtFecha(p.created_at)}</span>
+                <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {/* Burbuja: pedido (derecha) */}
+                  <div style={{ alignSelf: "flex-end", maxWidth: "82%" }}>
+                    <div style={{ background: bubbleMe, color: "white", borderRadius: "18px 18px 4px 18px", padding: "12px 16px", boxShadow: "0 4px 16px rgba(198,138,149,0.25)" }}>
+                      {p.imagenes.length > 0 && (
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: p.texto ? 8 : 0 }}>
+                          {p.imagenes.map((url, i) => (
+                            <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt="adjunto" style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 10, border: "1px solid rgba(255,255,255,0.4)" }} />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                      {p.texto && <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{p.texto}</p>}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end", marginTop: 4, paddingRight: 4 }}>
+                      <span style={{ fontSize: 10.5, color: meta.color, ...MONO, display: "flex", alignItems: "center", gap: 4 }}>
+                        <i className={`fa-solid ${meta.icon}`} /> {meta.label}
+                      </span>
+                      <span style={{ fontSize: 10.5, color: textMuted, ...MONO }}>{fmtHora(p.created_at)}</span>
+                    </div>
                   </div>
-                  <p style={{ margin: 0, fontSize: 14, color: textMain, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{p.texto}</p>
+
+                  {/* Burbuja: respuesta de Claude (izquierda) */}
                   {p.respuesta && (
-                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${border}` }}>
-                      <p style={{ margin: "0 0 4px", fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em", ...MONO }}>Respuesta</p>
-                      <p style={{ margin: 0, fontSize: 13, color: textMuted, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{p.respuesta}</p>
+                    <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                      <div style={{ background: bubbleClaude, color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: `1px solid ${border}` }}>
+                        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{p.respuesta}</p>
+                      </div>
+                      <div style={{ fontSize: 10.5, color: textMuted, marginTop: 4, paddingLeft: 4, ...MONO }}>
+                        Claude {p.completed_at && `· ${fmtHora(p.completed_at)}`}
+                      </div>
                     </div>
                   )}
                 </div>
               );
-            })}
+            })
+          )}
+          <div ref={bottomRef} />
+        </div>
+      </div>
+
+      {/* Input */}
+      <div style={{ borderTop: `1.5px solid ${border}`, background: cardBg, padding: "14px 16px", flexShrink: 0 }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          {imagenes.length > 0 && (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+              {imagenes.map((img, i) => (
+                <div key={i} style={{ position: "relative" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.preview} alt="preview" style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, border: `1px solid ${border}` }} />
+                  <button onClick={() => quitarImagen(i)} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C0524F", color: "white", border: "none", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <i className="fa-solid fa-xmark" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {error && <p style={{ margin: "0 0 8px", fontSize: 12, color: "#e57373", ...MONO }}><i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 5 }} />{error}</p>}
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{ flexShrink: 0, width: 42, height: 42, borderRadius: "50%", background: inputBg, border: `1px solid ${border}`, color: textMuted, fontSize: 15, cursor: "pointer" }}
+              title="Adjuntar imagen"
+            >
+              <i className="fa-solid fa-paperclip" />
+            </button>
+            <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: "none" }} />
+            <textarea
+              placeholder="Escribe tu pedido..."
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
+              rows={1}
+              style={{ flex: 1, background: inputBg, border: `1px solid ${border}`, borderRadius: 20, padding: "11px 16px", color: textMain, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", resize: "none", maxHeight: 120 }}
+            />
+            <button
+              onClick={enviar}
+              disabled={enviando || !texto.trim()}
+              style={{ flexShrink: 0, width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, #C68A95, #8B5E6A)", border: "none", color: "white", fontSize: 15, cursor: enviando ? "wait" : "pointer", opacity: !texto.trim() ? 0.5 : 1 }}
+            >
+              <i className={`fa-solid ${enviando ? "fa-spinner fa-spin" : "fa-paper-plane"}`} />
+            </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -26,11 +26,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   try {
-    const { texto } = await req.json();
+    const { texto, imagenes } = await req.json();
     if (!texto?.trim()) {
       return NextResponse.json({ error: "El pedido no puede estar vacío" }, { status: 400 });
     }
-    const pedido = await createPedido(texto.trim());
+    const pedido = await createPedido(texto.trim(), Array.isArray(imagenes) ? imagenes : []);
     return NextResponse.json({ pedido });
   } catch (err) {
     console.error("[admin/pedidos POST]", err);

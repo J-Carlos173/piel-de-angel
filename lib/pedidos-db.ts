@@ -3,6 +3,7 @@ import { getDb } from "./db";
 export type Pedido = {
   id: number;
   texto: string;
+  imagenes: string[];
   estado: "pendiente" | "en_proceso" | "hecho" | "error";
   respuesta: string | null;
   created_at: string;
@@ -21,13 +22,14 @@ export async function ensurePedidosTable() {
       completed_at TIMESTAMPTZ
     )
   `;
+  await sql`ALTER TABLE ia_pedidos ADD COLUMN IF NOT EXISTS imagenes JSONB NOT NULL DEFAULT '[]'::jsonb`;
 }
 
-export async function createPedido(texto: string): Promise<Pedido> {
+export async function createPedido(texto: string, imagenes: string[] = []): Promise<Pedido> {
   const sql = getDb();
   await ensurePedidosTable();
   const rows = await sql`
-    INSERT INTO ia_pedidos (texto) VALUES (${texto})
+    INSERT INTO ia_pedidos (texto, imagenes) VALUES (${texto}, ${JSON.stringify(imagenes)}::jsonb)
     RETURNING *
   `;
   return rows[0] as unknown as Pedido;

@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     if (!file) return NextResponse.json({ error: "No se recibió archivo" }, { status: 400 });
 
-    const blob = await put(`productos/${Date.now()}-${file.name}`, file, {
+    const folder = (formData.get("folder") as string | null) || "productos";
+    const blob = await put(`${folder}/${Date.now()}-${file.name}`, file, {
       access: "public",
     });
 
