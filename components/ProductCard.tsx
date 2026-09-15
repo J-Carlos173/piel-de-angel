@@ -39,12 +39,14 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
         </button>
 
         <div className={`producto-modal-img${agotado ? " agotado" : ""}`}>
-          {p.badge && (
-            <span className={`producto-badge ${p.badge}`}>
-              {p.badge === "bestseller" ? "Bestseller" : "Nuevo"}
-            </span>
-          )}
-          {enOferta && <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>}
+          <div className="producto-badges">
+            {p.badge && (
+              <span className={`producto-badge ${p.badge}`}>
+                {p.badge === "bestseller" ? "Bestseller" : "Nuevo"}
+              </span>
+            )}
+            {enOferta && <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>}
+          </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={p.img} alt={p.nombre} />
           {agotado && <div className="agotado-overlay">Agotado</div>}
@@ -107,14 +109,16 @@ export default function ProductCard({ p }: { p: Producto }) {
   return (
     <>
       <div className="producto-card reveal" onClick={() => setModalOpen(true)} style={{ cursor: "pointer" }}>
-        {p.badge && (
-          <span className={`producto-badge ${p.badge}`}>
-            {p.badge === "bestseller" ? "Bestseller" : "Nuevo"}
-          </span>
-        )}
-        {enOferta && (
-          <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>
-        )}
+        <div className="producto-badges">
+          {p.badge && (
+            <span className={`producto-badge ${p.badge}`}>
+              {p.badge === "bestseller" ? "Bestseller" : "Nuevo"}
+            </span>
+          )}
+          {enOferta && (
+            <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>
+          )}
+        </div>
 
         <div className={`producto-img${agotado ? " agotado" : ""}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -640,10 +640,9 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 .productos-grid.mini .producto-precio-original { font-size: 0.68rem; }
 .productos-grid.mini .producto-stock { font-size: 0.62rem; margin-bottom: 6px; }
 .productos-grid.mini .btn-add-cart { font-size: 0.62rem; padding: 7px 8px; letter-spacing: 0.5px; }
+.productos-grid.mini .producto-badges { top: 8px; left: 8px; gap: 4px; }
 .productos-grid.mini .producto-badge,
-.productos-grid.mini .producto-badge-oferta { top: 8px; padding: 3px 8px; font-size: 0.55rem; letter-spacing: 0.5px; }
-.productos-grid.mini .producto-badge { left: 8px; }
-.productos-grid.mini .producto-badge-oferta { right: 8px; }
+.productos-grid.mini .producto-badge-oferta { padding: 3px 8px; font-size: 0.55rem; letter-spacing: 0.5px; }
 
 @media (max-width: 600px) {
   .productos-grid.compact { grid-template-columns: repeat(2, 1fr); }
@@ -665,9 +664,16 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   transform: translateY(-10px);
   box-shadow: 0 28px 65px rgba(110, 103, 101, 0.15);
 }
-.producto-badge {
+.producto-badges {
   position: absolute;
   top: 16px; left: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.producto-badge {
   background: var(--rosa-deep);
   color: white;
   padding: 6px 14px;
@@ -676,13 +682,11 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-weight: 600;
-  z-index: 2;
+  white-space: nowrap;
 }
 .producto-badge.bestseller { background: var(--negro-soft); }
 .producto-badge.nuevo { background: var(--rosa); }
 .producto-badge-oferta {
-  position: absolute;
-  top: 16px; right: 16px;
   background: #C0392B;
   color: white;
   padding: 6px 14px;
@@ -691,7 +695,7 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-weight: 600;
-  z-index: 2;
+  white-space: nowrap;
 }
 .producto-img {
   height: 260px;
