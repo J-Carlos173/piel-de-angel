@@ -823,6 +823,91 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   box-shadow: none;
 }
 
+/* ============ PRODUCTO MODAL ============ */
+.producto-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 51, 49, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+.producto-modal {
+  background: white;
+  border-radius: 26px;
+  box-shadow: var(--sombra-card);
+  max-width: 880px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-theme="dark"] .producto-modal { background: #2A2523; }
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.producto-modal-close {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  color: var(--negro-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  z-index: 2;
+  transition: var(--transicion);
+}
+.producto-modal-close:hover { background: var(--rosa-deep); color: white; transform: scale(1.08); }
+.producto-modal-img {
+  position: relative;
+  min-height: 320px;
+  background: linear-gradient(135deg, #F8EFEC 0%, #F4E8E5 100%);
+}
+.producto-modal-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.producto-modal-img.agotado img { filter: grayscale(70%) opacity(0.7); }
+.producto-modal-content {
+  padding: 44px 40px;
+  display: flex;
+  flex-direction: column;
+}
+.producto-modal-content h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  color: var(--negro-soft);
+  margin: 6px 0 16px;
+  line-height: 1.2;
+}
+.producto-modal-desc {
+  font-size: 0.92rem;
+  color: var(--texto-soft);
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+.producto-modal-content .producto-precio { margin-bottom: 16px; }
+.producto-modal-content .producto-stock { margin-bottom: 22px; }
+.producto-modal-content .btn-add-cart { margin-top: auto; }
+
+@media (max-width: 700px) {
+  .producto-modal { grid-template-columns: 1fr; max-height: 92vh; }
+  .producto-modal-img { min-height: 220px; }
+  .producto-modal-content { padding: 28px 24px 32px; }
+}
+
 /* ============ CART DRAWER ============ */
 .cart-overlay {
   position: fixed;

@@ -60,14 +60,14 @@ export default function Productos() {
               onClick={() => setGridSize("compact")}
               title="Vista compacta"
             >
-              <i className="fa-solid fa-grip" />
+              <i className="fa-solid fa-border-all" />
             </button>
             <button
               className={`grid-size-btn${gridSize === "mini" ? " active" : ""}`}
               onClick={() => setGridSize("mini")}
               title="Vista mini"
             >
-              <i className="fa-solid fa-border-all" />
+              <i className="fa-solid fa-grip" />
             </button>
           </div>
         </div>
