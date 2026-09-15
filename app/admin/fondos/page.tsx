@@ -10,7 +10,9 @@ const ESTILOS: Estilo[] = [
   { id: "malla", nombre: "Malla de gradientes", desc: "Blobs difuminados en movimiento — look premium tipo sitio hecho con IA" },
   { id: "grano", nombre: "Textura de grano", desc: "Grano sutil sobre color plano, aire editorial discreto" },
   { id: "aurora", nombre: "Aurora animada", desc: "Gradiente fluido que se mueve lento de fondo" },
+  { id: "lujo", nombre: "Lujo oscuro", desc: "Fondo oscuro con acentos dorados y rosa — tendencia fuerte en marcas de belleza premium 2026, look regio y de alto contraste" },
   { id: "botanico", nombre: "Patrón botánico sutil", desc: "Hojitas chicas y estáticas en muy baja opacidad — reemplazo elegante de las hojas animadas, sin movimiento" },
+  { id: "terracota", nombre: "Terracota cálida", desc: "Tonos tierra y arena — look 'spa natural', tendencia en marcas de skincare con enfoque orgánico" },
   { id: "ondas", nombre: "Ondas suaves", desc: "Curva orgánica en la base de la sección" },
   { id: "minimal", nombre: "Minimalista", desc: "Solo color plano, sin decoración — el punto de comparación" },
 ];
@@ -142,12 +144,50 @@ export default function FondosPage() {
           animation: fondoAurora 12s ease infinite;
         }
 
+        /* Lujo oscuro */
+        .bg-lujo { background: #1C1917; }
+        .bg-lujo::before, .bg-lujo::after {
+          content: "";
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(10px);
+        }
+        .bg-lujo::before {
+          top: -140px; left: 50%;
+          transform: translateX(-50%);
+          width: 640px; height: 640px;
+          background: radial-gradient(circle, rgba(198,138,149,0.35) 0%, transparent 60%);
+          animation: fondoBlobFloat 16s ease-in-out infinite;
+        }
+        .bg-lujo::after {
+          bottom: -140px; right: 8%;
+          width: 460px; height: 460px;
+          background: radial-gradient(circle, rgba(212,175,110,0.28) 0%, transparent 60%);
+          animation: fondoBlobFloat 20s ease-in-out infinite reverse;
+        }
+        .bg-lujo .fondo-mock .eyebrow { color: #D4AF6E; }
+        .bg-lujo .fondo-mock h2 { color: #F5EDE8; }
+        .bg-lujo .fondo-mock h2 em { color: #E8B4BC; }
+        .bg-lujo .fondo-mock p { color: rgba(245,237,232,0.65); }
+        .bg-lujo .fondo-mock button { background: linear-gradient(135deg, #D4AF6E, #C68A95); box-shadow: 0 10px 30px rgba(212,175,110,0.3); }
+        .bg-lujo .fondo-label { background: rgba(28,25,23,0.8); }
+        .bg-lujo .fondo-label strong { color: #F5EDE8; }
+        .bg-lujo .fondo-label span { color: rgba(245,237,232,0.6); }
+
         /* 4. Botanico sutil */
         .bg-botanico {
           background-color: #FBFAF8;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40,8 C50,5 62,15 63,28 C64,40 55,52 45,58 C42,60 37,60 34,57 C26,51 22,40 25,29 C27,18 33,10 40,8 Z' fill='%235B7E64' opacity='0.06'/%3E%3C/svg%3E");
           background-size: 80px 80px;
         }
+
+        /* Terracota calida */
+        .bg-terracota {
+          background: linear-gradient(160deg, #F4E4D4 0%, #E8C9A8 45%, #D9A87E 100%);
+        }
+        .bg-terracota .fondo-mock .eyebrow { color: #9C6B3E; }
+        .bg-terracota .fondo-mock h2 em { color: #A9713F; }
+        .bg-terracota .fondo-mock button { background: #A9713F; box-shadow: 0 10px 30px rgba(169,113,63,0.35); }
 
         /* 5. Ondas suaves */
         .bg-ondas { background: linear-gradient(180deg, #FBFAF8 0%, #F4E8E5 100%); }
