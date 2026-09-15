@@ -643,6 +643,7 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 .productos-grid.mini .producto-badges { top: 8px; left: 8px; gap: 4px; }
 .productos-grid.mini .producto-badge,
 .productos-grid.mini .producto-badge-oferta { padding: 3px 8px; font-size: 0.55rem; letter-spacing: 0.5px; }
+.productos-grid.mini .producto-badge-oferta { margin-bottom: 4px; }
 
 @media (max-width: 600px) {
   .productos-grid.compact { grid-template-columns: repeat(2, 1fr); }
@@ -687,6 +688,8 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 .producto-badge.bestseller { background: var(--negro-soft); }
 .producto-badge.nuevo { background: var(--rosa); }
 .producto-badge-oferta {
+  display: inline-block;
+  margin-bottom: 8px;
   background: #C0392B;
   color: white;
   padding: 6px 14px;

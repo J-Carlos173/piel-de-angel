@@ -47,7 +47,6 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
                 {p.badge === "bestseller" ? "Bestseller" : "Nuevo"}
               </span>
             )}
-            {enOferta && <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>}
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={p.img} alt={p.nombre} />
@@ -59,6 +58,7 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
           <h2>{p.nombre}</h2>
           <p className="producto-modal-desc">{p.descripcion}</p>
 
+          {enOferta && <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>}
           <div className="producto-precio">
             {enOferta ? (
               <>
@@ -113,9 +113,6 @@ export default function ProductCard({ p }: { p: Producto }) {
               {p.badge === "bestseller" ? "Bestseller" : "Nuevo"}
             </span>
           )}
-          {enOferta && (
-            <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>
-          )}
         </div>
 
         <div className={`producto-img${agotado ? " agotado" : ""}`}>
@@ -128,6 +125,9 @@ export default function ProductCard({ p }: { p: Producto }) {
           <div className="producto-categoria">{p.categoria}</div>
           <h3>{p.nombre}</h3>
 
+          {enOferta && (
+            <span className="producto-badge-oferta">Ahorra {ahorroPct}%</span>
+          )}
           <div className="producto-precio">
             {enOferta ? (
               <>
