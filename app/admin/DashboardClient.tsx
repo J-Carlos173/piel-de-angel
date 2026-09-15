@@ -141,6 +141,14 @@ export default function DashboardClient({
       glow: "rgba(122,143,160,0.22)",
     },
     {
+      icon: "fa-paper-plane",
+      title: "Pedidos para Claude",
+      desc: "Escribe qué necesitas cambiar en la web y queda en cola para que se implemente",
+      href: "/admin/pedidos",
+      accent: "#8B6F6F",
+      glow: "rgba(139,111,111,0.22)",
+    },
+    {
       icon: "fa-palette",
       title: "Diseños de Fondo",
       desc: "Galería privada para probar distintos fondos antes de aplicarlos al sitio",
