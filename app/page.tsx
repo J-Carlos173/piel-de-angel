@@ -14,12 +14,10 @@ import WhatsappFloat from "@/components/WhatsappFloat";
 import CartDrawer from "@/components/CartDrawer";
 import Toast from "@/components/Toast";
 import RevealObserver from "@/components/RevealObserver";
-import FallingLeaves from "@/components/FallingLeaves";
 
 export default function Home() {
   return (
     <>
-      <FallingLeaves />
       <Navbar />
       <Hero />
       <RevealObserver>

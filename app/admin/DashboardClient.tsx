@@ -141,6 +141,14 @@ export default function DashboardClient({
       glow: "rgba(122,143,160,0.22)",
     },
     {
+      icon: "fa-palette",
+      title: "Diseños de Fondo",
+      desc: "Galería privada para probar distintos fondos antes de aplicarlos al sitio",
+      href: "/admin/fondos",
+      accent: "#7FA882",
+      glow: "rgba(127,168,130,0.22)",
+    },
+    {
       icon: "fa-wand-magic-sparkles",
       title: "Asistente IA",
       desc: "Pídele a Claude que gestione reseñas, servicios, agenda y más con lenguaje natural",
