@@ -2652,26 +2652,28 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) { --crema: #FBFAF8; --crema-pure:
 html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::before,
 html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
   top: auto; right: auto;
-  width: 12px; height: 12px;
+  width: 16px; height: 16px;
   border-radius: 50%;
   background: transparent;
-  filter: blur(2px);
+  filter: blur(2.5px);
 }
 html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::before {
   bottom: 8%; left: 8%;
   box-shadow:
-    50px 40px 0 -2px rgba(198,138,149,0.42),
-    170px 180px 0 2px rgba(212,175,110,0.35),
-    270px 20px 0 -4px rgba(198,138,149,0.3),
-    360px 200px 0 0px rgba(216,167,177,0.4);
+    50px 40px 0 -2px rgba(198,138,149,0.62),
+    170px 180px 0 3px rgba(212,175,110,0.52),
+    270px 20px 0 -4px rgba(198,138,149,0.46),
+    360px 200px 0 1px rgba(216,167,177,0.58),
+    120px 260px 0 -3px rgba(212,175,110,0.4);
   animation: bokehDriftSite1 16s ease-in-out infinite;
 }
 html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
   bottom: 4%; right: 6%;
   box-shadow:
-    -70px 60px 0 0px rgba(212,175,110,0.35),
-    -190px 150px 0 -3px rgba(198,138,149,0.3),
-    -30px 240px 0 3px rgba(216,167,177,0.35);
+    -70px 60px 0 0px rgba(212,175,110,0.52),
+    -190px 150px 0 -3px rgba(198,138,149,0.46),
+    -30px 240px 0 4px rgba(216,167,177,0.55),
+    -260px 40px 0 -2px rgba(212,175,110,0.4);
   animation: bokehDriftSite2 20s ease-in-out infinite 3s;
 }
 
