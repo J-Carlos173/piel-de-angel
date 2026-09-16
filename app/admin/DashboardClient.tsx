@@ -166,10 +166,6 @@ export default function DashboardClient({
   return (
     <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s", position: "relative" }}>
       <style>{`
-        @keyframes adminBlobFloat {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(-24px, 18px) scale(1.08); }
-        }
         .admin-grain::before {
           content: "";
           position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -206,26 +202,6 @@ export default function DashboardClient({
       }}>
         {/* Stripe botánico superior */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
-
-        {/* Malla de gradientes animada, como en el hero del sitio */}
-        <div aria-hidden style={{
-          position: "absolute", top: -140, right: -100, width: 340, height: 340, borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(198,138,149,${dark ? 0.28 : 0.22}) 0%, transparent 65%)`,
-          filter: "blur(18px)", animation: "adminBlobFloat 14s ease-in-out infinite", pointerEvents: "none",
-        }} />
-        <div aria-hidden style={{
-          position: "absolute", bottom: -10, right: 120, width: 220, height: 220, borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(212,175,110,${dark ? 0.22 : 0.16}) 0%, transparent 65%)`,
-          filter: "blur(18px)", animation: "adminBlobFloat 18s ease-in-out infinite reverse", pointerEvents: "none",
-        }} />
-
-        {/* Hoja decorativa */}
-        <svg aria-hidden style={{ position: "absolute", right: 0, top: -10, opacity: dark ? 0.08 : 0.09, width: 180, pointerEvents: "none" }} viewBox="0 0 220 320">
-          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#C68A95"/>
-          <path d="M110,10 C105,80 108,175 108,268" stroke="#8B6F6F" strokeWidth="2" fill="none" opacity={0.5}/>
-          <path d="M110,50 C140,65 175,60 200,50" stroke="#8B6F6F" strokeWidth="1" fill="none" opacity={0.35}/>
-          <path d="M106,110 C130,122 160,118 185,108" stroke="#8B6F6F" strokeWidth="1" fill="none" opacity={0.35}/>
-        </svg>
 
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
           <div>
