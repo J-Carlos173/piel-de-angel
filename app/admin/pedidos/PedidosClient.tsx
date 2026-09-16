@@ -29,10 +29,17 @@ const ESTADO_META: Record<Pedido["estado"], { label: string; color: string; icon
 
 const MENSAJES_TRABAJO = [
   "Revisando tu pedido...",
-  "Estamos trabajando en esto...",
-  "Esto puede tomar unos minutos...",
+  "Leyendo bien lo que pediste...",
+  "Dandole una vuelta a la idea...",
+  "Probando como se ve esto...",
   "Ajustando los detalles...",
-  "Dejando todo listo...",
+  "Esto puede tomar unos minutos, no te preocupes...",
+  "Afinando para que quede como quieres...",
+  "Casi, dejando todo prolijo...",
+  "Un poco mas de paciencia...",
+  "Revisando que no se rompa nada mas del sitio...",
+  "Puliendo los ultimos detalles...",
+  "Ya casi esta listo...",
 ];
 
 const SEGUNDOS_DEPLOY = 30;
@@ -254,7 +261,7 @@ export default function PedidosClient() {
           <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
             <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
               <i className="fa-solid fa-spinner fa-spin" style={{ color: "#C68A95" }} />
-              <span style={{ fontSize: 13, color: textMuted, ...MONO }}>{MENSAJES_TRABAJO[Math.floor(ahora / 3500) % MENSAJES_TRABAJO.length]}</span>
+              <span style={{ fontSize: 13, color: textMuted, ...MONO }}>{MENSAJES_TRABAJO[Math.floor(ahora / 6000) % MENSAJES_TRABAJO.length]}</span>
             </div>
           </div>
         ) : (() => {
