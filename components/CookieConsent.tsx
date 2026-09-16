@@ -26,8 +26,7 @@ export default function CookieConsent() {
   return (
     <div className="cookie-banner" role="dialog" aria-label="Aviso de cookies">
       <p className="cookie-banner-texto">
-        Usamos cookies propias, esenciales para el funcionamiento del sitio y el carro de compras.
-        No usamos cookies de publicidad ni de terceros por ahora.{" "}
+        Usamos cookies esenciales para el sitio y el carro de compras. Sin publicidad por ahora.{" "}
         <Link href="/terminos#cookies">Más información</Link>.
       </p>
       <div className="cookie-banner-botones">
