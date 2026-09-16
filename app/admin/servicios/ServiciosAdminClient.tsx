@@ -55,7 +55,6 @@ export default function ServiciosAdminClient() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroCat, setFiltroCat] = useState("");
 
-  const bg       = dark ? "#160f13" : "#f5eeec";
   const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
   const border   = dark ? "#3a2830" : "#ecddd9";
   const textMain = dark ? "#f0dde6" : "#2e1e24";
@@ -223,7 +222,7 @@ export default function ServiciosAdminClient() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", transition: "background 0.3s" }}>
       <style>{`
         @media (max-width: 640px) {
           .admin-card-row { flex-wrap: wrap !important; }

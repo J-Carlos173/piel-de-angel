@@ -33,7 +33,6 @@ export default function DashboardClient({
   const router = useRouter();
   const { dark } = useThemeStore();
 
-  const bg      = dark ? "#160f13" : "#f5eeec";
   const cardBg  = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
   const border  = dark ? "#3a2830" : "#ecddd9";
   const textMain= dark ? "#f0dde6" : "#2e1e24";
@@ -165,15 +164,8 @@ export default function DashboardClient({
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s", position: "relative" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", fontFamily: "Georgia, serif", transition: "background 0.3s", position: "relative" }}>
       <style>{`
-        .admin-grain::before {
-          content: "";
-          position: fixed; inset: 0; z-index: 0; pointer-events: none;
-          opacity: ${dark ? 0.05 : 0.03};
-          mix-blend-mode: overlay;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        }
         .admin-card {
           position: relative;
           overflow: hidden;
@@ -190,8 +182,6 @@ export default function DashboardClient({
         }
         .admin-card:hover::before { left: 130%; }
       `}</style>
-
-      <div className="admin-grain" />
 
       <AdminHeader
         eyebrow="Panel de administración"

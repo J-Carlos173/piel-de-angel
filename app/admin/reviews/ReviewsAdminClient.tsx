@@ -37,7 +37,6 @@ export default function ReviewsAdminClient() {
   const [acting, setActing] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("pending");
 
-  const bg       = dark ? "#160f13" : "#f5eeec";
   const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
   const border   = dark ? "#3a2830" : "#ecddd9";
   const textMain = dark ? "#f0dde6" : "#2e1e24";
@@ -92,7 +91,7 @@ export default function ReviewsAdminClient() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", transition: "background 0.3s" }}>
 
       <AdminHeader eyebrow="Gestión de Reseñas" title="Reseñas" backHref="/admin" maxWidth={860} />
 

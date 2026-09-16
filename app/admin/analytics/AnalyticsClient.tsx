@@ -33,7 +33,6 @@ export default function AnalyticsClient({
 }) {
   const { dark } = useThemeStore();
 
-  const bg       = dark ? "#160f13" : "#f5eeec";
   const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
   const border   = dark ? "#3a2830" : "#ecddd9";
   const textMain = dark ? "#f0dde6" : "#2e1e24";
@@ -57,7 +56,7 @@ export default function AnalyticsClient({
   const maxViews = Math.max(...topPages.map((p) => p.views), 1);
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
 
       <AdminHeader
         eyebrow="Analytics · Piel de Ángel"

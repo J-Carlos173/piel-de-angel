@@ -34,7 +34,6 @@ export default function AgendaClient() {
   const [loadingSlots, setLoadingSlots]     = useState(false);
   const [toggling, setToggling]             = useState<string | null>(null);
 
-  const bg        = dark ? "#160f13" : "#f5eeec";
   const cardBg    = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
   const border    = dark ? "#3a2830" : "#ecddd9";
   const textMain  = dark ? "#f0dde6" : "#2e1e24";
@@ -94,7 +93,7 @@ export default function AgendaClient() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", transition: "background 0.3s" }}>
 
       <AdminHeader eyebrow="Gestión de Citas" title="Agenda" backHref="/admin" />
 

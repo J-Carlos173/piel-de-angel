@@ -119,7 +119,6 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const totalFiltrado = confirmedFiltered.reduce((s, o) => s + (o.amount || o.total || 0), 0);
 
   // Tema
-  const bg          = dark ? "#160f13" : "#f5eeec";
   const cardBg      = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
   const cardBorder  = dark ? "#3a2830" : "#ecddd9";
   const textMain    = dark ? "#f0dde6" : "#2e1e24";
@@ -147,7 +146,7 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
 
       <AdminHeader
         eyebrow="Panel interno · Piel de Ángel"

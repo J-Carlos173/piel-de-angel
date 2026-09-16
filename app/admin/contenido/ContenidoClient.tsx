@@ -145,7 +145,6 @@ export default function ContenidoClient({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
 
-  const bg      = dark ? "#160f13" : "#f5eeec";
   const cardBg  = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
   const border  = dark ? "#3a2830" : "#ecddd9";
   const textMain= dark ? "#f0dde6" : "#2e1e24";
@@ -259,7 +258,7 @@ export default function ContenidoClient({
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
+    <div style={{ minHeight: "100vh", background: "transparent", transition: "background 0.3s" }}>
 
       <AdminHeader eyebrow="Editor de contenido" title="Editar Sitio Web" subtitle="Los cambios se reflejan en el sitio al instante" backHref="/admin" maxWidth={860} />
 
