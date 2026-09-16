@@ -38,6 +38,16 @@ function fmtSeccion(iso: string) {
   return fecha.toLocaleDateString("es-CL", { day: "numeric", month: "long", year: hoy.getFullYear() !== fecha.getFullYear() ? "numeric" : undefined });
 }
 
+const MENSAJES_TRABAJO = [
+  "Revisando tu pedido...",
+  "Estamos trabajando en esto...",
+  "Esto puede tomar unos minutos...",
+  "Ajustando los detalles...",
+  "Dejando todo listo...",
+];
+
+const SEGUNDOS_DEPLOY = 30;
+
 function titulo(p: Pedido) {
   const t = p.texto?.trim();
   if (t) return t.length > 42 ? t.slice(0, 42) + "…" : t;
@@ -56,6 +66,12 @@ export default function PedidosClient() {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [ahora, setAhora] = useState(() => Date.now());
+
+  useEffect(() => {
+    const t = setInterval(() => setAhora(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const bg        = dark ? "#160f13" : "#f5eeec";
   const sidebarBg = dark ? "rgba(30,21,26,0.97)" : "#ffffff";
@@ -251,13 +267,50 @@ export default function PedidosClient() {
                   </div>
                 </div>
 
-                {activo.respuesta && (
-                  <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
-                    <div style={{ background: bubbleClaude, color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: `1px solid ${border}` }}>
-                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{activo.respuesta}</p>
+                {(() => {
+                  if (activo.estado === "error") return null;
+
+                  if (!activo.respuesta) {
+                    const msg = MENSAJES_TRABAJO[Math.floor(ahora / 3500) % MENSAJES_TRABAJO.length];
+                    return (
+                      <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                        <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
+                          <i className="fa-solid fa-spinner fa-spin" style={{ color: "#C68A95" }} />
+                          <span style={{ fontSize: 13, color: textMuted, ...MONO }}>{msg}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const transcurridos = activo.completed_at ? (ahora - new Date(activo.completed_at).getTime()) / 1000 : SEGUNDOS_DEPLOY;
+                  if (transcurridos < SEGUNDOS_DEPLOY) {
+                    const restantes = Math.max(0, Math.ceil(SEGUNDOS_DEPLOY - transcurridos));
+                    return (
+                      <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                        <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
+                          <i className="fa-solid fa-cloud-arrow-up fa-fade" style={{ color: "#C68A95" }} />
+                          <span style={{ fontSize: 13, color: textMuted, ...MONO }}>El cambio se está subiendo a producción... ({restantes}s)</span>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                      <div style={{ background: bubbleClaude, color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: `1px solid ${border}` }}>
+                        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{activo.respuesta}</p>
+                      </div>
+                      <div style={{ fontSize: 10.5, color: textMuted, marginTop: 4, paddingLeft: 4, ...MONO }}>
+                        Claude {activo.completed_at && `· ${fmtHora(activo.completed_at)}`}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 10.5, color: textMuted, marginTop: 4, paddingLeft: 4, ...MONO }}>
-                      Claude {activo.completed_at && `· ${fmtHora(activo.completed_at)}`}
+                  );
+                })()}
+
+                {activo.estado === "error" && activo.respuesta && (
+                  <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                    <div style={{ background: "rgba(192,82,79,0.08)", color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: "1px solid rgba(192,82,79,0.3)" }}>
+                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{activo.respuesta}</p>
                     </div>
                   </div>
                 )}
