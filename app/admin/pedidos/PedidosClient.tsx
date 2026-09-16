@@ -36,6 +36,8 @@ const MENSAJES_TRABAJO = [
 ];
 
 const SEGUNDOS_DEPLOY = 30;
+const PIN_CORRECTO = "159632";
+const PIN_STORAGE_KEY = "pieldeangel_pedidos_pin_ok";
 
 function fmtHora(iso: string) {
   return new Date(iso).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
@@ -94,11 +96,34 @@ export default function PedidosClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [ahora, setAhora] = useState(() => Date.now());
+  const [pinListo, setPinListo] = useState(false);
+  const [desbloqueado, setDesbloqueado] = useState(false);
+  const [pinIngresado, setPinIngresado] = useState("");
+  const [pinError, setPinError] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setAhora(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(PIN_STORAGE_KEY) === "1") setDesbloqueado(true);
+    } catch {}
+    setPinListo(true);
+  }, []);
+
+  function verificarPin(e: React.FormEvent) {
+    e.preventDefault();
+    if (pinIngresado === PIN_CORRECTO) {
+      setDesbloqueado(true);
+      setPinError(false);
+      try { localStorage.setItem(PIN_STORAGE_KEY, "1"); } catch {}
+    } else {
+      setPinError(true);
+      setPinIngresado("");
+    }
+  }
 
   const bg        = dark ? "#160f13" : "#f5eeec";
   const sidebarBg = dark ? "rgba(30,21,26,0.97)" : "#ffffff";
@@ -306,6 +331,51 @@ export default function PedidosClient() {
       </div>
     </div>
   );
+
+  if (!pinListo) return null;
+
+  if (!desbloqueado) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: bg, fontFamily: "Georgia, serif", padding: 24 }}>
+        <div style={{ background: cardBg, borderRadius: 24, padding: "40px 36px", width: "100%", maxWidth: 360, boxShadow: "0 20px 60px rgba(139,111,111,0.15)", border: `1.5px solid ${border}`, textAlign: "center" }}>
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, #C68A95, #8B5E6A)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", boxShadow: "0 8px 24px rgba(198,138,149,0.35)" }}>
+            <i className="fa-solid fa-lock" style={{ color: "white", fontSize: 20 }} />
+          </div>
+          <h1 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: "normal", color: textMain, fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Asistente IA</h1>
+          <p style={{ margin: "0 0 24px", fontSize: 12.5, color: textMuted, ...MONO }}>Ingresa el PIN para entrar</p>
+          <form onSubmit={verificarPin}>
+            <input
+              type="password"
+              inputMode="numeric"
+              value={pinIngresado}
+              onChange={(e) => { setPinIngresado(e.target.value); setPinError(false); }}
+              autoFocus
+              placeholder="••••••"
+              style={{
+                width: "100%", boxSizing: "border-box", textAlign: "center", letterSpacing: "0.3em",
+                fontSize: 20, padding: "12px 16px", borderRadius: 12,
+                border: `1.5px solid ${pinError ? "#C0524F" : border}`,
+                background: inputBg, color: textMain, outline: "none", fontFamily: "Georgia, serif",
+              }}
+            />
+            {pinError && <p style={{ margin: "8px 0 0", fontSize: 12, color: "#C0524F", ...MONO }}>PIN incorrecto</p>}
+            <button
+              type="submit"
+              style={{ marginTop: 18, width: "100%", padding: "13px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #C68A95, #8B5E6A)", color: "white", fontSize: 13, ...MONO, cursor: "pointer" }}
+            >
+              Entrar
+            </button>
+          </form>
+          <button
+            onClick={() => router.push("/admin")}
+            style={{ marginTop: 16, background: "none", border: "none", color: textMuted, fontSize: 12, ...MONO, cursor: "pointer" }}
+          >
+            <i className="fa-solid fa-arrow-left" style={{ marginRight: 5 }} />Volver al panel
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ height: "100vh", display: "flex", background: bg, fontFamily: "Georgia, serif" }}>
