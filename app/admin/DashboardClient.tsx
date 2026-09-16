@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
+import AdminHeader from "./AdminHeader";
 
 function fmtPrecio(n: number) {
   return "$" + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -30,7 +31,7 @@ export default function DashboardClient({
   thisMonthRevenue: number;
 }) {
   const router = useRouter();
-  const { dark, toggle } = useThemeStore();
+  const { dark } = useThemeStore();
 
   const bg      = dark ? "#160f13" : "#f5eeec";
   const cardBg  = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
@@ -192,37 +193,16 @@ export default function DashboardClient({
 
       <div className="admin-grain" />
 
-      {/* Header */}
-      <div style={{
-        background: dark
-          ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
-          : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
-        padding: "36px 32px 32px", position: "relative", overflow: "hidden",
-        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
-      }}>
-        {/* Stripe botánico superior */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
-
-        <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
-          <div>
-            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "Montserrat, sans-serif" }}>Panel de administración</p>
-            <h1 style={{ margin: "8px 0 3px", color: dark ? "#f0dde6" : "#2e1e24", fontSize: 30, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              Piel de Ángel
-            </h1>
-            <p style={{ margin: 0, color: dark ? "rgba(127,168,130,0.50)" : "#9a8486", fontSize: 13, letterSpacing: "0.04em" }}>
-              ¿Qué deseas hacer hoy?
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={toggle} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#3a2830" : "#ecddd9"}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 15, cursor: "pointer" }}>
-              <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
-            </button>
-            <button onClick={handleLogout} style={{ background: dark ? "rgba(198,138,149,0.15)" : "rgba(198,138,149,0.10)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 14px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7 }}>
-              <i className="fa-solid fa-right-from-bracket" /> Salir
-            </button>
-          </div>
-        </div>
-      </div>
+      <AdminHeader
+        eyebrow="Panel de administración"
+        title="Piel de Ángel"
+        subtitle="¿Qué deseas hacer hoy?"
+        rightExtra={
+          <button onClick={handleLogout} style={{ background: dark ? "rgba(198,138,149,0.15)" : "rgba(198,138,149,0.10)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 14px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7 }}>
+            <i className="fa-solid fa-right-from-bracket" /> Salir
+          </button>
+        }
+      />
 
       {/* Grid de cards */}
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "8px 16px 60px" }}>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
+import AdminHeader from "../AdminHeader";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
@@ -31,8 +31,7 @@ export default function AnalyticsClient({
   topPages: { path: string; views: number }[];
   today: number; week: number; month: number; total: number;
 }) {
-  const router = useRouter();
-  const { dark, toggle } = useThemeStore();
+  const { dark } = useThemeStore();
 
   const bg       = dark ? "#160f13" : "#f5eeec";
   const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
@@ -60,25 +59,12 @@ export default function AnalyticsClient({
   return (
     <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
 
-      {/* Header */}
-      <div style={{ background: "linear-gradient(145deg, #5C3D47 0%, #8B5E6A 30%, #C68A95 68%, #E2B4BC 100%)", padding: "32px 32px 28px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -60, right: -60, width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 3, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)" }} />
-
-        <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, position: "relative" }}>
-          <div>
-            <button onClick={() => router.push("/admin")} style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 8, padding: "5px 12px", color: "#fff", fontSize: 12, cursor: "pointer", marginBottom: 10, fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
-              <i className="fa-solid fa-arrow-left" /> Panel
-            </button>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Analytics · Piel de Ángel</p>
-            <h1 style={{ margin: "6px 0 2px", color: "#fff", fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Visitas al sitio</h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontSize: 12 }}>Solo páginas del sitio público · sin admin</p>
-          </div>
-          <button onClick={toggle} style={{ background: "rgba(255,255,255,0.14)", border: "1.5px solid rgba(255,255,255,0.32)", borderRadius: 12, padding: "9px 13px", color: "#fff", fontSize: 15, cursor: "pointer" }}>
-            <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
-          </button>
-        </div>
-      </div>
+      <AdminHeader
+        eyebrow="Analytics · Piel de Ángel"
+        title="Visitas al sitio"
+        subtitle="Solo páginas del sitio público · sin admin"
+        backHref="/admin"
+      />
 
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 16px 56px" }}>
 

@@ -341,9 +341,10 @@ export default function FondosPage() {
           : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
         padding: "32px 32px 28px",
         borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
-        transition: "background 0.3s",
+        transition: "background 0.3s", position: "relative",
       }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", position: "relative" }}>
           <div>
             <Link href="/admin" style={{
               display: "inline-flex", alignItems: "center", gap: 6,

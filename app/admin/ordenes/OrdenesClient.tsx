@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
+import AdminHeader from "../AdminHeader";
 
 const MONO: React.CSSProperties = {
   fontFamily: "Montserrat, sans-serif",
@@ -60,7 +61,7 @@ function isInPeriod(dateStr: string, period: string) {
 
 export default function OrdenesClient({ orders }: { orders: Order[] }) {
   const router = useRouter();
-  const { dark, toggle } = useThemeStore();
+  const { dark } = useThemeStore();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("confirmed");
   const [periodoFilter, setPeriodoFilter] = useState("all");
@@ -148,33 +149,13 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
   return (
     <div style={{ minHeight: "100vh", background: bg, fontFamily: "Georgia, serif", transition: "background 0.3s" }}>
 
-      {/* ── Header ── */}
-      <div style={{
-        background: dark
-          ? "linear-gradient(160deg, #1e151a 0%, #1a1218 55%, #1e151a 100%)"
-          : "linear-gradient(160deg, #ffffff 0%, #fdf5f7 55%, #f9eef2 100%)",
-        padding: "36px 32px 32px", position: "relative", overflow: "hidden",
-        borderBottom: dark ? "1.5px solid #3a2830" : "1.5px solid #ecddd9",
-      }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #D8A7B1, #C68A95, #D8A7B1, transparent)" }} />
-        <svg aria-hidden style={{ position: "absolute", right: 0, top: -8, opacity: dark ? 0.07 : 0.08, width: 160, pointerEvents: "none" }} viewBox="0 0 220 320">
-          <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#C68A95"/>
-          <path d="M110,10 C105,80 108,175 108,268" stroke="#8B6F6F" strokeWidth="2" fill="none" opacity={0.4}/>
-          <path d="M110,50 C140,65 175,60 200,50" stroke="#8B6F6F" strokeWidth="1" fill="none" opacity={0.3}/>
-        </svg>
-
-        <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, position: "relative" }}>
-          <div>
-            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Panel interno · Piel de Ángel</p>
-            <h1 style={{ margin: "8px 0 3px", color: dark ? "#f0dde6" : "#2e1e24", fontSize: 28, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>Historial de Órdenes</h1>
-            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#9a8486", fontSize: 12, letterSpacing: "0.05em" }}>Estética & Skincare Premium</p>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <button onClick={toggle} title={dark ? "Modo claro" : "Modo oscuro"}
-              style={{ ...glassBtn, padding: "9px 13px", fontSize: 15 }}>
-              <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
-            </button>
+      <AdminHeader
+        eyebrow="Panel interno · Piel de Ángel"
+        title="Historial de Órdenes"
+        subtitle="Estética & Skincare Premium"
+        backHref="/admin"
+        rightExtra={
+          <>
             <button onClick={() => exportCSV(filtered)} style={glassBtn}>
               <i className="fa-solid fa-file-csv" />
               <span>CSV ({filtered.length})</span>
@@ -197,9 +178,9 @@ export default function OrdenesClient({ orders }: { orders: Order[] }) {
               style={{ ...glassBtn, background: dark ? "rgba(198,138,149,0.15)" : "rgba(198,138,149,0.10)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, color: dark ? "#e8b4bc" : "#C68A95" }}>
               <i className="fa-solid fa-right-from-bracket" /><span>Salir</span>
             </button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* ── Barra de filtros ── */}
       <div style={{

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
+import AdminHeader from "../AdminHeader";
 
 /* ── Tipos ─────────────────────────────────────────────── */
 type HeroContent = {
@@ -138,8 +138,7 @@ export default function ContenidoClient({
   initialHero: HeroContent;
   initialAbout: AboutContent;
 }) {
-  const router = useRouter();
-  const { dark, toggle } = useThemeStore();
+  const { dark } = useThemeStore();
   const [tab, setTab]       = useState<"hero" | "about">("hero");
   const [hero, setHero]     = useState<HeroContent>(initialHero);
   const [about, setAbout]   = useState<AboutContent>(initialAbout);
@@ -262,30 +261,7 @@ export default function ContenidoClient({
   return (
     <div style={{ minHeight: "100vh", background: bg, transition: "background 0.3s" }}>
 
-      {/* Header */}
-      <div style={{
-        background: dark
-          ? "linear-gradient(160deg,#1e151a,#1a1218 55%,#1e151a)"
-          : "linear-gradient(160deg,#ffffff,#fdf5f7 55%,#f9eef2)",
-        padding: "28px 32px 24px", borderBottom: `1.5px solid ${border}`, position: "relative",
-      }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,transparent,#D8A7B1,#C68A95,#D8A7B1,transparent)" }} />
-        <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-          <div>
-            <button onClick={() => router.push("/admin")} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1px solid ${border}`, borderRadius: 8, padding: "5px 12px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 12, cursor: "pointer", marginBottom: 10, ...MONO, display: "flex", alignItems: "center", gap: 6 }}>
-              <i className="fa-solid fa-arrow-left" /> Panel
-            </button>
-            <p style={{ margin: 0, color: dark ? "#9a7c86" : "#b08090", fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", ...MONO }}>Editor de contenido</p>
-            <h1 style={{ margin: "6px 0 2px", color: textMain, fontSize: 26, fontWeight: "normal", fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              Editar Sitio Web
-            </h1>
-            <p style={{ margin: 0, fontSize: 12, color: textMuted, ...MONO }}>Los cambios se reflejan en el sitio al instante</p>
-          </div>
-          <button onClick={toggle} style={{ background: dark ? "rgba(255,255,255,0.07)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${border}`, borderRadius: 12, padding: "9px 13px", color: dark ? "#c8a8b4" : "#C68A95", fontSize: 15, cursor: "pointer" }}>
-            <i className={`fa-solid ${dark ? "fa-sun" : "fa-moon"}`} />
-          </button>
-        </div>
-      </div>
+      <AdminHeader eyebrow="Editor de contenido" title="Editar Sitio Web" subtitle="Los cambios se reflejan en el sitio al instante" backHref="/admin" maxWidth={860} />
 
       {/* Contenido */}
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px 60px" }}>
