@@ -209,14 +209,14 @@ export default function DashboardClient({
 
         {/* Malla de gradientes animada, como en el hero del sitio */}
         <div aria-hidden style={{
-          position: "absolute", top: -120, right: -80, width: 340, height: 340, borderRadius: "50%",
+          position: "absolute", top: -140, right: -100, width: 340, height: 340, borderRadius: "50%",
           background: `radial-gradient(circle, rgba(198,138,149,${dark ? 0.28 : 0.22}) 0%, transparent 65%)`,
-          filter: "blur(6px)", animation: "adminBlobFloat 14s ease-in-out infinite", pointerEvents: "none",
+          filter: "blur(18px)", animation: "adminBlobFloat 14s ease-in-out infinite", pointerEvents: "none",
         }} />
         <div aria-hidden style={{
-          position: "absolute", bottom: -100, right: 120, width: 220, height: 220, borderRadius: "50%",
+          position: "absolute", bottom: -10, right: 120, width: 220, height: 220, borderRadius: "50%",
           background: `radial-gradient(circle, rgba(212,175,110,${dark ? 0.22 : 0.16}) 0%, transparent 65%)`,
-          filter: "blur(6px)", animation: "adminBlobFloat 18s ease-in-out infinite reverse", pointerEvents: "none",
+          filter: "blur(18px)", animation: "adminBlobFloat 18s ease-in-out infinite reverse", pointerEvents: "none",
         }} />
 
         {/* Hoja decorativa */}
