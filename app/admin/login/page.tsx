@@ -38,38 +38,74 @@ function LoginForm() {
       fontFamily: "'Cormorant Garamond', Georgia, serif",
       position: "relative", overflow: "hidden",
     }}>
+      <style>{`
+        @keyframes loginAuraFloat {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-46px, 34px) scale(1.18); }
+        }
+        @keyframes loginAuraFloatRev {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(40px, -30px) scale(1.14); }
+        }
+        .login-grain::before {
+          content: "";
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          opacity: 0.035;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .login-card { position: relative; overflow: hidden; }
+        .login-card::before {
+          content: "";
+          position: absolute;
+          top: 0; left: -130%;
+          width: 60%; height: 100%;
+          background: linear-gradient(115deg, transparent, rgba(255,255,255,0.4), transparent);
+          transform: skewX(-20deg);
+          transition: left 0.7s cubic-bezier(0.16,1,0.3,1);
+          pointer-events: none;
+        }
+        .login-card:hover::before { left: 130%; }
+        .login-btn { position: relative; overflow: hidden; }
+        .login-btn::before {
+          content: "";
+          position: absolute;
+          top: 0; left: -130%;
+          width: 60%; height: 100%;
+          background: linear-gradient(115deg, transparent, rgba(255,255,255,0.45), transparent);
+          transform: skewX(-20deg);
+          transition: left 0.5s cubic-bezier(0.16,1,0.3,1);
+          pointer-events: none;
+        }
+        .login-btn:hover::before { left: 130%; }
+      `}</style>
 
-      {/* Hoja decorativa superior derecha */}
-      <svg aria-hidden style={{ position: "absolute", right: -30, top: -20, opacity: 0.09, width: 240, pointerEvents: "none" }} viewBox="0 0 220 320">
-        <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#4A6B52"/>
-        <path d="M110,10 C105,80 108,175 108,268" stroke="#2E4D35" strokeWidth="2" fill="none" opacity={0.5}/>
-        <path d="M110,50 C140,65 175,60 200,50" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.35}/>
-        <path d="M106,110 C130,122 160,118 185,108" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.35}/>
-        <path d="M102,170 C122,180 148,176 168,166" stroke="#2E4D35" strokeWidth="1" fill="none" opacity={0.3}/>
-      </svg>
+      <div className="login-grain" />
 
-      {/* Hoja inferior izquierda */}
-      <svg aria-hidden style={{ position: "absolute", left: -20, bottom: -30, opacity: 0.07, width: 180, pointerEvents: "none", transform: "rotate(-15deg)" }} viewBox="0 0 220 320">
-        <path d="M110,10 C155,5 200,35 205,85 C210,135 188,210 150,258 C130,282 90,292 68,270 C38,238 28,185 40,125 C55,58 78,16 110,10 Z" fill="#5B7E64"/>
-        <path d="M110,10 C105,80 108,175 108,268" stroke="#2E4D35" strokeWidth="2" fill="none" opacity={0.4}/>
-      </svg>
-
-      {/* Ornamento botánico arriba de la card */}
-      <div style={{ position: "absolute", top: "calc(50% - 230px)", left: "50%", transform: "translateX(-50%)" }}>
-        <svg viewBox="0 0 220 44" width={160} height={32} aria-hidden>
-          <path d="M0,32 Q45,32 88,32"    stroke="#5B7E64" strokeWidth="0.7" fill="none" opacity={0.3} strokeLinecap="round" />
-          <path d="M132,32 Q175,32 220,32" stroke="#5B7E64" strokeWidth="0.7" fill="none" opacity={0.3} strokeLinecap="round" />
-          <path d="M110,35 C110,27 110,18 110,11" stroke="#4A6B52" strokeWidth="1.1" fill="none" opacity={0.55} strokeLinecap="round" />
-          <path d="M110,11 C107,6 107,2 110,0 C113,2 113,6 110,11 Z" fill="#5B7E64" opacity={0.5} />
-          <path d="M110,23 C103,20 96,18 91,17" stroke="#4A6B52" strokeWidth="0.9" fill="none" opacity={0.48} strokeLinecap="round" />
-          <path d="M91,17 C86,12 87,7 89,6 C90,10 91,14 91,17 Z" fill="#5B7E64" opacity={0.45} />
-          <path d="M110,23 C117,20 124,18 129,17" stroke="#4A6B52" strokeWidth="0.9" fill="none" opacity={0.48} strokeLinecap="round" />
-          <path d="M129,17 C134,12 133,7 131,6 C130,10 129,14 129,17 Z" fill="#5B7E64" opacity={0.45} />
-        </svg>
-      </div>
+      {/* Aura: circulos de luz animados, mas presentes que en el resto del sitio */}
+      <div aria-hidden style={{
+        position: "absolute", top: -160, right: -120, width: 480, height: 480, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(198,138,149,0.38) 0%, transparent 68%)",
+        filter: "blur(10px)", animation: "loginAuraFloat 11s ease-in-out infinite", pointerEvents: "none",
+      }} />
+      <div aria-hidden style={{
+        position: "absolute", bottom: -180, left: -140, width: 440, height: 440, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(212,175,110,0.30) 0%, transparent 68%)",
+        filter: "blur(10px)", animation: "loginAuraFloatRev 14s ease-in-out infinite", pointerEvents: "none",
+      }} />
+      <div aria-hidden style={{
+        position: "absolute", top: "38%", left: "8%", width: 220, height: 220, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(216,167,177,0.30) 0%, transparent 70%)",
+        filter: "blur(8px)", animation: "loginAuraFloat 9s ease-in-out infinite reverse", pointerEvents: "none",
+      }} />
+      <div aria-hidden style={{
+        position: "absolute", bottom: "12%", right: "10%", width: 180, height: 180, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(198,138,149,0.26) 0%, transparent 70%)",
+        filter: "blur(8px)", animation: "loginAuraFloatRev 10s ease-in-out infinite", pointerEvents: "none",
+      }} />
 
       {/* Card */}
-      <div style={{
+      <div className="login-card" style={{
         background: "rgba(255,255,255,0.92)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
@@ -77,7 +113,7 @@ function LoginForm() {
         padding: "48px 44px 40px",
         width: "100%", maxWidth: 390,
         boxShadow: "0 24px 70px rgba(100,60,70,0.12), 0 0 0 1px rgba(198,138,149,0.18)",
-        position: "relative",
+        zIndex: 1,
       }}>
         {/* Stripe superior */}
         <div style={{
@@ -116,7 +152,7 @@ function LoginForm() {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: "block", fontSize: 10, color: "#7A9E8A", textTransform: "uppercase", letterSpacing: "0.16em", marginBottom: 9, fontFamily: "Montserrat, sans-serif" }}>
+            <label style={{ display: "block", fontSize: 10, color: "#C68A95", textTransform: "uppercase", letterSpacing: "0.16em", marginBottom: 9, fontFamily: "Montserrat, sans-serif" }}>
               Contraseña
             </label>
             <input
@@ -157,18 +193,22 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
+            className="login-btn"
             style={{
               width: "100%", padding: "14px",
-              background: "linear-gradient(135deg, #8B6F6F 0%, #C68A95 55%, #D8A7B1 100%)",
-              border: "none", borderRadius: 12,
-              color: "#fff", fontSize: 15,
+              background: "#C68A95",
+              border: "none", borderRadius: 100,
+              color: "#fff", fontSize: 13,
+              textTransform: "uppercase",
               cursor: loading ? "not-allowed" : "pointer",
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              letterSpacing: "0.1em",
+              fontFamily: "Montserrat, sans-serif", fontWeight: 500,
+              letterSpacing: "2px",
               opacity: loading ? 0.75 : 1,
-              boxShadow: "0 8px 22px rgba(198,138,149,0.38)",
-              transition: "transform 0.18s, box-shadow 0.18s",
+              boxShadow: "0 14px 40px rgba(198,138,149,0.30)",
+              transition: "background 0.25s, transform 0.18s, box-shadow 0.18s",
             }}
+            onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.background = "#2e1e24"; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 20px 50px rgba(198,138,149,0.45)"; } }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "#C68A95"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 14px 40px rgba(198,138,149,0.30)"; }}
           >
             {loading
               ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }} />Entrando…</>
