@@ -1749,6 +1749,73 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 [data-theme="dark"] .promo-badge-finished { background: #3D3533; }
 [data-theme="dark"] .promo-prizes li { background: rgba(216,167,177,0.07); }
 
+/* ============ CONSEJOS DE PIEL ============ */
+.consejos-section { background: var(--crema); padding: 100px 0; }
+.consejos-container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+.consejo-card {
+  position: relative;
+  background: var(--crema-pure);
+  border-radius: 20px;
+  padding: 44px 44px 32px;
+  box-shadow: var(--sombra-card);
+  border: 1px solid var(--gris-suave);
+  border-top: 3px solid var(--rosa);
+  text-align: center;
+}
+.consejo-tag {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--rosa-deep);
+  background: rgba(216,167,177,0.15);
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+.consejo-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 500;
+  color: var(--negro-soft);
+  margin: 16px 0 12px;
+}
+.consejo-desc { font-size: 15px; color: var(--texto); line-height: 1.75; margin: 0 0 18px; }
+.consejo-fuente { display: block; font-size: 12px; font-style: italic; color: var(--texto-soft); }
+.consejo-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 28px;
+}
+.consejo-flecha {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--gris-suave);
+  background: transparent;
+  color: var(--texto);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transicion);
+}
+.consejo-flecha:hover { background: var(--rosa-deep); border-color: var(--rosa-deep); color: white; }
+.consejo-dots { display: flex; gap: 7px; }
+.consejo-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gris-suave);
+  cursor: pointer;
+  padding: 0;
+  transition: var(--transicion);
+}
+.consejo-dot.activo { background: var(--rosa-deep); width: 20px; border-radius: 4px; }
+[data-theme="dark"] .consejo-tag { background: rgba(216,167,177,0.1); }
+@media (max-width: 600px) {
+  .consejo-card { padding: 32px 24px 26px; }
+}
+
 /* ============ FOOTER ============ */
 footer { background: var(--negro-soft); color: var(--gris-suave); padding: 80px 0 30px; }
 .footer-grid {
