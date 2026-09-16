@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllReviews, updateReviewStatus, deleteReview } from "@/lib/reviews-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const reviews = await getAllReviews();
     return NextResponse.json({ reviews });
@@ -11,6 +15,9 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { id, estado } = await req.json();
     if (!id || !["approved", "rejected"].includes(estado)) {
@@ -24,6 +31,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });

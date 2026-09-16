@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting, setSetting } from "@/lib/db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
+  }
   const { currentPassword, newPassword } = await req.json();
 
   if (!newPassword || newPassword.length < 6) {

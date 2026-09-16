@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { getAllOrders } from "@/lib/db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 function fmtPrecio(n: number) {
   return "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -12,7 +13,10 @@ function fmtFecha(d: string) {
   });
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const orders = await getAllOrders();
 

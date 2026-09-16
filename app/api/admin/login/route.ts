@@ -28,11 +28,12 @@ export async function POST(req: NextRequest) {
   }
 
   const { password } = await req.json();
-  const envPass = process.env.ADMIN_PASSWORD || "pieldeangel2024";
-  const dbPass  = await getSetting("admin_password").catch(() => null);
-  const valid   = dbPass ?? envPass;
+  const envPass  = process.env.ADMIN_PASSWORD || "pieldeangel2024";
+  const dbPass   = await getSetting("admin_password").catch(() => null);
+  const dbPass2  = await getSetting("admin_password_2").catch(() => null);
+  const validas  = [dbPass ?? envPass, dbPass2].filter((p): p is string => !!p);
 
-  if (password !== valid) {
+  if (!validas.includes(password)) {
     const cur      = attempts.get(ip) ?? { count: 0, resetAt: now + LOCKOUT_MS };
     const newCount = cur.count + 1;
     attempts.set(ip, { count: newCount, resetAt: cur.resetAt });

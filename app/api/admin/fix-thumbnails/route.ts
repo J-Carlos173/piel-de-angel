@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { ensureServiciosTable } from "@/lib/services-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 const PHOTOS: { keywords: string[]; url: string }[] = [
   { keywords: ["ceja"],                  url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80" },
@@ -28,7 +29,10 @@ function pickPhoto(title: string, categoria: string): string {
   return FALLBACK;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     await ensureServiciosTable();
     const sql = getDb();

@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting, setSetting } from "@/lib/db";
+import { isAdminAuthorized as isAuthorized } from "@/lib/admin-auth";
 
 const VALIDOS = ["malla", "grano", "aurora", "lujo", "botanico", "terracota", "ondas", "bokeh", "minimal"];
-
-function isAuthorized(req: NextRequest): boolean {
-  const cookie = req.cookies.get("admin_auth");
-  const adminPass = process.env.ADMIN_PASSWORD || "pieldeangel2024";
-  const expected = Buffer.from(adminPass).toString("base64");
-  return !!cookie && cookie.value === expected;
-}
 
 export async function GET() {
   try {

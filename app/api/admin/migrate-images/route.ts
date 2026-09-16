@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { getAllProducts, updateProduct } from "@/lib/products-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const products = await getAllProducts();
     const results: { id: string; title: string; status: string; newUrl?: string }[] = [];

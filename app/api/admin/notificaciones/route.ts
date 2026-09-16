@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting, setSetting } from "@/lib/db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
 const KEYS = ["notif_compras", "notif_citas", "notif_seguridad"] as const;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   const [compras, citas, seguridad] = await Promise.all(
     KEYS.map((k) => getSetting(k).catch(() => null))
   );
@@ -17,6 +21,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   const body = await req.json();
   await Promise.all(
     KEYS.filter((k) => k in body).map((k) =>

@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "krlos173173@gmail.com";
 
@@ -27,7 +28,10 @@ export type Cita = {
   pasada: boolean;
 };
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const auth = getAuth();
     const calendar = google.calendar({ version: "v3", auth });

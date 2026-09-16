@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllBlockedSlots, getBlockedSlots, blockSlot, unblockSlot } from "@/lib/blocked-slots-db";
 import { getAllSlots } from "@/lib/calendar";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 // GET ?date=YYYY-MM-DD  → slots del día con estado bloqueado/libre
 // GET sin params        → todos los bloqueos futuros
 export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const date = req.nextUrl.searchParams.get("date");
     if (date) {
@@ -28,6 +32,9 @@ export async function GET(req: NextRequest) {
 
 // POST { date, time, reason? }  → bloquear
 export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { date, time, reason } = await req.json();
     if (!date || !time) return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
@@ -41,6 +48,9 @@ export async function POST(req: NextRequest) {
 
 // DELETE { date, time }  → desbloquear
 export async function DELETE(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { date, time } = await req.json();
     if (!date || !time) return NextResponse.json({ error: "Faltan datos" }, { status: 400 });

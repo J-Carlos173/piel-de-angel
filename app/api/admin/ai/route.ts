@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getAllReviews, updateReviewStatus, deleteReview } from "@/lib/reviews-db";
 import { getAllServicios, createServicio, updateServicio, deleteServicio } from "@/lib/services-db";
 import { getDb } from "@/lib/db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -218,6 +219,9 @@ async function runTool(name: string, input: Record<string, unknown>): Promise<un
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { messages } = await req.json() as { messages: Anthropic.MessageParam[] };
 

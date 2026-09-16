@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllPromos, createPromo, deletePromo, togglePromoActive } from "@/lib/promos-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const promos = await getAllPromos();
     return NextResponse.json({ promos });
@@ -11,6 +15,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { code, discount, max_uses } = await req.json();
     if (!code?.trim() || !discount) return NextResponse.json({ error: "Código y descuento son obligatorios" }, { status: 400 });
@@ -30,6 +37,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { id, active } = await req.json();
     await togglePromoActive(Number(id), Boolean(active));
@@ -40,6 +50,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { id } = await req.json();
     await deletePromo(Number(id));

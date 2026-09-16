@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createProduct, ensureProductsTable } from "@/lib/products-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 const BASE  = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
 const EMAIL = process.env.MEDUSA_ADMIN_EMAIL;
@@ -18,7 +19,10 @@ async function getToken(): Promise<string | null> {
   return token ?? null;
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const token = await getToken();
     if (!token) return NextResponse.json({ error: "No se pudo autenticar con Medusa" }, { status: 500 });

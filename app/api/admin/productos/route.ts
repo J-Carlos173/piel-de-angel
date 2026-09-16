@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "@/lib/products-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const products = await getAllProducts();
     return NextResponse.json({ products });
@@ -12,6 +16,9 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const body = await req.json();
     const { id, title, description, thumbnail, status, precio, precio_oferta, stock, categoria, badge } = body;
@@ -36,6 +43,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { title, description, precio, precio_oferta, stock, categoria, badge, thumbnail } = await req.json();
     if (!title?.trim()) return NextResponse.json({ error: "Título requerido" }, { status: 400 });
@@ -59,6 +69,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });

@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPedido, deletePedido, getAllPedidos, updatePedido } from "@/lib/pedidos-db";
-
-function isAuthorized(req: NextRequest): boolean {
-  const cookie = req.cookies.get("admin_auth");
-  const adminPass = process.env.ADMIN_PASSWORD || "pieldeangel2024";
-  const expected = Buffer.from(adminPass).toString("base64");
-  return !!cookie && cookie.value === expected;
-}
+import { isAdminAuthorized as isAuthorized } from "@/lib/admin-auth";
 
 export async function GET(req: NextRequest) {
   if (!isAuthorized(req)) {

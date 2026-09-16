@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { ensureServiciosTable } from "@/lib/services-db";
+import { isAdminAuthorized } from "@/lib/admin-auth";
 
 const SERVICIOS_INICIALES = [
   { title: "Limpieza Facial",       description: "Una purificación profunda que elimina impurezas y devuelve frescura, luminosidad y suavidad a tu rostro.",                                                        thumbnail: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80", precio: 0, duracion: 0, categoria: "Facial",      orden: 1 },
@@ -11,7 +12,10 @@ const SERVICIOS_INICIALES = [
   { title: "Ritual de Bienestar",   description: "Una experiencia completa de relajación y cuidado: masaje facial, aromaterapia y un mimo de pies a cabeza.",                                                      thumbnail: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&q=80", precio: 0, duracion: 0, categoria: "Bienestar",   orden: 6 },
 ];
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminAuthorized(req)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   try {
     await ensureServiciosTable();
     const sql = getDb();
