@@ -2637,4 +2637,41 @@ html[data-bg="ondas"]:not([data-theme="dark"]) .hero {
   background-size: 100% 140px;
 }
 
+/* Bokeh flotante — circulos de luz subiendo lento y desvaneciendose */
+@keyframes bokehDriftSite1 {
+  0%   { transform: translateY(0); opacity: 0; }
+  15%, 85% { opacity: 1; }
+  100% { transform: translateY(-220px); opacity: 0; }
+}
+@keyframes bokehDriftSite2 {
+  0%   { transform: translateY(0); opacity: 0; }
+  15%, 85% { opacity: 1; }
+  100% { transform: translateY(-280px); opacity: 0; }
+}
+html[data-bg="bokeh"]:not([data-theme="dark"]) { --crema: #FBFAF8; --crema-pure: #F4E8E5; }
+html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::before,
+html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
+  top: auto; right: auto;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: transparent;
+  filter: blur(2px);
+}
+html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::before {
+  bottom: 8%; left: 8%;
+  box-shadow:
+    50px 40px 0 -2px rgba(198,138,149,0.42),
+    170px 180px 0 2px rgba(212,175,110,0.35),
+    270px 20px 0 -4px rgba(198,138,149,0.3),
+    360px 200px 0 0px rgba(216,167,177,0.4);
+  animation: bokehDriftSite1 16s ease-in-out infinite;
+}
+html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
+  bottom: 4%; right: 6%;
+  box-shadow:
+    -70px 60px 0 0px rgba(212,175,110,0.35),
+    -190px 150px 0 -3px rgba(198,138,149,0.3),
+    -30px 240px 0 3px rgba(216,167,177,0.35);
+  animation: bokehDriftSite2 20s ease-in-out infinite 3s;
+}
 /* Minimalista: sin overrides, es el look actual del sitio sin decoración extra */

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting, setSetting } from "@/lib/db";
 
-const VALIDOS = ["malla", "grano", "aurora", "lujo", "botanico", "terracota", "ondas", "minimal"];
+const VALIDOS = ["malla", "grano", "aurora", "lujo", "botanico", "terracota", "ondas", "bokeh", "minimal"];
 
 function isAuthorized(req: NextRequest): boolean {
   const cookie = req.cookies.get("admin_auth");

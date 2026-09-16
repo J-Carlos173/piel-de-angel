@@ -17,6 +17,7 @@ const ESTILOS: Estilo[] = [
   { id: "botanico", nombre: "Patrón botánico sutil", desc: "Hojitas chicas y estáticas en muy baja opacidad — reemplazo elegante de las hojas animadas, sin movimiento" },
   { id: "terracota", nombre: "Terracota cálida", desc: "Tonos tierra y arena — look 'spa natural', tendencia en marcas de skincare con enfoque orgánico" },
   { id: "ondas", nombre: "Ondas suaves", desc: "Curva orgánica en la base de la sección" },
+  { id: "bokeh", nombre: "Bokeh flotante", desc: "Círculos de luz suaves flotando muy lento hacia arriba — movimiento genuino y orgánico, no repetitivo como un blob que solo respira" },
   { id: "minimal", nombre: "Minimalista", desc: "Solo color plano, sin decoración — el punto de comparación" },
 ];
 
@@ -268,6 +269,18 @@ export default function FondosPage() {
         .bg-ondas { background: linear-gradient(180deg, #FBFAF8 0%, #F4E8E5 100%); }
         .bg-ondas svg { position: absolute; bottom: -2px; left: 0; width: 100%; height: 140px; }
 
+        /* Bokeh flotante */
+        @keyframes bokehDriftA { 0% { transform: translate(0,0); opacity: 0; } 10%,90% { opacity: 1; } 100% { transform: translate(30px,-260px); opacity: 0; } }
+        @keyframes bokehDriftB { 0% { transform: translate(0,0); opacity: 0; } 10%,90% { opacity: 1; } 100% { transform: translate(-45px,-320px); opacity: 0; } }
+        @keyframes bokehDriftC { 0% { transform: translate(0,0); opacity: 0; } 10%,90% { opacity: 1; } 100% { transform: translate(15px,-220px); opacity: 0; } }
+        .bg-bokeh { background: linear-gradient(180deg, #FBFAF8 0%, #F4E8E5 100%); }
+        .bg-bokeh .bokeh-c {
+          position: absolute;
+          bottom: -40px;
+          border-radius: 50%;
+          filter: blur(3px);
+        }
+
         /* 6. Minimalista */
         .bg-minimal { background: #F7F5F2; }
 
@@ -304,6 +317,9 @@ export default function FondosPage() {
         .fondos-dark .bg-ondas { background: linear-gradient(180deg, #1C1917 0%, #2A1F22 100%); }
         .fondos-dark .bg-ondas svg path:nth-child(1) { fill: #D4AF6E; opacity: 0.14; }
         .fondos-dark .bg-ondas svg path:nth-child(2) { fill: #C68A95; opacity: 0.12; }
+
+        .fondos-dark .bg-bokeh { background: linear-gradient(180deg, #1C1917 0%, #2A1F22 100%); }
+        .fondos-dark .bg-bokeh .bokeh-c { background: radial-gradient(circle, rgba(212,175,110,0.55) 0%, transparent 70%) !important; }
 
         .fondos-dark .bg-minimal { background: #1C1917; }
 
@@ -428,6 +444,26 @@ export default function FondosPage() {
               <path d="M0,90 C300,40 900,140 1200,60 L1200,140 L0,140 Z" fill="#8B6F6F" opacity="0.08" />
             </svg>
           )}
+
+          {estilo.id === "bokeh" && [
+            { left: "8%",  size: 46, dur: 16, delay: 0,   anim: "bokehDriftA", color: "rgba(198,138,149,0.35)" },
+            { left: "20%", size: 26, dur: 12, delay: 3,   anim: "bokehDriftC", color: "rgba(212,175,110,0.4)" },
+            { left: "38%", size: 64, dur: 20, delay: 1.5, anim: "bokehDriftB", color: "rgba(198,138,149,0.28)" },
+            { left: "55%", size: 34, dur: 14, delay: 5,   anim: "bokehDriftA", color: "rgba(212,175,110,0.35)" },
+            { left: "72%", size: 50, dur: 18, delay: 2.5, anim: "bokehDriftC", color: "rgba(198,138,149,0.3)" },
+            { left: "88%", size: 30, dur: 13, delay: 7,   anim: "bokehDriftB", color: "rgba(216,167,177,0.4)" },
+          ].map((c, i) => (
+            <div
+              key={i}
+              className="bokeh-c"
+              style={{
+                left: c.left,
+                width: c.size, height: c.size,
+                background: `radial-gradient(circle, ${c.color} 0%, transparent 70%)`,
+                animation: `${c.anim} ${c.dur}s ease-in-out ${c.delay}s infinite`,
+              }}
+            />
+          ))}
         </div>
         );
       })}
