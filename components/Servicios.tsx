@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReveal } from "@/hooks/useReveal";
 
 type Servicio = {
@@ -29,6 +29,9 @@ function fmtPrecio(n: number) {
 export default function Servicios() {
   const [servicios, setServicios] = useState<Servicio[]>(FALLBACK);
   const ref = useReveal([servicios]);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [puedeIzq, setPuedeIzq] = useState(false);
+  const [puedeDer, setPuedeDer] = useState(true);
 
   useEffect(() => {
     fetch("/api/services")
@@ -36,6 +39,27 @@ export default function Servicios() {
       .then((data) => { if (data.servicios?.length > 0) setServicios(data.servicios); })
       .catch(() => {});
   }, []);
+
+  function actualizarFlechas() {
+    const el = trackRef.current;
+    if (!el) return;
+    setPuedeIzq(el.scrollLeft > 8);
+    setPuedeDer(el.scrollLeft < el.scrollWidth - el.clientWidth - 8);
+  }
+
+  useEffect(() => {
+    actualizarFlechas();
+    window.addEventListener("resize", actualizarFlechas);
+    return () => window.removeEventListener("resize", actualizarFlechas);
+  }, [servicios]);
+
+  function desplazar(dir: 1 | -1) {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>(".servicio-card");
+    const paso = card ? card.offsetWidth + 28 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * paso, behavior: "smooth" });
+  }
 
   return (
     <section className="servicios" id="servicios" ref={ref}>
@@ -51,29 +75,49 @@ export default function Servicios() {
           </p>
         </div>
 
-        <div className="servicios-grid">
-          {servicios.map((s) => (
-            <div className="servicio-card reveal" key={s.id}>
-              <div className="servicio-img">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.thumbnail} alt={s.title} />
+        <div className="servicios-carousel-wrap">
+          <button
+            type="button"
+            aria-label="Servicios anteriores"
+            className={`servicios-flecha izq${!puedeIzq ? " oculta" : ""}`}
+            onClick={() => desplazar(-1)}
+          >
+            <i className="fa-solid fa-chevron-left" />
+          </button>
+
+          <div className="servicios-carousel" ref={trackRef} onScroll={actualizarFlechas}>
+            {servicios.map((s) => (
+              <div className="servicio-card reveal" key={s.id}>
+                <div className="servicio-img">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={s.thumbnail} alt={s.title} />
+                </div>
+                <div className="servicio-content">
+                  <h3>{s.title}</h3>
+                  <p>{s.description}</p>
+                  {(s.precio > 0 || s.duracion > 0) && (
+                    <p style={{ fontSize: "0.8rem", color: "var(--rosa-deep)", fontFamily: "Montserrat, sans-serif", marginBottom: "0.5rem", opacity: 0.85 }}>
+                      {s.precio > 0 && fmtPrecio(s.precio)}
+                      {s.precio > 0 && s.duracion > 0 && " · "}
+                      {s.duracion > 0 && `${s.duracion} min`}
+                    </p>
+                  )}
+                  <a href="#agenda" className="servicio-btn">
+                    Agendar <i className="fa-solid fa-calendar-check" />
+                  </a>
+                </div>
               </div>
-              <div className="servicio-content">
-                <h3>{s.title}</h3>
-                <p>{s.description}</p>
-                {(s.precio > 0 || s.duracion > 0) && (
-                  <p style={{ fontSize: "0.8rem", color: "var(--rosa-deep)", fontFamily: "Montserrat, sans-serif", marginBottom: "0.5rem", opacity: 0.85 }}>
-                    {s.precio > 0 && fmtPrecio(s.precio)}
-                    {s.precio > 0 && s.duracion > 0 && " · "}
-                    {s.duracion > 0 && `${s.duracion} min`}
-                  </p>
-                )}
-                <a href="#agenda" className="servicio-btn">
-                  Agendar <i className="fa-solid fa-calendar-check" />
-                </a>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <button
+            type="button"
+            aria-label="Servicios siguientes"
+            className={`servicios-flecha der${!puedeDer ? " oculta" : ""}`}
+            onClick={() => desplazar(1)}
+          >
+            <i className="fa-solid fa-chevron-right" />
+          </button>
         </div>
       </div>
     </section>
