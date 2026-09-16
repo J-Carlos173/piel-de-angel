@@ -6,6 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 
 type Pedido = {
   id: number;
+  hilo_id: number | null;
   texto: string;
   imagenes: string[];
   estado: "pendiente" | "en_proceso" | "hecho" | "error";
@@ -14,12 +15,27 @@ type Pedido = {
   completed_at: string | null;
 };
 
+type Hilo = {
+  id: number;
+  mensajes: Pedido[];
+};
+
 const ESTADO_META: Record<Pedido["estado"], { label: string; color: string; icon: string }> = {
   pendiente:  { label: "Enviado",    color: "#B08A00", icon: "fa-check" },
   en_proceso: { label: "Trabajando en esto...", color: "#3A6FB0", icon: "fa-spinner fa-spin" },
   hecho:      { label: "Listo",      color: "#4CAF85", icon: "fa-check-double" },
   error:      { label: "Con error",  color: "#C0524F", icon: "fa-triangle-exclamation" },
 };
+
+const MENSAJES_TRABAJO = [
+  "Revisando tu pedido...",
+  "Estamos trabajando en esto...",
+  "Esto puede tomar unos minutos...",
+  "Ajustando los detalles...",
+  "Dejando todo listo...",
+];
+
+const SEGUNDOS_DEPLOY = 30;
 
 function fmtHora(iso: string) {
   return new Date(iso).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
@@ -38,20 +54,30 @@ function fmtSeccion(iso: string) {
   return fecha.toLocaleDateString("es-CL", { day: "numeric", month: "long", year: hoy.getFullYear() !== fecha.getFullYear() ? "numeric" : undefined });
 }
 
-const MENSAJES_TRABAJO = [
-  "Revisando tu pedido...",
-  "Estamos trabajando en esto...",
-  "Esto puede tomar unos minutos...",
-  "Ajustando los detalles...",
-  "Dejando todo listo...",
-];
-
-const SEGUNDOS_DEPLOY = 30;
-
 function titulo(p: Pedido) {
   const t = p.texto?.trim();
   if (t) return t.length > 42 ? t.slice(0, 42) + "…" : t;
   return p.imagenes.length > 0 ? "(imagen adjunta)" : "(sin texto)";
+}
+
+function agruparHilos(pedidos: Pedido[]): Hilo[] {
+  const grupos = new Map<number, Pedido[]>();
+  for (const p of pedidos) {
+    const hiloId = p.hilo_id ?? p.id;
+    if (!grupos.has(hiloId)) grupos.set(hiloId, []);
+    grupos.get(hiloId)!.push(p);
+  }
+  const hilos: Hilo[] = [];
+  for (const [id, mensajes] of grupos) {
+    mensajes.sort((a, b) => a.id - b.id);
+    hilos.push({ id, mensajes });
+  }
+  hilos.sort((a, b) => {
+    const ultA = a.mensajes[a.mensajes.length - 1];
+    const ultB = b.mensajes[b.mensajes.length - 1];
+    return new Date(ultB.created_at).getTime() - new Date(ultA.created_at).getTime();
+  });
+  return hilos;
 }
 
 export default function PedidosClient() {
@@ -66,6 +92,7 @@ export default function PedidosClient() {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const [ahora, setAhora] = useState(() => Date.now());
 
   useEffect(() => {
@@ -100,6 +127,13 @@ export default function PedidosClient() {
     return () => clearInterval(interval);
   }, []);
 
+  const hilos = agruparHilos(pedidos);
+  const hiloActivo = seleccionado ? hilos.find((h) => h.id === seleccionado) ?? null : null;
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [hiloActivo?.mensajes.length]);
+
   function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     setImagenes((prev) => [...prev, ...files.map((file) => ({ file, preview: URL.createObjectURL(file) }))]);
@@ -130,12 +164,12 @@ export default function PedidosClient() {
       const res = await fetch("/api/admin/pedidos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto: texto.trim(), imagenes: urls }),
+        body: JSON.stringify({ texto: texto.trim(), imagenes: urls, hilo_id: seleccionado ?? undefined }),
       });
       const data = await res.json();
       if (!res.ok || !data.pedido) { setError(data.error || "Error al enviar. Intenta de nuevo."); return; }
-      setPedidos((prev) => [data.pedido, ...prev]);
-      setSeleccionado(data.pedido.id);
+      setPedidos((prev) => [...prev, data.pedido]);
+      if (!seleccionado) setSeleccionado(data.pedido.id);
       setTexto("");
       setImagenes([]);
     } catch {
@@ -145,23 +179,133 @@ export default function PedidosClient() {
     }
   }
 
-  async function eliminar(id: number) {
-    if (!confirm("¿Borrar esta conversación? También se borra el archivo en tu PC.")) return;
-    setEliminando(id);
+  async function eliminar(hiloId: number) {
+    if (!confirm("¿Borrar esta conversación completa? También se borran los archivos en tu PC.")) return;
+    setEliminando(hiloId);
     try {
       await fetch("/api/admin/pedidos", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: hiloId }),
       });
-      setPedidos((prev) => prev.filter((p) => p.id !== id));
-      if (seleccionado === id) setSeleccionado(null);
+      setPedidos((prev) => prev.filter((p) => (p.hilo_id ?? p.id) !== hiloId));
+      if (seleccionado === hiloId) setSeleccionado(null);
     } catch {} finally {
       setEliminando(null);
     }
   }
 
-  const activo = seleccionado ? pedidos.find((p) => p.id === seleccionado) ?? null : null;
+  function renderMensaje(p: Pedido) {
+    return (
+      <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+        <div style={{ alignSelf: "flex-end", maxWidth: "82%" }}>
+          <div style={{ background: bubbleMe, color: "white", borderRadius: "18px 18px 4px 18px", padding: "12px 16px", boxShadow: "0 4px 16px rgba(198,138,149,0.25)" }}>
+            {p.imagenes.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: p.texto ? 8 : 0 }}>
+                {p.imagenes.map((url, i) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="adjunto" style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 10, border: "1px solid rgba(255,255,255,0.4)" }} />
+                  </a>
+                ))}
+              </div>
+            )}
+            {p.texto && <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{p.texto}</p>}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end", marginTop: 4, paddingRight: 4 }}>
+            <span style={{ fontSize: 10.5, color: ESTADO_META[p.estado].color, ...MONO, display: "flex", alignItems: "center", gap: 4 }}>
+              <i className={`fa-solid ${ESTADO_META[p.estado].icon}`} /> {ESTADO_META[p.estado].label}
+            </span>
+          </div>
+        </div>
+
+        {p.estado === "error" && p.respuesta ? (
+          <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+            <div style={{ background: "rgba(192,82,79,0.08)", color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: "1px solid rgba(192,82,79,0.3)" }}>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{p.respuesta}</p>
+            </div>
+          </div>
+        ) : !p.respuesta ? (
+          <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+            <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
+              <i className="fa-solid fa-spinner fa-spin" style={{ color: "#C68A95" }} />
+              <span style={{ fontSize: 13, color: textMuted, ...MONO }}>{MENSAJES_TRABAJO[Math.floor(ahora / 3500) % MENSAJES_TRABAJO.length]}</span>
+            </div>
+          </div>
+        ) : (() => {
+          const transcurridos = p.completed_at ? (ahora - new Date(p.completed_at).getTime()) / 1000 : SEGUNDOS_DEPLOY;
+          if (transcurridos < SEGUNDOS_DEPLOY) {
+            const restantes = Math.max(0, Math.ceil(SEGUNDOS_DEPLOY - transcurridos));
+            return (
+              <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
+                  <i className="fa-solid fa-cloud-arrow-up fa-fade" style={{ color: "#C68A95" }} />
+                  <span style={{ fontSize: 13, color: textMuted, ...MONO }}>El cambio se está subiendo a producción... ({restantes}s)</span>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+              <div style={{ background: bubbleClaude, color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: `1px solid ${border}` }}>
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{p.respuesta}</p>
+              </div>
+              <div style={{ fontSize: 10.5, color: textMuted, marginTop: 4, paddingLeft: 4, ...MONO }}>
+                Claude {p.completed_at && `· ${fmtHora(p.completed_at)}`}
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+    );
+  }
+
+  const composeBox = (
+    <div style={{ borderTop: `1.5px solid ${border}`, background: cardBg, padding: "16px 24px", flexShrink: 0 }}>
+      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        {imagenes.length > 0 && (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+            {imagenes.map((img, i) => (
+              <div key={i} style={{ position: "relative" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img.preview} alt="preview" style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, border: `1px solid ${border}` }} />
+                <button onClick={() => quitarImagen(i)} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C0524F", color: "white", border: "none", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <i className="fa-solid fa-xmark" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {error && <p style={{ margin: "0 0 8px", fontSize: 12, color: "#e57373", ...MONO }}><i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 5 }} />{error}</p>}
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            style={{ flexShrink: 0, width: 42, height: 42, borderRadius: "50%", background: inputBg, border: `1px solid ${border}`, color: textMuted, fontSize: 15, cursor: "pointer" }}
+            title="Adjuntar imagen"
+          >
+            <i className="fa-solid fa-paperclip" />
+          </button>
+          <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: "none" }} />
+          <textarea
+            placeholder={seleccionado ? "Escribe para seguir esta conversación..." : "Escribe tu pedido..."}
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
+            rows={1}
+            autoFocus
+            style={{ flex: 1, background: inputBg, border: `1px solid ${border}`, borderRadius: 20, padding: "11px 16px", color: textMain, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", resize: "none", maxHeight: 120 }}
+          />
+          <button
+            onClick={enviar}
+            disabled={enviando || !texto.trim()}
+            style={{ flexShrink: 0, width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, #C68A95, #8B5E6A)", border: "none", color: "white", fontSize: 15, cursor: enviando ? "wait" : "pointer", opacity: !texto.trim() ? 0.5 : 1 }}
+          >
+            <i className={`fa-solid ${enviando ? "fa-spinner fa-spin" : "fa-paper-plane"}`} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ height: "100vh", display: "flex", background: bg, fontFamily: "Georgia, serif" }}>
@@ -193,21 +337,23 @@ export default function PedidosClient() {
         <div style={{ flex: 1, overflowY: "auto", padding: "0 8px 12px" }}>
           {loading ? (
             <p style={{ textAlign: "center", color: textMuted, fontSize: 12, ...MONO, marginTop: 20 }}>Cargando...</p>
-          ) : pedidos.length === 0 ? (
+          ) : hilos.length === 0 ? (
             <p style={{ textAlign: "center", color: textMuted, fontSize: 12, ...MONO, marginTop: 20, padding: "0 16px" }}>Sin conversaciones todavía.</p>
           ) : (
-            pedidos.map((p, idx) => {
-              const meta = ESTADO_META[p.estado];
-              const seccion = fmtSeccion(p.created_at);
-              const seccionAnterior = idx > 0 ? fmtSeccion(pedidos[idx - 1].created_at) : null;
-              const isActive = seleccionado === p.id;
+            hilos.map((h, idx) => {
+              const primero = h.mensajes[0];
+              const ultimo = h.mensajes[h.mensajes.length - 1];
+              const meta = ESTADO_META[ultimo.estado];
+              const seccion = fmtSeccion(ultimo.created_at);
+              const seccionAnterior = idx > 0 ? fmtSeccion(hilos[idx - 1].mensajes[hilos[idx - 1].mensajes.length - 1].created_at) : null;
+              const isActive = seleccionado === h.id;
               return (
-                <div key={p.id}>
+                <div key={h.id}>
                   {seccion !== seccionAnterior && (
                     <p style={{ margin: "14px 8px 6px", fontSize: 10, color: textMuted, ...MONO, textTransform: "uppercase", letterSpacing: "0.08em" }}>{seccion}</p>
                   )}
                   <div
-                    onClick={() => setSeleccionado(p.id)}
+                    onClick={() => setSeleccionado(h.id)}
                     style={{
                       display: "flex", alignItems: "center", gap: 8, padding: "10px 10px",
                       borderRadius: 10, cursor: "pointer", marginBottom: 3,
@@ -216,18 +362,20 @@ export default function PedidosClient() {
                   >
                     <div style={{ width: 7, height: 7, borderRadius: "50%", background: meta.color, flexShrink: 0 }} title={meta.label} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: 12.5, color: textMain, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{titulo(p)}</p>
-                      <p style={{ margin: 0, fontSize: 10, color: textMuted, ...MONO }}>{fmtHora(p.created_at)} · {meta.label}</p>
+                      <p style={{ margin: 0, fontSize: 12.5, color: textMain, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{titulo(primero)}</p>
+                      <p style={{ margin: 0, fontSize: 10, color: textMuted, ...MONO }}>
+                        {fmtHora(ultimo.created_at)} · {meta.label}{h.mensajes.length > 1 ? ` · ${h.mensajes.length} mensajes` : ""}
+                      </p>
                     </div>
                     <button
-                      onClick={(e) => { e.stopPropagation(); eliminar(p.id); }}
-                      disabled={eliminando === p.id}
+                      onClick={(e) => { e.stopPropagation(); eliminar(h.id); }}
+                      disabled={eliminando === h.id}
                       title="Borrar conversación"
                       style={{ background: "none", border: "none", color: textMuted, fontSize: 12, cursor: "pointer", padding: 4, flexShrink: 0, opacity: 0.6 }}
                       onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                       onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.6")}
                     >
-                      <i className={`fa-solid ${eliminando === p.id ? "fa-spinner fa-spin" : "fa-trash"}`} />
+                      <i className={`fa-solid ${eliminando === h.id ? "fa-spinner fa-spin" : "fa-trash"}`} />
                     </button>
                   </div>
                 </div>
@@ -239,88 +387,18 @@ export default function PedidosClient() {
 
       {/* Panel principal */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {activo ? (
+        {hiloActivo ? (
           <>
             <div style={{ padding: "16px 24px", borderBottom: `1.5px solid ${border}`, flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 11, color: textMuted, ...MONO }}>Pedido #{activo.id} · {fmtHora(activo.created_at)}</p>
+              <p style={{ margin: 0, fontSize: 11, color: textMuted, ...MONO }}>Conversación #{hiloActivo.id} · {hiloActivo.mensajes.length} mensaje{hiloActivo.mensajes.length !== 1 ? "s" : ""}</p>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
-              <div style={{ maxWidth: 640, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
-                <div style={{ alignSelf: "flex-end", maxWidth: "82%" }}>
-                  <div style={{ background: bubbleMe, color: "white", borderRadius: "18px 18px 4px 18px", padding: "12px 16px", boxShadow: "0 4px 16px rgba(198,138,149,0.25)" }}>
-                    {activo.imagenes.length > 0 && (
-                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: activo.texto ? 8 : 0 }}>
-                        {activo.imagenes.map((url, i) => (
-                          <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={url} alt="adjunto" style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 10, border: "1px solid rgba(255,255,255,0.4)" }} />
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                    {activo.texto && <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{activo.texto}</p>}
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end", marginTop: 4, paddingRight: 4 }}>
-                    <span style={{ fontSize: 10.5, color: ESTADO_META[activo.estado].color, ...MONO, display: "flex", alignItems: "center", gap: 4 }}>
-                      <i className={`fa-solid ${ESTADO_META[activo.estado].icon}`} /> {ESTADO_META[activo.estado].label}
-                    </span>
-                  </div>
-                </div>
-
-                {(() => {
-                  if (activo.estado === "error") return null;
-
-                  if (!activo.respuesta) {
-                    const msg = MENSAJES_TRABAJO[Math.floor(ahora / 3500) % MENSAJES_TRABAJO.length];
-                    return (
-                      <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
-                        <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
-                          <i className="fa-solid fa-spinner fa-spin" style={{ color: "#C68A95" }} />
-                          <span style={{ fontSize: 13, color: textMuted, ...MONO }}>{msg}</span>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  const transcurridos = activo.completed_at ? (ahora - new Date(activo.completed_at).getTime()) / 1000 : SEGUNDOS_DEPLOY;
-                  if (transcurridos < SEGUNDOS_DEPLOY) {
-                    const restantes = Math.max(0, Math.ceil(SEGUNDOS_DEPLOY - transcurridos));
-                    return (
-                      <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
-                        <div style={{ background: bubbleClaude, borderRadius: "18px 18px 18px 4px", padding: "14px 18px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 10 }}>
-                          <i className="fa-solid fa-cloud-arrow-up fa-fade" style={{ color: "#C68A95" }} />
-                          <span style={{ fontSize: 13, color: textMuted, ...MONO }}>El cambio se está subiendo a producción... ({restantes}s)</span>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
-                      <div style={{ background: bubbleClaude, color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: `1px solid ${border}` }}>
-                        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{activo.respuesta}</p>
-                      </div>
-                      <div style={{ fontSize: 10.5, color: textMuted, marginTop: 4, paddingLeft: 4, ...MONO }}>
-                        Claude {activo.completed_at && `· ${fmtHora(activo.completed_at)}`}
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {activo.estado === "error" && activo.respuesta && (
-                  <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
-                    <div style={{ background: "rgba(192,82,79,0.08)", color: textMain, borderRadius: "18px 18px 18px 4px", padding: "12px 16px", border: "1px solid rgba(192,82,79,0.3)" }}>
-                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{activo.respuesta}</p>
-                    </div>
-                  </div>
-                )}
+              <div style={{ maxWidth: 640, margin: "0 auto" }}>
+                {hiloActivo.mensajes.map(renderMensaje)}
+                <div ref={bottomRef} />
               </div>
             </div>
-            <div style={{ padding: "16px 24px", borderTop: `1.5px solid ${border}`, textAlign: "center", flexShrink: 0 }}>
-              <button onClick={() => setSeleccionado(null)} style={{ background: "none", border: `1px solid ${border}`, borderRadius: 100, padding: "9px 20px", color: textMuted, fontSize: 12, ...MONO, cursor: "pointer" }}>
-                <i className="fa-solid fa-plus" style={{ marginRight: 6 }} />Nueva conversación
-              </button>
-            </div>
+            {composeBox}
           </>
         ) : (
           <>
@@ -331,50 +409,7 @@ export default function PedidosClient() {
                 <p style={{ margin: "6px 0 0", fontSize: 12, ...MONO }}>Escribe tu pedido abajo. Claude lo revisa y responde acá mismo.</p>
               </div>
             </div>
-            <div style={{ borderTop: `1.5px solid ${border}`, background: cardBg, padding: "16px 24px", flexShrink: 0 }}>
-              <div style={{ maxWidth: 640, margin: "0 auto" }}>
-                {imagenes.length > 0 && (
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-                    {imagenes.map((img, i) => (
-                      <div key={i} style={{ position: "relative" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={img.preview} alt="preview" style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, border: `1px solid ${border}` }} />
-                        <button onClick={() => quitarImagen(i)} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C0524F", color: "white", border: "none", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <i className="fa-solid fa-xmark" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {error && <p style={{ margin: "0 0 8px", fontSize: 12, color: "#e57373", ...MONO }}><i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 5 }} />{error}</p>}
-                <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    style={{ flexShrink: 0, width: 42, height: 42, borderRadius: "50%", background: inputBg, border: `1px solid ${border}`, color: textMuted, fontSize: 15, cursor: "pointer" }}
-                    title="Adjuntar imagen"
-                  >
-                    <i className="fa-solid fa-paperclip" />
-                  </button>
-                  <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: "none" }} />
-                  <textarea
-                    placeholder="Escribe tu pedido..."
-                    value={texto}
-                    onChange={(e) => setTexto(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
-                    rows={1}
-                    autoFocus
-                    style={{ flex: 1, background: inputBg, border: `1px solid ${border}`, borderRadius: 20, padding: "11px 16px", color: textMain, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", resize: "none", maxHeight: 120 }}
-                  />
-                  <button
-                    onClick={enviar}
-                    disabled={enviando || !texto.trim()}
-                    style={{ flexShrink: 0, width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, #C68A95, #8B5E6A)", border: "none", color: "white", fontSize: 15, cursor: enviando ? "wait" : "pointer", opacity: !texto.trim() ? 0.5 : 1 }}
-                  >
-                    <i className={`fa-solid ${enviando ? "fa-spinner fa-spin" : "fa-paper-plane"}`} />
-                  </button>
-                </div>
-              </div>
-            </div>
+            {composeBox}
           </>
         )}
       </div>

@@ -2,6 +2,7 @@ import { getDb } from "./db";
 
 export type Pedido = {
   id: number;
+  hilo_id: number | null;
   texto: string;
   imagenes: string[];
   estado: "pendiente" | "en_proceso" | "hecho" | "error";
@@ -23,13 +24,14 @@ export async function ensurePedidosTable() {
     )
   `;
   await sql`ALTER TABLE ia_pedidos ADD COLUMN IF NOT EXISTS imagenes JSONB NOT NULL DEFAULT '[]'::jsonb`;
+  await sql`ALTER TABLE ia_pedidos ADD COLUMN IF NOT EXISTS hilo_id INTEGER`;
 }
 
-export async function createPedido(texto: string, imagenes: string[] = []): Promise<Pedido> {
+export async function createPedido(texto: string, imagenes: string[] = [], hiloId?: number): Promise<Pedido> {
   const sql = getDb();
   await ensurePedidosTable();
   const rows = await sql`
-    INSERT INTO ia_pedidos (texto, imagenes) VALUES (${texto}, ${JSON.stringify(imagenes)}::jsonb)
+    INSERT INTO ia_pedidos (texto, imagenes, hilo_id) VALUES (${texto}, ${JSON.stringify(imagenes)}::jsonb, ${hiloId ?? null})
     RETURNING *
   `;
   return rows[0] as unknown as Pedido;
@@ -38,7 +40,7 @@ export async function createPedido(texto: string, imagenes: string[] = []): Prom
 export async function getAllPedidos(): Promise<Pedido[]> {
   const sql = getDb();
   await ensurePedidosTable();
-  const rows = await sql`SELECT * FROM ia_pedidos ORDER BY created_at DESC LIMIT 100`;
+  const rows = await sql`SELECT * FROM ia_pedidos ORDER BY created_at ASC LIMIT 300`;
   return rows as unknown as Pedido[];
 }
 
@@ -59,8 +61,9 @@ export async function updatePedido(
   return (rows[0] as unknown as Pedido) ?? null;
 }
 
+/** Borra el pedido; si es el primero de un hilo, borra todo el hilo con el. */
 export async function deletePedido(id: number): Promise<boolean> {
   const sql = getDb();
-  await sql`DELETE FROM ia_pedidos WHERE id = ${id}`;
+  await sql`DELETE FROM ia_pedidos WHERE id = ${id} OR hilo_id = ${id}`;
   return true;
 }
