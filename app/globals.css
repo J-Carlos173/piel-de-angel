@@ -2674,4 +2674,64 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
     -30px 240px 0 3px rgba(216,167,177,0.35);
   animation: bokehDriftSite2 20s ease-in-out infinite 3s;
 }
+
+/* ===== BANNER DE COOKIES ===== */
+.cookie-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 16px;
+  background: var(--crema-pure);
+  border: 1px solid var(--gris-suave);
+  box-shadow: var(--sombra-card);
+}
+.cookie-banner-texto {
+  flex: 1 1 320px;
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--texto);
+}
+.cookie-banner-texto a {
+  color: var(--rosa-deep);
+  text-decoration: underline;
+}
+.cookie-banner-botones {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.cookie-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-family: Montserrat, sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cookie-btn-outline {
+  background: transparent;
+  border: 1px solid var(--gris-calido);
+  color: var(--texto);
+}
+.cookie-btn-solido {
+  background: linear-gradient(135deg, var(--rosa-deep), #8B5E6A);
+  border: none;
+  color: white;
+}
+@media (max-width: 480px) {
+  .cookie-banner { flex-direction: column; align-items: stretch; }
+  .cookie-banner-botones { justify-content: flex-end; }
+}
 /* Minimalista: sin overrides, es el look actual del sitio sin decoración extra */

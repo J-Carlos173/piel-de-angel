@@ -118,7 +118,22 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="8. Responsabilidad">
+          <Section title="8. Cookies">
+            <p id="cookies">
+              Usamos cookies propias y esenciales para que el sitio funcione correctamente:
+              mantener tu carro de compras y, en el panel administrativo, la sesión de acceso.
+              Estas cookies no requieren tu consentimiento por ser estrictamente necesarias.
+            </p>
+            <p>
+              Actualmente no usamos cookies de publicidad ni de terceros (como Meta Pixel o
+              Google Ads). Medimos las visitas de forma anónima y sin cookies mediante
+              Vercel Analytics. Si en el futuro incorporamos cookies de análisis o publicidad,
+              te lo pediremos explícitamente mediante el aviso de cookies del sitio, y podrás
+              aceptarlas o rechazarlas.
+            </p>
+          </Section>
+
+          <Section title="9. Responsabilidad">
             <p>
               Piel de Ángel no se hace responsable por retrasos ocasionados por las empresas
               de transporte, fuerza mayor o errores en los datos de envío proporcionados
@@ -126,7 +141,7 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="9. Legislación Aplicable">
+          <Section title="10. Legislación Aplicable">
             <p>
               Los presentes Términos y Condiciones se rigen por las leyes de la República de Chile.
               Cualquier controversia será sometida a la jurisdicción de los tribunales ordinarios
@@ -134,7 +149,7 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="10. Contacto">
+          <Section title="11. Contacto">
             <p>
               Para consultas, reclamos o ejercer tus derechos como consumidor:
             </p>

@@ -3,6 +3,7 @@ import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Analytics } from "@vercel/analytics/next";
 import PageTracker from "@/components/PageTracker";
+import CookieConsent from "@/components/CookieConsent";
 import { getSetting } from "@/lib/db";
 
 const SITE_URL = "https://www.pieldeangel.cl";
@@ -227,6 +228,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeProvider />
         <PageTracker />
         {children}
+        <CookieConsent />
         <Analytics />
       </body>
     </html>
