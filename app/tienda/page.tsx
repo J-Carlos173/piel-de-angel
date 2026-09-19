@@ -61,12 +61,16 @@ export default async function TiendaPage() {
   try {
     const productos = await getPublishedProducts();
     categorias = Array.from(new Set(productos.map((p) => p.categoria).filter(Boolean)));
-    const conteo = new Map<string, number>();
+    // Se agrupa sin distinguir mayúsculas ("Beauty Of Joseon" y "Beauty of Joseon" son la misma marca).
+    const conteo = new Map<string, { nombre: string; n: number }>();
     for (const p of productos) {
       const marca = p.title.includes(" - ") ? p.title.split(" - ")[0].trim() : "";
-      if (marca) conteo.set(marca, (conteo.get(marca) ?? 0) + 1);
+      if (!marca) continue;
+      const clave = marca.toLowerCase();
+      const previo = conteo.get(clave);
+      conteo.set(clave, { nombre: previo?.nombre ?? marca, n: (previo?.n ?? 0) + 1 });
     }
-    marcas = Array.from(conteo.entries()).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([m]) => m);
+    marcas = Array.from(conteo.values()).sort((a, b) => b.n - a.n).slice(0, 8).map((m) => m.nombre);
   } catch {}
 
   const jsonLd = {
