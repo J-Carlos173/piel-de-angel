@@ -2869,7 +2869,7 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
 /* ===== PAGINA DE ENLACES (biografia de Instagram) ===== */
 .links-page { min-height: 100vh; background: linear-gradient(160deg, var(--crema-pure) 0%, var(--crema) 100%); display: flex; justify-content: center; padding: 48px 20px 60px; }
 .links-card { width: 100%; max-width: 440px; text-align: center; }
-.links-logo { width: 84px; height: 84px; object-fit: contain; border-radius: 50%; background: #fff; padding: 6px; box-shadow: var(--sombra-card); }
+.links-logo { display: block; margin: 0 auto; width: 84px; height: 84px; object-fit: contain; border-radius: 50%; background: #fff; padding: 6px; box-shadow: var(--sombra-card); }
 .links-card h1 { font-size: 1.9rem; color: var(--negro-soft); margin: 16px 0 6px; }
 .links-card h1 em { color: var(--rosa-deep); font-style: italic; }
 .links-sub { font-size: 0.9rem; color: var(--texto); line-height: 1.6; margin: 0 0 30px; }
