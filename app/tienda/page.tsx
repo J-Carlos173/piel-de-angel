@@ -8,6 +8,7 @@ import Toast from "@/components/Toast";
 import { getPublishedProducts } from "@/lib/products-db";
 import { COSTO_ENVIO, GRATIS_SANTIAGO } from "@/lib/pricing";
 import { formatPrecio } from "@/data/productos";
+import { slugProducto } from "@/lib/slug";
 
 export const revalidate = 600;
 
@@ -58,8 +59,10 @@ function lista(items: string[]): string {
 export default async function TiendaPage() {
   let categorias: string[] = [];
   let marcas: string[] = [];
+  let listado: { title: string; id: string }[] = [];
   try {
     const productos = await getPublishedProducts();
+    listado = productos.map((p) => ({ title: p.title, id: p.id }));
     categorias = Array.from(new Set(productos.map((p) => p.categoria).filter(Boolean)));
     // Se agrupa sin distinguir mayúsculas ("Beauty Of Joseon" y "Beauty of Joseon" son la misma marca).
     const conteo = new Map<string, { nombre: string; n: number }>();
@@ -84,6 +87,16 @@ export default async function TiendaPage() {
         description: DESCRIPTION,
         isPartOf: { "@id": `${SITE}/#website` },
         about: { "@id": `${SITE}/#store` },
+      },
+      {
+        "@type": "ItemList",
+        name: "Productos de la tienda",
+        itemListElement: listado.map((p, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: p.title,
+          url: `${SITE}/producto/${slugProducto(p.title, p.id)}`,
+        })),
       },
       {
         "@type": "FAQPage",

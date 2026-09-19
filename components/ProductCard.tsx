@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Producto, formatPrecio, precioFinal, WHATSAPP_NUMERO } from "@/data/productos";
 import { useCartStore } from "@/store/cartStore";
+import { slugProducto } from "@/lib/slug";
 
 function stockLabel(stock: number): string {
   if (stock <= 0) return "Agotado";
@@ -93,6 +94,9 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
             rel="noopener noreferrer"
           >
             <i className="fa-brands fa-whatsapp" /> Consultar por WhatsApp
+          </a>
+          <a className="producto-modal-link" href={`/producto/${slugProducto(p.nombre, p.id)}`}>
+            Ver página del producto
           </a>
         </div>
       </div>

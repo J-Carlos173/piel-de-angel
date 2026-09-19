@@ -2884,3 +2884,14 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
 
 .producto-modal-wa { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; padding: 12px 18px; border-radius: 100px; border: 1.5px solid var(--gris-suave); color: var(--texto); font-size: 0.78rem; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; transition: var(--transicion); }
 .producto-modal-wa:hover { border-color: var(--rosa-deep); color: var(--rosa-deep); }
+
+/* ===== PAGINA DE PRODUCTO ===== */
+.pp-precio { display: flex; align-items: baseline; gap: 14px; margin: 10px 0 4px; }
+.pp-precio-normal { font-size: 1.8rem; color: var(--negro-soft); }
+.pp-precio-original { font-size: 1.2rem; color: var(--texto-soft); text-decoration: line-through; }
+.pp-precio-oferta { font-size: 2rem; color: #C0392B; font-weight: 600; }
+.pp-stock { font-size: 0.85rem; color: var(--texto); margin: 0 0 22px; }
+.pp-foto { background: #fff; aspect-ratio: 1 / 1; }
+.pp-foto img { object-fit: contain; padding: 18px; }
+.producto-modal-link { display: block; margin-top: 12px; text-align: center; font-size: 0.75rem; color: var(--texto-soft); text-decoration: underline; }
+.producto-modal-link:hover { color: var(--rosa-deep); }
