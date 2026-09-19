@@ -22,9 +22,9 @@ export default function Home() {
       <Navbar />
       <Hero />
       <RevealObserver>
+        <Productos />
         <About />
         <Servicios />
-        <Productos />
         <Consejos />
         <Promociones />
         <Agenda />

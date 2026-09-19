@@ -75,6 +75,12 @@ export default function Servicios() {
             </div>
           ))}
         </div>
+
+        <div className="reveal" style={{ textAlign: "center", marginTop: 48 }}>
+          <a href="#agenda" className="btn-primary">
+            <i className="fa-regular fa-calendar" /> Reservar Hora
+          </a>
+        </div>
       </div>
     </section>
   );

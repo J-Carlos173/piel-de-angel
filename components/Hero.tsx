@@ -42,8 +42,8 @@ export default async function Hero() {
           </h1>
           <p className="hero-subtitle">{c.subtitle}</p>
           <div className="hero-buttons">
-            <a href="#agenda" className="btn-primary">
-              <i className="fa-regular fa-calendar" /> Reservar Hora
+            <a href="#productos" className="btn-primary">
+              <i className="fa-solid fa-bag-shopping" /> Tienda
             </a>
             <a href="#servicios" className="btn-secondary">
               Ver Servicios <i className="fa-solid fa-arrow-right" />
