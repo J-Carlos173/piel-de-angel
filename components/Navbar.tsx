@@ -42,8 +42,8 @@ export default function Navbar() {
 
           {/* Extras visibles solo en el menú móvil */}
           <li className="mobile-menu-extras">
-            <a href="/#agenda" onClick={closeMenu} className="nav-cta mobile-cta">
-              Reservar Hora
+            <a href="/tienda" onClick={closeMenu} className="nav-cta mobile-cta">
+              <i className="fa-solid fa-bag-shopping" /> Tienda
             </a>
             <div className="mobile-menu-icons">
               <button className="theme-toggle" onClick={toggle} aria-label={dark ? "Modo claro" : "Modo oscuro"}>
@@ -58,8 +58,8 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
-          <a href="/#agenda" className="nav-cta">
-            Reservar Hora
+          <a href="/tienda" className="nav-cta">
+            <i className="fa-solid fa-bag-shopping" /> Tienda
           </a>
           <button
             className="theme-toggle desktop-only"

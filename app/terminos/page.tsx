@@ -20,7 +20,7 @@ export default function TerminosPage() {
             Términos y Condiciones
           </h1>
           <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "var(--gris-calido)", letterSpacing: "0.08em" }}>
-            Última actualización: Mayo 2026
+            Última actualización: Septiembre 2026
           </p>
         </div>
 
@@ -67,8 +67,8 @@ export default function TerminosPage() {
 
           <Section title="4. Despacho y Envío">
             <ul>
-              <li><strong>Santiago Urbano</strong> (dentro del círculo de Américo Vespucio): despacho los días sábados. Costo: $2.990. Envío gratis en compras sobre $40.000 los sábados.</li>
-              <li><strong>Regiones</strong> (Copiapó a Puerto Montt): envío por Blue Express o Starken. Costo: $2.990. El plazo de entrega depende del transportista (2–5 días hábiles).</li>
+              <li><strong>Santiago Urbano</strong> (dentro del círculo de Américo Vespucio): despacho los días sábados. Costo: $2.990. Envío gratis en compras desde $40.000.</li>
+              <li><strong>Regiones</strong> (Copiapó a Puerto Montt): envío por Blue Express o Starken. El costo del envío no se cobra en el sitio: lo pagas directamente al transportista cuando recibes tu pedido. El plazo de entrega depende del transportista (2–5 días hábiles).</li>
             </ul>
             <p>
               Los pedidos se preparan una vez confirmado el pago. El tiempo de despacho puede
