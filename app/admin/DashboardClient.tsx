@@ -23,12 +23,13 @@ type Card = {
 };
 
 export default function DashboardClient({
-  totalOrders, totalRevenue, thisMonthOrders, thisMonthRevenue,
+  totalOrders, totalRevenue, thisMonthOrders, thisMonthRevenue, tareasPendientes,
 }: {
   totalOrders: number;
   totalRevenue: number;
   thisMonthOrders: number;
   thisMonthRevenue: number;
+  tareasPendientes: number;
 }) {
   const router = useRouter();
   const { dark } = useThemeStore();
@@ -58,6 +59,16 @@ export default function DashboardClient({
       href: "/admin/ventas",
       accent: "#8B6F6F",
       glow: "rgba(139,111,111,0.22)",
+    },
+    {
+      icon: "fa-list-check",
+      title: "Tareas y notas",
+      desc: "Pendientes para llegar a más gente y cosas para recordar",
+      stat: String(tareasPendientes),
+      statLabel: tareasPendientes === 1 ? "pendiente" : "pendientes",
+      href: "/admin/tareas",
+      accent: "#C4919A",
+      glow: "rgba(196,145,154,0.22)",
     },
     {
       icon: "fa-key",
