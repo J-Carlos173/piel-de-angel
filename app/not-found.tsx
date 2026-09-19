@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
@@ -26,15 +27,15 @@ export default function NotFound() {
             Puede que el enlace haya cambiado. Te dejamos algunos lugares para seguir.
           </p>
           <div className="lp-actions" style={{ justifyContent: "center" }}>
-            <a href="/tienda" className="btn-primary">
+            <Link href="/tienda" className="btn-primary">
               <i className="fa-solid fa-bag-shopping" /> Ir a la tienda
-            </a>
+            </Link>
             <a href="/#servicios" className="btn-secondary">
               Ver servicios <i className="fa-solid fa-arrow-right" />
             </a>
           </div>
           <p className="lp-related">
-            <a href="/">Volver al inicio</a> · <a href="/consejos">consejos de piel</a> ·{" "}
+            <Link href="/">Volver al inicio</Link> · <Link href="/consejos">consejos de piel</Link> ·{" "}
             <a href={WA} target="_blank" rel="noopener noreferrer">escribirnos por WhatsApp</a>
           </p>
         </div>
