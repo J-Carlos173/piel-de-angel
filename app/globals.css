@@ -2863,3 +2863,5 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
   .lp-photo { aspect-ratio: 4 / 3; }
   .lp-actions .btn-primary, .lp-actions .btn-secondary { width: 100%; justify-content: center; }
 }
+.lp-chip-link { text-decoration: none; transition: var(--transicion); }
+.lp-chip-link:hover { border-color: var(--rosa-deep); color: var(--rosa-deep); transform: translateY(-2px); }

@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { SERVICIOS_LP } from "@/data/servicios-lp";
 
 const BASE = "https://www.pieldeangel.cl";
 
@@ -12,7 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/#testimonios`,  lastModified: new Date(), changeFrequency: "weekly",  priority: 0.7  },
     { url: `${BASE}/#nosotros`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
     { url: `${BASE}/#contacto`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
-    { url: `${BASE}/lifting-de-pestanas`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.85 },
+    ...SERVICIOS_LP.map((s) => ({
+      url: `${BASE}/${s.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    })),
     { url: `${BASE}/consejos`,      lastModified: new Date(), changeFrequency: "monthly", priority: 0.7  },
     { url: `${BASE}/terminos`,      lastModified: new Date(), changeFrequency: "yearly",  priority: 0.3  },
   ];

@@ -1,3 +1,5 @@
+import { SERVICIOS_LP } from "@/data/servicios-lp";
+
 export default function Footer() {
   return (
     <footer>
@@ -35,10 +37,10 @@ export default function Footer() {
               {[
                 ["/#inicio", "Inicio"],
                 ["/#productos", "Tienda"],
-                ["/#nosotros", "Nosotros"],
                 ["/#servicios", "Servicios"],
                 ["/#promociones", "Promos"],
                 ["/#agenda", "Agenda"],
+                ["/#nosotros", "Nosotros"],
                 ["/consejos", "Consejos de piel"],
               ].map(([href, label]) => (
                 <li key={href}>
@@ -51,15 +53,9 @@ export default function Footer() {
           <div className="footer-col">
             <h4>Servicios</h4>
             <ul>
-              {[
-                ["Limpieza Facial", "/#servicios"],
-                ["Lifting de Pestañas", "/lifting-de-pestanas"],
-                ["Hidratación Facial", "/#servicios"],
-                ["Tratamientos Faciales", "/#servicios"],
-                ["Skincare Premium", "/#servicios"],
-              ].map(([s, href]) => (
-                <li key={s}>
-                  <a href={href}>{s}</a>
+              {SERVICIOS_LP.map((s) => (
+                <li key={s.slug}>
+                  <a href={`/${s.slug}`}>{s.nombre}</a>
                 </li>
               ))}
             </ul>

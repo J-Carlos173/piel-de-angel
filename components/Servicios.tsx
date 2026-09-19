@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useReveal } from "@/hooks/useReveal";
+import { slugParaServicio } from "@/data/servicios-lp";
 
 type Servicio = {
   id: string;
@@ -71,8 +72,8 @@ export default function Servicios() {
                 <a href="#agenda" className="servicio-btn">
                   Agendar <i className="fa-solid fa-calendar-check" />
                 </a>
-                {/pesta/i.test(s.title) && (
-                  <a href="/lifting-de-pestanas" className="servicio-btn" style={{ marginLeft: 20 }}>
+                {slugParaServicio(s.title) && (
+                  <a href={`/${slugParaServicio(s.title)}`} className="servicio-btn" style={{ marginLeft: 20 }}>
                     Más info
                   </a>
                 )}

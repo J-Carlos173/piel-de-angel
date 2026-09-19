@@ -22,10 +22,10 @@ export default function Home() {
       <Hero />
       <RevealObserver>
         <Productos />
-        <About />
         <Servicios />
         <Promociones />
         <Agenda />
+        <About />
         <Testimonios />
         <Instagram />
       </RevealObserver>

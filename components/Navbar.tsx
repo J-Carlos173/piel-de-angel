@@ -28,7 +28,7 @@ export default function Navbar() {
         </a>
 
         <ul className={`nav-links${menuOpen ? " active" : ""}`} id="navLinks">
-          {["inicio", "productos", "nosotros", "servicios", "promociones"].map((id) => (
+          {["inicio", "productos", "servicios", "promociones", "nosotros"].map((id) => (
             <li key={id}>
               <a
                 href={`/#${id}`}
