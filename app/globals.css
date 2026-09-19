@@ -2865,3 +2865,19 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
 }
 .lp-chip-link { text-decoration: none; transition: var(--transicion); }
 .lp-chip-link:hover { border-color: var(--rosa-deep); color: var(--rosa-deep); transform: translateY(-2px); }
+
+/* ===== PAGINA DE ENLACES (biografia de Instagram) ===== */
+.links-page { min-height: 100vh; background: linear-gradient(160deg, var(--crema-pure) 0%, var(--crema) 100%); display: flex; justify-content: center; padding: 48px 20px 60px; }
+.links-card { width: 100%; max-width: 440px; text-align: center; }
+.links-logo { width: 84px; height: 84px; object-fit: contain; border-radius: 50%; background: #fff; padding: 6px; box-shadow: var(--sombra-card); }
+.links-card h1 { font-size: 1.9rem; color: var(--negro-soft); margin: 16px 0 6px; }
+.links-card h1 em { color: var(--rosa-deep); font-style: italic; }
+.links-sub { font-size: 0.9rem; color: var(--texto); line-height: 1.6; margin: 0 0 30px; }
+.links-lista { display: flex; flex-direction: column; gap: 12px; }
+.links-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 20px; border-radius: 100px; border: 1.5px solid var(--gris-suave); background: var(--crema-pure); color: var(--negro-soft); font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; transition: var(--transicion); }
+.links-btn:hover { border-color: var(--rosa-deep); color: var(--rosa-deep); transform: translateY(-2px); }
+.links-btn-destacado { background: var(--rosa-deep); border-color: var(--rosa-deep); color: #fff; box-shadow: 0 14px 40px rgba(198, 138, 149, 0.30); }
+.links-btn-destacado:hover { background: var(--negro-soft); border-color: var(--negro-soft); color: #fff; }
+.links-titulo { margin: 34px 0 12px; font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--rosa-deep); }
+.links-lista-chica { gap: 8px; }
+.links-btn-chico { padding: 12px 18px; font-size: 0.78rem; letter-spacing: 1px; }
