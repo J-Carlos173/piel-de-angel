@@ -57,7 +57,7 @@ export default function Servicios() {
             <div className="servicio-card reveal" key={s.id}>
               <div className="servicio-img">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.thumbnail} alt={s.title} />
+                <img src={s.thumbnail} alt={s.title} loading="lazy" decoding="async" />
               </div>
               <div className="servicio-content">
                 <h3>{s.title}</h3>

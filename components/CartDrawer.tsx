@@ -45,7 +45,7 @@ export default function CartDrawer() {
                 <div className="cart-item" key={item.id}>
                   <div className="cart-item-img">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={prod.img} alt={prod.nombre} />
+                    <img src={prod.img} alt={prod.nombre} loading="lazy" decoding="async" />
                   </div>
                   <div className="cart-item-info">
                     <h4>{prod.nombre}</h4>

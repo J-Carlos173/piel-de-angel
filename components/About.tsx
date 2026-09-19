@@ -38,11 +38,11 @@ export default async function About() {
           <div className="about-deco" />
           <div className="about-img-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.image1Url} alt="Centro estético" />
+            <img src={c.image1Url} alt="Centro estético" loading="lazy" decoding="async" />
           </div>
           <div className="about-img-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.image2Url} alt="Productos skincare" />
+            <img src={c.image2Url} alt="Productos skincare" loading="lazy" decoding="async" />
           </div>
         </div>
 

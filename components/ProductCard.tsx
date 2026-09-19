@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Producto, formatPrecio, precioFinal } from "@/data/productos";
+import { Producto, formatPrecio, precioFinal, WHATSAPP_NUMERO } from "@/data/productos";
 import { useCartStore } from "@/store/cartStore";
 
 function stockLabel(stock: number): string {
@@ -85,6 +85,15 @@ function ProductModal({ p, onClose }: { p: Producto; onClose: () => void }) {
               <><i className="fa-solid fa-plus" /> Agregar al carrito</>
             )}
           </button>
+
+          <a
+            className="producto-modal-wa"
+            href={`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(`Hola, me interesa "${p.nombre}". ¿Me puedes dar más información?`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i className="fa-brands fa-whatsapp" /> Consultar por WhatsApp
+          </a>
         </div>
       </div>
     </div>,
@@ -117,7 +126,7 @@ export default function ProductCard({ p }: { p: Producto }) {
 
         <div className={`producto-img${agotado ? " agotado" : ""}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={p.img} alt={p.nombre} />
+          <img src={p.img} alt={p.nombre} loading="lazy" decoding="async" />
           {agotado && <div className="agotado-overlay">Agotado</div>}
         </div>
 
