@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/#testimonios`,  lastModified: new Date(), changeFrequency: "weekly",  priority: 0.7  },
     { url: `${BASE}/#nosotros`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
     { url: `${BASE}/#contacto`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
+    { url: `${BASE}/tienda`,          lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9  },
     ...SERVICIOS_LP.map((s) => ({
       url: `${BASE}/${s.slug}`,
       lastModified: new Date(),

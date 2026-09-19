@@ -36,7 +36,7 @@ export default function Footer() {
             <ul>
               {[
                 ["/#inicio", "Inicio"],
-                ["/#productos", "Tienda"],
+                ["/tienda", "Tienda"],
                 ["/#servicios", "Servicios"],
                 ["/#promociones", "Promos"],
                 ["/#agenda", "Agenda"],

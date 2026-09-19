@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const WA = `https://wa.me/56977031461?text=${encodeURIComponent("Hola, quiero reservar una hora a domicilio.")}`;
 
 const PRINCIPALES: { href: string; icono: string; texto: string; externo?: boolean; destacado?: boolean }[] = [
-  { href: "/#productos", icono: "fa-solid fa-bag-shopping", texto: "Tienda online", destacado: true },
+  { href: "/tienda", icono: "fa-solid fa-bag-shopping", texto: "Tienda online", destacado: true },
   { href: WA, icono: "fa-brands fa-whatsapp", texto: "Reservar por WhatsApp", externo: true },
   { href: "/#servicios", icono: "fa-regular fa-calendar", texto: "Servicios a domicilio" },
   { href: "/consejos", icono: "fa-regular fa-lightbulb", texto: "Consejos de piel" },

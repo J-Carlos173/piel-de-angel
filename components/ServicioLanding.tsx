@@ -147,7 +147,7 @@ export default async function ServicioLanding({ s }: { s: ServicioLP }) {
             </div>
 
             <p className="lp-related">
-              Mira también: <a href="/#servicios">todos los servicios</a> · <a href="/#productos">la tienda</a> ·{" "}
+              Mira también: <a href="/#servicios">todos los servicios</a> · <a href="/tienda">la tienda</a> ·{" "}
               <a href="/consejos">consejos de piel</a>
             </p>
           </div>
