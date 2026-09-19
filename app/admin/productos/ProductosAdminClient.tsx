@@ -28,6 +28,22 @@ function fmtPrecio(n: number) {
   return "$" + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
+/** Precio de oferta a partir de un % de descuento, redondeado a la decena (3.492 -> 3.490). */
+function ofertaDesdePct(precio: string, pct: string): string {
+  const p = Number(precio);
+  const d = Number(pct);
+  if (!pct || !p || !(d > 0)) return "";
+  const oferta = Math.round((p * (1 - Math.min(d, 90) / 100)) / 10) * 10;
+  return oferta > 0 && oferta < p ? String(oferta) : "";
+}
+
+function pctDesdeOferta(precio: string, oferta: string): string {
+  const p = Number(precio);
+  const o = Number(oferta);
+  if (!p || !o || o >= p) return "";
+  return String(Math.round((1 - o / p) * 100));
+}
+
 export default function ProductosAdminClient() {
   const { dark } = useThemeStore();
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -328,6 +344,11 @@ export default function ProductosAdminClient() {
                   </div>
 
                   <div>
+                    <label style={labelStyle}>Descuento % (calcula la oferta)</label>
+                    <input type="number" min="1" max="90" placeholder={nuevoForm.precio ? "Ej: 10" : "Escribe el precio primero"} disabled={!Number(nuevoForm.precio)} value={pctDesdeOferta(nuevoForm.precio, nuevoForm.precioOferta)} onChange={(e) => setNuevoForm((f) => ({ ...f, precioOferta: ofertaDesdePct(f.precio, e.target.value) }))} style={inputStyle} />
+                  </div>
+
+                  <div>
                     <label style={labelStyle}>Stock (unidades)</label>
                     <input type="number" min="0" value={nuevoForm.stock} onChange={(e) => setNuevoForm((f) => ({ ...f, stock: e.target.value }))} style={inputStyle} />
                   </div>
@@ -559,6 +580,10 @@ export default function ProductosAdminClient() {
                         <div>
                           <label style={labelStyle}>Precio oferta (opcional)</label>
                           <input type="number" min="0" value={f.precioOferta} onChange={(e) => updateField(p.id, "precioOferta", e.target.value)} placeholder="Dejar vacío = sin oferta" style={inputStyle} />
+                        </div>
+                        <div>
+                          <label style={labelStyle}>Descuento % (calcula la oferta)</label>
+                          <input type="number" min="1" max="90" value={pctDesdeOferta(f.precio, f.precioOferta)} onChange={(e) => updateField(p.id, "precioOferta", ofertaDesdePct(f.precio, e.target.value))} disabled={!Number(f.precio)} placeholder={f.precio ? "Ej: 10" : "Escribe el precio primero"} style={inputStyle} />
                         </div>
                         <div>
                           <label style={labelStyle}>Categoría</label>
