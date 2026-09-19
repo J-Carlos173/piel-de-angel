@@ -71,6 +71,11 @@ export default function Servicios() {
                 <a href="#agenda" className="servicio-btn">
                   Agendar <i className="fa-solid fa-calendar-check" />
                 </a>
+                {/pesta/i.test(s.title) && (
+                  <a href="/lifting-de-pestanas" className="servicio-btn" style={{ marginLeft: 20 }}>
+                    Más info
+                  </a>
+                )}
               </div>
             </div>
           ))}

@@ -52,14 +52,14 @@ export default function Footer() {
             <h4>Servicios</h4>
             <ul>
               {[
-                "Limpieza Facial",
-                "Lifting de Pestañas",
-                "Hidratación Facial",
-                "Tratamientos Faciales",
-                "Skincare Premium",
-              ].map((s) => (
+                ["Limpieza Facial", "/#servicios"],
+                ["Lifting de Pestañas", "/lifting-de-pestanas"],
+                ["Hidratación Facial", "/#servicios"],
+                ["Tratamientos Faciales", "/#servicios"],
+                ["Skincare Premium", "/#servicios"],
+              ].map(([s, href]) => (
                 <li key={s}>
-                  <a href="/#servicios">{s}</a>
+                  <a href={href}>{s}</a>
                 </li>
               ))}
             </ul>

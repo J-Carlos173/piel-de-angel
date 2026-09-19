@@ -194,7 +194,7 @@ const jsonLd = {
         name: "Servicios de Estética Piel de Ángel",
         itemListElement: [
           { "@type": "Offer", itemOffered: { "@type": "Service", name: "Limpieza Facial Profunda",    description: "Purificación profunda que elimina impurezas y devuelve luminosidad al rostro." } },
-          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Lifting de Pestañas",         description: "Tratamiento de lifting de pestañas en Santiago que curva y realza las pestañas naturales desde la raíz, con efecto de mirada abierta, natural y duradero, sin extensiones de pestañas." } },
+          { "@type": "Offer", itemOffered: { "@type": "Service", name: "Lifting de Pestañas", url: `${SITE_URL}/lifting-de-pestanas`,        description: "Tratamiento de lifting de pestañas en Santiago que curva y realza las pestañas naturales desde la raíz, con efecto de mirada abierta, natural y duradero, sin extensiones de pestañas." } },
           { "@type": "Offer", itemOffered: { "@type": "Service", name: "Hidratación Facial",          description: "Restaura la hidratación profunda con activos premium." } },
           { "@type": "Offer", itemOffered: { "@type": "Service", name: "Tratamiento Anti-edad",       description: "Protocolos personalizados anti-edad y revitalizantes." } },
           { "@type": "Offer", itemOffered: { "@type": "Service", name: "Ritual de Bienestar",         description: "Experiencia completa de relajación: masaje facial y aromaterapia." } },
