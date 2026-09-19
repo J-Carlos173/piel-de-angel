@@ -33,12 +33,13 @@ export default function Footer() {
             <h4>Navegación</h4>
             <ul>
               {[
-                ["#inicio", "Inicio"],
-                ["#nosotros", "Nosotros"],
-                ["#servicios", "Servicios"],
-                ["#productos", "Tienda"],
-                ["#promociones", "Promos"],
-                ["#agenda", "Agenda"],
+                ["/#inicio", "Inicio"],
+                ["/#productos", "Tienda"],
+                ["/#nosotros", "Nosotros"],
+                ["/#servicios", "Servicios"],
+                ["/#promociones", "Promos"],
+                ["/#agenda", "Agenda"],
+                ["/consejos", "Consejos de piel"],
               ].map(([href, label]) => (
                 <li key={href}>
                   <a href={href}>{label}</a>
@@ -58,7 +59,7 @@ export default function Footer() {
                 "Skincare Premium",
               ].map((s) => (
                 <li key={s}>
-                  <a href="#servicios">{s}</a>
+                  <a href="/#servicios">{s}</a>
                 </li>
               ))}
             </ul>

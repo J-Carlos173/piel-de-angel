@@ -5,7 +5,6 @@ import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Servicios from "@/components/Servicios";
 import Productos from "@/components/Productos";
-import Consejos from "@/components/Consejos";
 import Promociones from "@/components/Promociones";
 import Instagram from "@/components/Instagram";
 import Agenda from "@/components/Agenda";
@@ -25,7 +24,6 @@ export default function Home() {
         <Productos />
         <About />
         <Servicios />
-        <Consejos />
         <Promociones />
         <Agenda />
         <Testimonios />

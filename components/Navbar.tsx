@@ -22,7 +22,7 @@ export default function Navbar() {
   return (
     <nav className={`navbar${scrolled ? " scrolled" : ""}`} id="navbar">
       <div className="container nav-wrapper">
-        <a href="#inicio" className="logo" style={{ display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+        <a href="/#inicio" className="logo" style={{ display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
           <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ height: 40, width: 40, objectFit: "contain", borderRadius: 4, flexShrink: 0 }} />
           Piel de <span>Ángel</span>
         </a>
@@ -31,7 +31,7 @@ export default function Navbar() {
           {["inicio", "productos", "nosotros", "servicios", "promociones"].map((id) => (
             <li key={id}>
               <a
-                href={`#${id}`}
+                href={`/#${id}`}
                 onClick={closeMenu}
                 style={{ textTransform: "capitalize" }}
               >
@@ -42,7 +42,7 @@ export default function Navbar() {
 
           {/* Extras visibles solo en el menú móvil */}
           <li className="mobile-menu-extras">
-            <a href="#agenda" onClick={closeMenu} className="nav-cta mobile-cta">
+            <a href="/#agenda" onClick={closeMenu} className="nav-cta mobile-cta">
               Reservar Hora
             </a>
             <div className="mobile-menu-icons">
@@ -58,7 +58,7 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
-          <a href="#agenda" className="nav-cta">
+          <a href="/#agenda" className="nav-cta">
             Reservar Hora
           </a>
           <button
