@@ -90,6 +90,9 @@ export default function Agenda() {
           <p className="section-subtitle">
             Lunes a viernes · 9:00 – 17:00 hrs · Respuesta en menos de 24 horas
           </p>
+          <p className="section-subtitle" style={{ marginTop: 6 }}>
+            Atendemos a domicilio: vamos a tu casa.
+          </p>
         </div>
 
         <div className="agenda-card">

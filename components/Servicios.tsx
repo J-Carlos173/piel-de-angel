@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useReveal } from "@/hooks/useReveal";
-import { slugParaServicio } from "@/data/servicios-lp";
+import { COMUNAS, slugParaServicio } from "@/data/servicios-lp";
 
 type Servicio = {
   id: string;
@@ -42,13 +42,16 @@ export default function Servicios() {
     <section className="servicios" id="servicios" ref={ref}>
       <div className="container">
         <div className="section-header reveal">
-          <span className="eyebrow">Nuestros Servicios</span>
+          <span className="eyebrow">Servicios a domicilio</span>
           <h2 className="section-title">
             Tratamientos <em>diseñados para ti</em>
           </h2>
           <p className="section-subtitle">
             Cada tratamiento es una experiencia sensorial cuidadosamente curada para
             nutrir, revitalizar y devolverle a tu piel su luminosidad natural.
+          </p>
+          <p className="servicios-zona">
+            <i className="fa-solid fa-house-chimney" /> Vamos a tu casa en {COMUNAS.slice(0, -1).join(", ")} y {COMUNAS[COMUNAS.length - 1]}
           </p>
         </div>
 
@@ -58,6 +61,9 @@ export default function Servicios() {
               <div className="servicio-img">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={s.thumbnail} alt={s.title} loading="lazy" decoding="async" />
+                <span className="servicio-domicilio">
+                  <i className="fa-solid fa-house-chimney" /> A domicilio
+                </span>
               </div>
               <div className="servicio-content">
                 <h3>{s.title}</h3>

@@ -2895,3 +2895,32 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
 .pp-foto img { object-fit: contain; padding: 18px; }
 .producto-modal-link { display: block; margin-top: 12px; text-align: center; font-size: 0.75rem; color: var(--texto-soft); text-decoration: underline; }
 .producto-modal-link:hover { color: var(--rosa-deep); }
+
+/* Servicios: aviso de atención a domicilio */
+.servicios-zona {
+  margin: 14px auto 0;
+  max-width: 640px;
+  font-family: Montserrat, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--rosa-deep);
+}
+.servicios-zona i { margin-right: 6px; }
+.servicio-domicilio {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--rosa-deep);
+  font-family: Montserrat, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
