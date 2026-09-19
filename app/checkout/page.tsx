@@ -4,21 +4,14 @@ import { useState, useRef, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useProductsStore } from "@/store/productsStore";
 import { formatPrecio, precioFinal } from "@/data/productos";
+import { calcularEnvio, GRATIS_SANTIAGO } from "@/lib/pricing";
 import Link from "next/link";
 
-const COSTO_ENVIO = 2990;
-const GRATIS_SANTIAGO = 40000;
 const WEBPAY_PLUS_ACTIVO = true; // false = link simple webpay.cl | true = WebPay Plus API
 const WEBPAY_SIMPLE_URL = "https://www.webpay.cl/form-pay/294463";
 
 function esSabado(): boolean {
   return new Date().getDay() === 6;
-}
-
-function calcularEnvio(subtotal: number, zona: "santiago" | "regiones"): number {
-  // Regiones: no se cobra en el checkout, se paga directo al transportista al recibirlo
-  if (zona === "regiones") return 0;
-  return subtotal >= GRATIS_SANTIAGO ? 0 : COSTO_ENVIO;
 }
 
 export default function CheckoutPage() {

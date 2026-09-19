@@ -11,7 +11,7 @@ export interface Producto {
 }
 
 /** Precio que realmente se cobra: el de oferta si está activo y es menor al normal. */
-export function precioFinal(p: Producto): number {
+export function precioFinal(p: Pick<Producto, "precio" | "precio_oferta">): number {
   return p.precio_oferta && p.precio_oferta > 0 && p.precio_oferta < p.precio
     ? p.precio_oferta
     : p.precio;
