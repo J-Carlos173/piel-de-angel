@@ -9,7 +9,7 @@ import { getSetting } from "@/lib/db";
 const SITE_URL = "https://www.pieldeangel.cl";
 const SITE_NAME = "Piel de Ángel";
 const DESCRIPTION =
-  "Skincare premium y estética facial en Santiago Oriente — Vitacura, Lo Barnechea, Providencia, Las Condes y Ñuñoa. Sérums con ácido hialurónico, vitamina C, retinol y protección solar. Rutinas K-beauty y tratamientos faciales profesionales. Envío a todo Chile.";
+  "Skincare premium y estética facial a domicilio en Santiago Oriente — Vitacura, Lo Barnechea, Las Condes, Providencia y Ñuñoa. Sérums con ácido hialurónico, vitamina C, retinol y protección solar. Rutinas K-beauty y tratamientos faciales profesionales. Envío a todo Chile.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,6 +33,9 @@ export const metadata: Metadata = {
     "protector solar Chile",
     "crema antiedad Santiago",
     "lifting pestañas Santiago",
+    "lifting de pestañas a domicilio",
+    "estética facial a domicilio Santiago",
+    "estética a domicilio Las Condes",
     "limpieza facial Santiago",
     "estética premium Santiago",
     "tratamientos faciales Santiago",
@@ -110,14 +113,13 @@ const jsonLd = {
       areaServed: [
         { "@type": "City", name: "Vitacura" },
         { "@type": "City", name: "Lo Barnechea" },
-        { "@type": "City", name: "Providencia" },
         { "@type": "City", name: "Las Condes" },
+        { "@type": "City", name: "Providencia" },
         { "@type": "City", name: "Ñuñoa" },
       ],
       address: {
         "@type": "PostalAddress",
-        streetAddress: "Omar Herrera Gutiérrez 1556",
-        addressLocality: "Puente Alto",
+        addressLocality: "Santiago",
         addressRegion: "Región Metropolitana",
         addressCountry: "CL",
       },
@@ -179,7 +181,14 @@ const jsonLd = {
       "@id": `${SITE_URL}/#servicios`,
       name: "Tratamientos y Servicios de Estética",
       provider: { "@id": `${SITE_URL}/#business` },
-      areaServed: "Santiago, Chile",
+      description: "Tratamientos de estética facial y pestañas a domicilio en Santiago Oriente.",
+      areaServed: [
+        { "@type": "City", name: "Vitacura" },
+        { "@type": "City", name: "Lo Barnechea" },
+        { "@type": "City", name: "Las Condes" },
+        { "@type": "City", name: "Providencia" },
+        { "@type": "City", name: "Ñuñoa" },
+      ],
       hasOfferCatalog: {
         "@type": "OfferCatalog",
         name: "Servicios de Estética Piel de Ángel",
