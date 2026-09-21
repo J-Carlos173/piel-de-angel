@@ -144,6 +144,8 @@ export default function ContenidoClient({
   const [about, setAbout]   = useState<AboutContent>(initialAbout);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
+  const [subiendo, setSubiendo] = useState<string | null>(null);
+  const [errorFoto, setErrorFoto] = useState("");
 
   const cardBg  = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
   const border  = dark ? "#3a2830" : "#ecddd9";
@@ -192,9 +194,40 @@ export default function ContenidoClient({
     );
   }
 
+  // Las fotos del celular pesan varios MB: se achican antes de subir (el servidor acepta ~4 MB).
+  async function reducirImagen(file: File, maxLado = 1600): Promise<File> {
+    const bmp = await createImageBitmap(file);
+    const escala = Math.min(1, maxLado / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bmp.width * escala);
+    canvas.height = Math.round(bmp.height * escala);
+    canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, "image/jpeg", 0.85));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
+  }
+
+  async function subirFoto(label: string, file: File, onChange: (v: string) => void) {
+    setSubiendo(label);
+    setErrorFoto("");
+    try {
+      const fd = new FormData();
+      fd.append("file", await reducirImagen(file));
+      fd.append("folder", "contenido");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || "No se pudo subir");
+      onChange(data.url);
+    } catch {
+      setErrorFoto("No se pudo subir la foto. Prueba con otra o inténtalo de nuevo.");
+    }
+    setSubiendo(null);
+  }
+
   function ImageField({ label, value, onChange }: {
     label: string; value: string; onChange: (v: string) => void;
   }) {
+    const ocupado = subiendo === label;
     return (
       <div style={{ marginBottom: 18 }}>
         <label style={labelStyle}>{label}</label>
@@ -217,8 +250,31 @@ export default function ContenidoClient({
             />
           )}
         </div>
-        <p style={{ margin: "4px 0 0", fontSize: 10, color: textMuted, ...MONO }}>
-          Pega la URL de una imagen (Unsplash, Google, etc.)
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
+          <label
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px",
+              borderRadius: 10, border: `1.5px solid ${border}`, background: cardBg, color: textMain,
+              fontSize: 12, cursor: ocupado ? "wait" : "pointer", opacity: ocupado ? 0.6 : 1, ...MONO,
+            }}
+          >
+            <i className={`fa-solid ${ocupado ? "fa-spinner fa-spin" : "fa-camera"}`} />
+            {ocupado ? "Subiendo…" : "Subir foto desde el celular o computador"}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={ocupado}
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) subirFoto(label, f, onChange);
+              }}
+            />
+          </label>
+        </div>
+        <p style={{ margin: "6px 0 0", fontSize: 10, color: textMuted, ...MONO }}>
+          Sube tu propia foto, o pega el enlace de una imagen (Unsplash, etc.).
         </p>
       </div>
     );
@@ -309,7 +365,10 @@ export default function ContenidoClient({
                 <Field label="Badge — título" value={hero.badgeTitle} onChange={(v) => setHero({ ...hero, badgeTitle: v })} />
                 <Field label="Badge — subtítulo" value={hero.badgeSubtitle} onChange={(v) => setHero({ ...hero, badgeSubtitle: v })} />
               </div>
-              <ImageField label="Imagen principal (URL)" value={hero.imageUrl} onChange={(v) => setHero({ ...hero, imageUrl: v })} />
+              <ImageField label="Imagen principal" value={hero.imageUrl} onChange={(v) => setHero({ ...hero, imageUrl: v })} />
+              {errorFoto && (
+                <p style={{ margin: "0 0 14px", fontSize: 12, color: "#b04a5a", ...MONO }}>{errorFoto}</p>
+              )}
               <Field label="Texto alternativo de la imagen" value={hero.imageAlt} onChange={(v) => setHero({ ...hero, imageAlt: v })} />
             </>
           )}
@@ -324,8 +383,11 @@ export default function ContenidoClient({
               <Field label="Título — texto en cursiva (rosado)" value={about.titleItalic} onChange={(v) => setAbout({ ...about, titleItalic: v })} />
               <Field label="Párrafo 1" value={about.paragraph1} onChange={(v) => setAbout({ ...about, paragraph1: v })} rows={4} />
               <Field label="Párrafo 2" value={about.paragraph2} onChange={(v) => setAbout({ ...about, paragraph2: v })} rows={4} />
-              <ImageField label="Imagen grande (URL)" value={about.image1Url} onChange={(v) => setAbout({ ...about, image1Url: v })} />
-              <ImageField label="Imagen pequeña (URL)" value={about.image2Url} onChange={(v) => setAbout({ ...about, image2Url: v })} />
+              <ImageField label="Imagen grande" value={about.image1Url} onChange={(v) => setAbout({ ...about, image1Url: v })} />
+              <ImageField label="Imagen pequeña" value={about.image2Url} onChange={(v) => setAbout({ ...about, image2Url: v })} />
+              {errorFoto && (
+                <p style={{ margin: "0 0 14px", fontSize: 12, color: "#b04a5a", ...MONO }}>{errorFoto}</p>
+              )}
             </>
           )}
 
