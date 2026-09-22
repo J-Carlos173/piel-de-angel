@@ -34,6 +34,7 @@ export default function Agenda() {
   const [step, setStep] = useState<Step>("date");
   const [selectedDate, setSelectedDate] = useState("");
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [diaLaboral, setDiaLaboral] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
   const [form, setForm] = useState({ name: "", email: "", phone: "", service: SERVICIOS[0] });
@@ -52,8 +53,10 @@ export default function Agenda() {
       const res = await fetch(`/api/availability?date=${date}`);
       const data = await res.json();
       setSlots(data.slots || []);
+      setDiaLaboral(data.workingDay !== false);
     } catch {
       setSlots([]);
+      setDiaLaboral(true);
     }
     setLoadingSlots(false);
   }
@@ -155,7 +158,11 @@ export default function Agenda() {
                       Cargando horarios…
                     </div>
                   ) : slots.length === 0 ? (
-                    <div className="agenda-empty">No hay horarios disponibles este día.</div>
+                    <div className="agenda-empty">
+                      {diaLaboral
+                        ? "Ese día ya no quedan horas disponibles. Prueba con otro día."
+                        : "Ese día no atendemos. Elige otra fecha: lunes a viernes de 16:30 a 20:00, o sábado de 9:00 a 20:00."}
+                    </div>
                   ) : (
                     <div className="slots-grid">
                       {slots.map(({ time, available }) => (

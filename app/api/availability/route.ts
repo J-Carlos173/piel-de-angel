@@ -8,12 +8,12 @@ export async function GET(req: NextRequest) {
   }
 
   if (!isWorkingDay(date)) {
-    return NextResponse.json({ slots: [] });
+    return NextResponse.json({ slots: [], workingDay: false });
   }
 
   const all = getAllSlots(date);
   const busy = await getBusySlots(date);
   const slots = all.map((time) => ({ time, available: !busy.includes(time) }));
 
-  return NextResponse.json({ slots });
+  return NextResponse.json({ slots, workingDay: true });
 }

@@ -6,14 +6,30 @@ const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "krlos173173@gmail.com";
 // Bloques de 90 min (1h30) — Tere indicó entre 1.5 y 2 hrs según servicio
 const SLOT_DURATION_MIN = 90;
 
+/** Genera horas de inicio cada SLOT_DURATION_MIN dentro de una ventana, sin pasarse del cierre. */
+function generarSlots(inicio: string, fin: string): string[] {
+  const [hIni, mIni] = inicio.split(":").map(Number);
+  const [hFin, mFin] = fin.split(":").map(Number);
+  const inicioMin = hIni * 60 + mIni;
+  const finMin = hFin * 60 + mFin;
+  const slots: string[] = [];
+  for (let t = inicioMin; t + SLOT_DURATION_MIN <= finMin; t += SLOT_DURATION_MIN) {
+    const h = Math.floor(t / 60);
+    const m = t % 60;
+    slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+  }
+  return slots;
+}
+
 // Horarios disponibles por día (0=Dom,1=Lun,2=Mar,3=Mié,4=Jue,5=Vie,6=Sáb)
-// Temporada: mientras Tere trabaja en Adonai-Sidim
+// Definido por Carlos el 21-09-2026: Lunes a viernes 16:30 a 20:00, Sábado 9:00 a 20:00.
 const SCHEDULE: Record<number, string[]> = {
-  2: ["16:00", "18:00"],                 // Martes
-  3: ["16:00", "18:00"],                 // Miércoles
-  4: ["16:00", "18:00", "20:00"],        // Jueves
-  5: ["16:00", "18:00", "20:00"],        // Viernes
-  6: ["09:30", "11:30", "13:30"],        // Sábado
+  1: generarSlots("16:30", "20:00"), // Lunes
+  2: generarSlots("16:30", "20:00"), // Martes
+  3: generarSlots("16:30", "20:00"), // Miércoles
+  4: generarSlots("16:30", "20:00"), // Jueves
+  5: generarSlots("16:30", "20:00"), // Viernes
+  6: generarSlots("09:00", "20:00"), // Sábado
 };
 
 function getAuth() {

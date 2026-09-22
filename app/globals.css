@@ -1535,14 +1535,18 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   box-shadow: 0 0 0 3px rgba(216,167,177,0.12);
 }
 .agenda-date-input:focus { outline: none; border-color: var(--rosa); box-shadow: 0 0 0 4px rgba(216,167,177,0.18); }
-/* Expande el indicador nativo a todo el ancho para que el click funcione en cualquier parte */
-.agenda-date-input::-webkit-calendar-picker-indicator {
-  position: absolute;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  margin: 0; padding: 0;
-  opacity: 0;
-  cursor: pointer;
+/* Expande el indicador nativo a todo el ancho para que el click funcione en cualquier parte.
+   Solo en desktop (mouse): en el celular todo el campo ya abre el calendario nativo,
+   y este mismo truco hace que se abra y se cierre de inmediato (parpadeo). */
+@media (hover: hover) and (pointer: fine) {
+  .agenda-date-input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    margin: 0; padding: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
 }
 .slots-grid {
   display: grid;
