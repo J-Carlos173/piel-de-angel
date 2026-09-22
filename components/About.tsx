@@ -57,9 +57,8 @@ export default async function About() {
           <div className="about-features">
             {[
               { icon: "fa-heart",  title: "Cuidado Personal", desc: "Atención adaptada a cada piel" },
-              { icon: "fa-leaf",   title: "Productos Premium", desc: "Cosmética de alta gama" },
-              { icon: "fa-spa",    title: "Ambiente Spa",      desc: "Bienestar y relajación total" },
-              { icon: "fa-award",  title: "Experiencia",       desc: "Profesionales certificadas" },
+              { icon: "fa-leaf",   title: "Productos premium", desc: "Cosmética profesional de alta gama" },
+              { icon: "fa-award",  title: "Experiencia",       desc: "Profesional certificada" },
             ].map(({ icon, title, desc }) => (
               <div className="feature-item" key={title}>
                 <div className="feature-icon">
