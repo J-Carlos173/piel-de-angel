@@ -15,6 +15,9 @@ type AboutContent = {
   paragraph1: string; paragraph2: string;
   image1Url: string; image2Url: string;
 };
+type TiendaContent = {
+  eyebrow: string; titleLine1: string; titleItalic: string; subtitle: string;
+};
 
 /* ── Plantillas prediseñadas ────────────────────────────── */
 const HERO_PRESETS: { label: string; icon: string; content: HeroContent }[] = [
@@ -133,15 +136,17 @@ const ABOUT_PRESETS: { label: string; icon: string; content: AboutContent }[] = 
 
 /* ── Componente principal ───────────────────────────────── */
 export default function ContenidoClient({
-  initialHero, initialAbout,
+  initialHero, initialAbout, initialTienda,
 }: {
   initialHero: HeroContent;
   initialAbout: AboutContent;
+  initialTienda: TiendaContent;
 }) {
   const { dark } = useThemeStore();
-  const [tab, setTab]       = useState<"hero" | "about">("hero");
+  const [tab, setTab]       = useState<"hero" | "about" | "tienda">("hero");
   const [hero, setHero]     = useState<HeroContent>(initialHero);
   const [about, setAbout]   = useState<AboutContent>(initialAbout);
+  const [tienda, setTienda] = useState<TiendaContent>(initialTienda);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
   const [subiendo, setSubiendo] = useState<string | null>(null);
@@ -156,8 +161,8 @@ export default function ContenidoClient({
 
   async function save() {
     setSaving(true);
-    const key = tab === "hero" ? "content_hero" : "content_about";
-    const value = tab === "hero" ? hero : about;
+    const key = tab === "hero" ? "content_hero" : tab === "about" ? "content_about" : "content_tienda";
+    const value = tab === "hero" ? hero : tab === "about" ? about : tienda;
     await fetch("/api/admin/content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -322,16 +327,16 @@ export default function ContenidoClient({
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px 60px" }}>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-          {(["hero", "about"] as const).map((t) => (
+        <div style={{ display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" }}>
+          {(["hero", "about", "tienda"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding: "10px 22px", borderRadius: 12, border: `1.5px solid ${tab === t ? "#C68A95" : border}`,
               background: tab === t ? "rgba(198,138,149,0.12)" : cardBg,
               color: tab === t ? "#C68A95" : textMuted, cursor: "pointer", fontSize: 13,
               fontWeight: tab === t ? 600 : 400, transition: "all 0.2s", ...MONO,
             }}>
-              <i className={`fa-solid ${t === "hero" ? "fa-house" : "fa-circle-info"}`} style={{ marginRight: 7 }} />
-              {t === "hero" ? "Sección Inicio" : "Sobre Nosotros"}
+              <i className={`fa-solid ${t === "hero" ? "fa-house" : t === "about" ? "fa-circle-info" : "fa-bag-shopping"}`} style={{ marginRight: 7 }} />
+              {t === "hero" ? "Sección Inicio" : t === "about" ? "Sobre Nosotros" : "Sección Tienda"}
             </button>
           ))}
         </div>
@@ -339,18 +344,21 @@ export default function ContenidoClient({
         <div style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 20, padding: "32px 28px" }}>
 
           {/* Plantillas */}
-          <div style={{ marginBottom: 8 }}>
-            <p style={{ margin: "0 0 12px", fontSize: 11, color: textMuted, letterSpacing: "0.12em", textTransform: "uppercase", ...MONO }}>
-              <i className="fa-solid fa-wand-magic-sparkles" style={{ marginRight: 6, color: "#C68A95" }} />
-              Plantillas prediseñadas — clic para cargar
-            </p>
-            {tab === "hero"
-              ? <Presets presets={HERO_PRESETS} onSelect={setHero} />
-              : <Presets presets={ABOUT_PRESETS} onSelect={setAbout} />
-            }
-          </div>
-
-          <div style={{ height: 1, background: border, margin: "4px 0 28px" }} />
+          {tab !== "tienda" && (
+            <>
+              <div style={{ marginBottom: 8 }}>
+                <p style={{ margin: "0 0 12px", fontSize: 11, color: textMuted, letterSpacing: "0.12em", textTransform: "uppercase", ...MONO }}>
+                  <i className="fa-solid fa-wand-magic-sparkles" style={{ marginRight: 6, color: "#C68A95" }} />
+                  Plantillas prediseñadas — clic para cargar
+                </p>
+                {tab === "hero"
+                  ? <Presets presets={HERO_PRESETS} onSelect={setHero} />
+                  : <Presets presets={ABOUT_PRESETS} onSelect={setAbout} />
+                }
+              </div>
+              <div style={{ height: 1, background: border, margin: "4px 0 28px" }} />
+            </>
+          )}
 
           {/* Campos Hero */}
           {tab === "hero" && (
@@ -388,6 +396,21 @@ export default function ContenidoClient({
               {errorFoto && (
                 <p style={{ margin: "0 0 14px", fontSize: 12, color: "#b04a5a", ...MONO }}>{errorFoto}</p>
               )}
+            </>
+          )}
+
+          {/* Campos Tienda */}
+          {tab === "tienda" && (
+            <>
+              <p style={{ margin: "0 0 20px", fontSize: 12, color: textMuted, ...MONO }}>
+                Este es el encabezado que aparece justo arriba de los productos, en el inicio del sitio y en la página de la tienda.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Field label="Etiqueta superior" value={tienda.eyebrow} onChange={(v) => setTienda({ ...tienda, eyebrow: v })} />
+                <Field label="Título — primera palabra" value={tienda.titleLine1} onChange={(v) => setTienda({ ...tienda, titleLine1: v })} />
+              </div>
+              <Field label="Título — palabra en cursiva (rosado)" value={tienda.titleItalic} onChange={(v) => setTienda({ ...tienda, titleItalic: v })} />
+              <Field label="Subtítulo / descripción" value={tienda.subtitle} onChange={(v) => setTienda({ ...tienda, subtitle: v })} rows={3} />
             </>
           )}
 

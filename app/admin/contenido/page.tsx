@@ -15,6 +15,14 @@ const HERO_DEFAULTS = {
   badgeSubtitle: "Cada piel es única",
 };
 
+const TIENDA_DEFAULTS = {
+  eyebrow: "Nuestra Tienda",
+  titleLine1: "Skincare",
+  titleItalic: "Premium",
+  subtitle:
+    "Una selección curada de cosmética de alta gama para que cada día sea un ritual de cuidado. Compra fácil y rápido por WhatsApp.",
+};
+
 const ABOUT_DEFAULTS = {
   eyebrow: "Sobre Nosotros",
   titleLine1: "Un refugio para tu",
@@ -28,13 +36,15 @@ const ABOUT_DEFAULTS = {
 };
 
 export default async function ContenidoPage() {
-  const [rawHero, rawAbout] = await Promise.all([
+  const [rawHero, rawAbout, rawTienda] = await Promise.all([
     getSetting("content_hero").catch(() => null),
     getSetting("content_about").catch(() => null),
+    getSetting("content_tienda").catch(() => null),
   ]);
 
-  const hero  = rawHero  ? { ...HERO_DEFAULTS,  ...JSON.parse(rawHero)  } : HERO_DEFAULTS;
-  const about = rawAbout ? { ...ABOUT_DEFAULTS, ...JSON.parse(rawAbout) } : ABOUT_DEFAULTS;
+  const hero   = rawHero   ? { ...HERO_DEFAULTS,   ...JSON.parse(rawHero)   } : HERO_DEFAULTS;
+  const about  = rawAbout  ? { ...ABOUT_DEFAULTS,  ...JSON.parse(rawAbout)  } : ABOUT_DEFAULTS;
+  const tienda = rawTienda ? { ...TIENDA_DEFAULTS, ...JSON.parse(rawTienda) } : TIENDA_DEFAULTS;
 
-  return <ContenidoClient initialHero={hero} initialAbout={about} />;
+  return <ContenidoClient initialHero={hero} initialAbout={about} initialTienda={tienda} />;
 }
