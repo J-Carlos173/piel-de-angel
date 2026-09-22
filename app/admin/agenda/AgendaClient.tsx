@@ -156,7 +156,7 @@ export default function AgendaClient() {
                 <div style={{ textAlign: "center", padding: "30px 0", color: textMuted }}>
                   <i className="fa-solid fa-calendar-xmark" style={{ fontSize: 30, display: "block", marginBottom: 12, opacity: 0.4 }} />
                   <p style={{ ...MONO, fontSize: 13 }}>Este día no tiene horarios disponibles.</p>
-                  <p style={{ ...MONO, fontSize: 11, marginTop: 4 }}>Los días hábiles son Mar, Mié, Jue, Vie y Sáb.</p>
+                  <p style={{ ...MONO, fontSize: 11, marginTop: 4 }}>Se atiende de lunes a viernes de 16:30 a 20:00, y sábado de 9:00 a 20:00.</p>
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
