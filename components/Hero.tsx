@@ -1,4 +1,6 @@
 import { getSetting } from "@/lib/db";
+import { getPublishedServicios } from "@/lib/services-db";
+import HeroPhotoCarousel from "./HeroPhotoCarousel";
 
 type HeroContent = {
   eyebrow: string;
@@ -31,6 +33,17 @@ export default async function Hero() {
     if (raw) c = { ...DEFAULTS, ...JSON.parse(raw) };
   } catch {}
 
+  // Rota entre las fotos de los servicios activos en vez de mostrar una sola cara fija.
+  // Si ningún servicio activo tiene foto, se usa la imagen configurada en Editar Sitio Web.
+  let fotos: { src: string; alt: string }[] = [];
+  try {
+    const servicios = await getPublishedServicios();
+    fotos = servicios
+      .filter((s) => s.thumbnail)
+      .map((s) => ({ src: s.thumbnail, alt: `${s.title} a domicilio — Piel de Ángel` }));
+  } catch {}
+  if (fotos.length === 0) fotos = [{ src: c.imageUrl, alt: c.imageAlt }];
+
   return (
     <section className="hero" id="inicio">
       <div className="container hero-wrapper">
@@ -53,8 +66,7 @@ export default async function Hero() {
 
         <div className="hero-image">
           <div className="hero-image-wrap">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.imageUrl} alt={c.imageAlt} />
+            <HeroPhotoCarousel fotos={fotos} />
           </div>
           <div className="hero-badge">
             <div className="hero-badge-icon">
