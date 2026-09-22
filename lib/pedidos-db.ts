@@ -7,6 +7,8 @@ export type Pedido = {
   imagenes: string[];
   estado: "pendiente" | "en_proceso" | "hecho" | "error";
   respuesta: string | null;
+  /** Si la respuesta implicó subir un cambio a producción. Si es false, el panel muestra la respuesta al instante (sin la animación de "subiendo a producción"). */
+  con_cambio: boolean;
   created_at: string;
   completed_at: string | null;
 };
@@ -25,6 +27,7 @@ export async function ensurePedidosTable() {
   `;
   await sql`ALTER TABLE ia_pedidos ADD COLUMN IF NOT EXISTS imagenes JSONB NOT NULL DEFAULT '[]'::jsonb`;
   await sql`ALTER TABLE ia_pedidos ADD COLUMN IF NOT EXISTS hilo_id INTEGER`;
+  await sql`ALTER TABLE ia_pedidos ADD COLUMN IF NOT EXISTS con_cambio BOOLEAN NOT NULL DEFAULT TRUE`;
 }
 
 export async function createPedido(texto: string, imagenes: string[] = [], hiloId?: number): Promise<Pedido> {
@@ -46,7 +49,7 @@ export async function getAllPedidos(): Promise<Pedido[]> {
 
 export async function updatePedido(
   id: number,
-  data: { estado?: Pedido["estado"]; respuesta?: string }
+  data: { estado?: Pedido["estado"]; respuesta?: string; con_cambio?: boolean }
 ): Promise<Pedido | null> {
   const sql = getDb();
   const completedAt = data.estado === "hecho" || data.estado === "error" ? new Date().toISOString() : null;
@@ -54,6 +57,7 @@ export async function updatePedido(
     UPDATE ia_pedidos SET
       estado       = COALESCE(${data.estado ?? null}, estado),
       respuesta    = COALESCE(${data.respuesta ?? null}, respuesta),
+      con_cambio   = CASE WHEN ${data.con_cambio !== undefined} THEN ${data.con_cambio ?? true} ELSE con_cambio END,
       completed_at = COALESCE(${completedAt}, completed_at)
     WHERE id = ${id}
     RETURNING *

@@ -11,6 +11,7 @@ type Pedido = {
   imagenes: string[];
   estado: "pendiente" | "en_proceso" | "hecho" | "error";
   respuesta: string | null;
+  con_cambio: boolean;
   created_at: string;
   completed_at: string | null;
 };
@@ -271,7 +272,7 @@ export default function PedidosClient() {
           </div>
         ) : (() => {
           const transcurridos = p.completed_at ? (ahora - new Date(p.completed_at).getTime()) / 1000 : SEGUNDOS_DEPLOY;
-          if (transcurridos < SEGUNDOS_DEPLOY) {
+          if (p.con_cambio !== false && transcurridos < SEGUNDOS_DEPLOY) {
             const restantes = Math.max(0, Math.ceil(SEGUNDOS_DEPLOY - transcurridos));
             return (
               <div style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
