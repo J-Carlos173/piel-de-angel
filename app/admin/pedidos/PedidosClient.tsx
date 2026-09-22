@@ -26,6 +26,11 @@ const ESTADO_META: Record<Pedido["estado"], { label: string; color: string; icon
   hecho:      { label: "Listo",      color: "#4CAF85", icon: "fa-check-double" },
   error:      { label: "Con error",  color: "#C0524F", icon: "fa-triangle-exclamation" },
 };
+// Si algún pedido llega con un estado inesperado, esto evita que se caiga toda la pantalla.
+const ESTADO_FALLBACK = { label: "Desconocido", color: "#9a8486", icon: "fa-question" };
+function metaDe(estado: string) {
+  return ESTADO_META[estado as Pedido["estado"]] ?? ESTADO_FALLBACK;
+}
 
 const MENSAJES_TRABAJO = [
   "Revisando tu pedido...",
@@ -245,8 +250,8 @@ export default function PedidosClient() {
             {p.texto && <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{p.texto}</p>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end", marginTop: 4, paddingRight: 4 }}>
-            <span style={{ fontSize: 10.5, color: ESTADO_META[p.estado].color, ...MONO, display: "flex", alignItems: "center", gap: 4 }}>
-              <i className={`fa-solid ${ESTADO_META[p.estado].icon}`} /> {ESTADO_META[p.estado].label}
+            <span style={{ fontSize: 10.5, color: metaDe(p.estado).color, ...MONO, display: "flex", alignItems: "center", gap: 4 }}>
+              <i className={`fa-solid ${metaDe(p.estado).icon}`} /> {metaDe(p.estado).label}
             </span>
           </div>
         </div>
@@ -420,7 +425,7 @@ export default function PedidosClient() {
             hilos.map((h, idx) => {
               const primero = h.mensajes[0];
               const ultimo = h.mensajes[h.mensajes.length - 1];
-              const meta = ESTADO_META[ultimo.estado];
+              const meta = metaDe(ultimo.estado);
               const seccion = fmtSeccion(ultimo.created_at);
               const seccionAnterior = idx > 0 ? fmtSeccion(hilos[idx - 1].mensajes[hilos[idx - 1].mensajes.length - 1].created_at) : null;
               const isActive = seleccionado === h.id;
