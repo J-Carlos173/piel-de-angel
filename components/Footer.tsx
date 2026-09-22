@@ -18,8 +18,7 @@ export default async function Footer() {
               <img src="/logo-pa.jpg" alt="Piel de Ángel" style={{ height: 70, objectFit: "contain", borderRadius: 4 }} />
             </div>
             <p className="footer-desc">
-              Un refugio de bienestar y belleza donde cada detalle está pensado para
-              realzar lo más natural de ti.
+              Conocer tu piel cambia la forma de cuidarla.
             </p>
             <div className="footer-redes">
               <a
