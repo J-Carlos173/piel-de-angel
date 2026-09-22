@@ -144,6 +144,14 @@ export default function DashboardClient({
       glow: "rgba(122,107,138,0.22)",
     },
     {
+      icon: "fa-lightbulb",
+      title: "Consejos de piel",
+      desc: "Escribir, editar, ocultar o borrar los consejos del inicio y de /consejos",
+      href: "/admin/consejos",
+      accent: "#8A9B6E",
+      glow: "rgba(138,155,110,0.22)",
+    },
+    {
       icon: "fa-heart",
       title: "Reseñas",
       desc: "Moderar las reseñas de clientas antes de publicarlas en el sitio",
