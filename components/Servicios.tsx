@@ -29,12 +29,16 @@ function fmtPrecio(n: number) {
 
 export default function Servicios() {
   const [servicios, setServicios] = useState<Servicio[]>(FALLBACK);
+  const [zonas, setZonas] = useState<string[]>(COMUNAS);
   const ref = useReveal([servicios]);
 
   useEffect(() => {
     fetch("/api/services")
       .then((r) => r.json())
-      .then((data) => { if (data.servicios?.length > 0) setServicios(data.servicios); })
+      .then((data) => {
+        if (data.servicios?.length > 0) setServicios(data.servicios);
+        if (data.zonas?.length > 0) setZonas(data.zonas);
+      })
       .catch(() => {});
   }, []);
 
@@ -51,7 +55,7 @@ export default function Servicios() {
             nutrir, revitalizar y devolverle a tu piel su luminosidad natural.
           </p>
           <p className="servicios-zona">
-            <i className="fa-solid fa-house-chimney" /> Vamos a tu casa en {COMUNAS.slice(0, -1).join(", ")} y {COMUNAS[COMUNAS.length - 1]}
+            <i className="fa-solid fa-house-chimney" /> Vamos a tu casa en {zonas.slice(0, -1).join(", ")} y {zonas[zonas.length - 1]}
           </p>
         </div>
 

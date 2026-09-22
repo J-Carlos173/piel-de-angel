@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ServicioLanding from "@/components/ServicioLanding";
 import { SERVICIOS_LP } from "@/data/servicios-lp";
+import { getServiciosLPOverrides, getZonasDomicilio, mergeServicioLP } from "@/lib/servicios-lp-content";
 
 export const revalidate = 3600;
 export const dynamicParams = false;
@@ -14,8 +15,10 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ servicio: string }> }): Promise<Metadata> {
   const { servicio } = await params;
-  const s = SERVICIOS_LP.find((x) => x.slug === servicio);
-  if (!s) return {};
+  const base = SERVICIOS_LP.find((x) => x.slug === servicio);
+  if (!base) return {};
+  const overrides = await getServiciosLPOverrides();
+  const s = mergeServicioLP(base, overrides[base.slug]);
   const url = `${SITE}/${s.slug}`;
   return {
     title: s.metaTitle,
@@ -35,7 +38,12 @@ export async function generateMetadata({ params }: { params: Promise<{ servicio:
 
 export default async function ServicioPage({ params }: { params: Promise<{ servicio: string }> }) {
   const { servicio } = await params;
-  const s = SERVICIOS_LP.find((x) => x.slug === servicio);
-  if (!s) notFound();
-  return <ServicioLanding s={s} />;
+  const base = SERVICIOS_LP.find((x) => x.slug === servicio);
+  if (!base) notFound();
+  const [overrides, zonas] = await Promise.all([
+    getServiciosLPOverrides(),
+    getZonasDomicilio(),
+  ]);
+  const s = mergeServicioLP(base, overrides[base.slug]);
+  return <ServicioLanding s={s} zonas={zonas} />;
 }

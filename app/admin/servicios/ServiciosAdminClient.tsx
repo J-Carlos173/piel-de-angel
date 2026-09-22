@@ -235,13 +235,21 @@ export default function ServiciosAdminClient() {
         title="Servicios"
         backHref="/admin"
         rightExtra={
-          <button
-            onClick={() => { setCreando((v) => !v); setCreateError(null); }}
-            style={{ background: dark ? "rgba(198,138,149,0.14)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 18px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7 }}
-          >
-            <i className={`fa-solid ${creando ? "fa-xmark" : "fa-plus"}`} />
-            {creando ? "Cancelar" : "Nuevo Servicio"}
-          </button>
+          <>
+            <a
+              href="/admin/servicios/paginas"
+              style={{ background: dark ? "rgba(198,138,149,0.14)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 18px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7, textDecoration: "none" }}
+            >
+              <i className="fa-solid fa-file-pen" /> Editar páginas
+            </a>
+            <button
+              onClick={() => { setCreando((v) => !v); setCreateError(null); }}
+              style={{ background: dark ? "rgba(198,138,149,0.14)" : "rgba(198,138,149,0.08)", border: `1.5px solid ${dark ? "#6a3a42" : "#e8c6cc"}`, borderRadius: 12, padding: "9px 18px", color: dark ? "#e8b4bc" : "#C68A95", fontSize: 13, cursor: "pointer", fontFamily: "Montserrat, sans-serif", display: "flex", alignItems: "center", gap: 7 }}
+            >
+              <i className={`fa-solid ${creando ? "fa-xmark" : "fa-plus"}`} />
+              {creando ? "Cancelar" : "Nuevo Servicio"}
+            </button>
+          </>
         }
       />
 

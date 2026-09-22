@@ -8,7 +8,7 @@ import { COMUNAS, SERVICIOS_LP, type ServicioLP } from "@/data/servicios-lp";
 
 const SITE = "https://www.pieldeangel.cl";
 
-export default async function ServicioLanding({ s }: { s: ServicioLP }) {
+export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: ServicioLP; zonas?: string[] }) {
   const url = `${SITE}/${s.slug}`;
   const wa = `https://wa.me/56977031461?text=${encodeURIComponent(s.waTexto)}`;
   const otros = SERVICIOS_LP.filter((o) => o.slug !== s.slug);
@@ -17,7 +17,9 @@ export default async function ServicioLanding({ s }: { s: ServicioLP }) {
     ...s.faq,
     {
       q: "¿En qué comunas atienden?",
-      a: `Atendemos a domicilio en ${COMUNAS.slice(0, -1).join(", ")} y ${COMUNAS[COMUNAS.length - 1]}. Si vives en otra zona, escríbenos y lo revisamos.`,
+      a: zonas.length > 1
+        ? `Atendemos a domicilio en ${zonas.slice(0, -1).join(", ")} y ${zonas[zonas.length - 1]}. Si vives en otra zona, escríbenos y lo revisamos.`
+        : `Atendemos a domicilio en ${zonas[0] ?? "Santiago"}. Si vives en otra zona, escríbenos y lo revisamos.`,
     },
     {
       q: "¿Cuánto cuesta y cómo reservo?",
@@ -36,7 +38,7 @@ export default async function ServicioLanding({ s }: { s: ServicioLP }) {
         url,
         description: s.metaDescription,
         provider: { "@id": `${SITE}/#business` },
-        areaServed: COMUNAS.map((name) => ({ "@type": "City", name })),
+        areaServed: zonas.map((name) => ({ "@type": "City", name })),
       },
       {
         "@type": "FAQPage",
@@ -109,7 +111,7 @@ export default async function ServicioLanding({ s }: { s: ServicioLP }) {
 
             <h2>Zonas de atención a domicilio</h2>
             <div className="lp-chips">
-              {COMUNAS.map((c) => (
+              {zonas.map((c) => (
                 <span key={c} className="lp-chip">{c}</span>
               ))}
             </div>
