@@ -1,6 +1,14 @@
 import { SERVICIOS_LP } from "@/data/servicios-lp";
+import { getPublishedServicios } from "@/lib/services-db";
 
-export default function Footer() {
+export default async function Footer() {
+  // Solo se listan los servicios que Tere tiene activos en Gestión de Servicios.
+  let serviciosActivos = SERVICIOS_LP;
+  try {
+    const publicados = await getPublishedServicios();
+    serviciosActivos = SERVICIOS_LP.filter((s) => publicados.some((p) => s.match.test(p.title)));
+  } catch {}
+
   return (
     <footer>
       <div className="container">
@@ -50,16 +58,18 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="footer-col">
-            <h4>Servicios</h4>
-            <ul>
-              {SERVICIOS_LP.map((s) => (
-                <li key={s.slug}>
-                  <a href={`/${s.slug}`}>{s.nombre}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {serviciosActivos.length > 0 && (
+            <div className="footer-col">
+              <h4>Servicios</h4>
+              <ul>
+                {serviciosActivos.map((s) => (
+                  <li key={s.slug}>
+                    <a href={`/${s.slug}`}>{s.nombre}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="footer-col">
             <h4>Contacto</h4>
