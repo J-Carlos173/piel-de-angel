@@ -120,6 +120,14 @@ export default function DashboardClient({
       glow: "rgba(155,110,122,0.22)",
     },
     {
+      icon: "fa-gift",
+      title: "Concursos y avisos",
+      desc: "Las tarjetas de la sección Promociones de la página principal: activar, ocultar o crear nuevas",
+      href: "/admin/promos-web",
+      accent: "#B08090",
+      glow: "rgba(176,128,144,0.22)",
+    },
+    {
       icon: "fa-box-open",
       title: "Productos",
       desc: "Gestionar catálogo, stock, precios y categorías",
