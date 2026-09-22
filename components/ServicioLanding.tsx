@@ -11,7 +11,6 @@ const SITE = "https://www.pieldeangel.cl";
 export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: ServicioLP; zonas?: string[] }) {
   const url = `${SITE}/${s.slug}`;
   const wa = `https://wa.me/56977031461?text=${encodeURIComponent(s.waTexto)}`;
-  const otros = SERVICIOS_LP.filter((o) => o.slug !== s.slug);
 
   const faq = [
     ...s.faq,
@@ -59,9 +58,13 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
   };
 
   let foto = "";
+  let otros: ServicioLP[] = [];
   try {
     const servicios = await getAllServicios();
-    foto = servicios.find((x) => s.match.test(x.title) && x.status === "published")?.thumbnail ?? "";
+    const publicados = servicios.filter((x) => x.status === "published");
+    foto = publicados.find((x) => s.match.test(x.title))?.thumbnail ?? "";
+    // Solo se enlazan páginas de servicios que Tere tiene publicados, para no llevar a una página oculta.
+    otros = SERVICIOS_LP.filter((o) => o.slug !== s.slug && publicados.some((p) => o.match.test(p.title)));
   } catch {}
 
   return (
@@ -139,14 +142,18 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
               </div>
             </div>
 
-            <h2>Otros servicios a domicilio</h2>
-            <div className="lp-chips">
-              {otros.map((o) => (
-                <a key={o.slug} href={`/${o.slug}`} className="lp-chip lp-chip-link">
-                  {o.nombre}
-                </a>
-              ))}
-            </div>
+            {otros.length > 0 && (
+              <>
+                <h2>Otros servicios a domicilio</h2>
+                <div className="lp-chips">
+                  {otros.map((o) => (
+                    <a key={o.slug} href={`/${o.slug}`} className="lp-chip lp-chip-link">
+                      {o.nombre}
+                    </a>
+                  ))}
+                </div>
+              </>
+            )}
 
             <p className="lp-related">
               Mira también: <a href="/#servicios">todos los servicios</a> · <a href="/tienda">la tienda</a> ·{" "}

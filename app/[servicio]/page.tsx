@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ServicioLanding from "@/components/ServicioLanding";
 import { SERVICIOS_LP } from "@/data/servicios-lp";
 import { getServiciosLPOverrides, getZonasDomicilio, mergeServicioLP } from "@/lib/servicios-lp-content";
+import { getPublishedServicios } from "@/lib/services-db";
 
 export const revalidate = 3600;
 export const dynamicParams = false;
@@ -13,10 +14,20 @@ export function generateStaticParams() {
   return SERVICIOS_LP.map((s) => ({ servicio: s.slug }));
 }
 
+async function estaPublicado(base: (typeof SERVICIOS_LP)[number]): Promise<boolean> {
+  try {
+    const publicados = await getPublishedServicios();
+    return publicados.some((p) => base.match.test(p.title));
+  } catch {
+    // Si falla la consulta, se prefiere mostrar la página antes que ocultarla por error.
+    return true;
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ servicio: string }> }): Promise<Metadata> {
   const { servicio } = await params;
   const base = SERVICIOS_LP.find((x) => x.slug === servicio);
-  if (!base) return {};
+  if (!base || !(await estaPublicado(base))) return { robots: { index: false, follow: true } };
   const overrides = await getServiciosLPOverrides();
   const s = mergeServicioLP(base, overrides[base.slug]);
   const url = `${SITE}/${s.slug}`;
@@ -40,6 +51,10 @@ export default async function ServicioPage({ params }: { params: Promise<{ servi
   const { servicio } = await params;
   const base = SERVICIOS_LP.find((x) => x.slug === servicio);
   if (!base) notFound();
+
+  // Tere controla esto desde Gestión de Servicios: si el servicio no está "Publicado", su página se oculta.
+  if (!(await estaPublicado(base))) redirect("/#servicios");
+
   const [overrides, zonas] = await Promise.all([
     getServiciosLPOverrides(),
     getZonasDomicilio(),

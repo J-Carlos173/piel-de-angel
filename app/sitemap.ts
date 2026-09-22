@@ -1,11 +1,13 @@
 import { MetadataRoute } from "next";
 import { SERVICIOS_LP } from "@/data/servicios-lp";
 import { getPublishedProducts } from "@/lib/products-db";
+import { getPublishedServicios } from "@/lib/services-db";
 import { slugProducto } from "@/lib/slug";
 
 const BASE = "https://www.pieldeangel.cl";
 
-// Los productos se leen de la base: al agregar o borrar uno, el mapa se actualiza solo.
+// Los productos y las páginas de servicios se leen de la base: al publicar, ocultar o
+// borrar uno, el mapa se actualiza solo.
 export const revalidate = 600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -19,6 +21,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch {}
 
+  let serviciosPublicados = SERVICIOS_LP;
+  try {
+    const publicados = await getPublishedServicios();
+    serviciosPublicados = SERVICIOS_LP.filter((s) => publicados.some((p) => s.match.test(p.title)));
+  } catch {}
+
   return [
     { url: BASE,                    lastModified: new Date(), changeFrequency: "weekly",  priority: 1    },
     { url: `${BASE}/#productos`,    lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9  },
@@ -28,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/#nosotros`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
     { url: `${BASE}/#contacto`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
     { url: `${BASE}/tienda`,        lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9  },
-    ...SERVICIOS_LP.map((s) => ({
+    ...serviciosPublicados.map((s) => ({
       url: `${BASE}/${s.slug}`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,

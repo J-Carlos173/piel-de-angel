@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAllServicios, createServicio, updateServicio, deleteServicio } from "@/lib/services-db";
 import { isAdminAuthorized } from "@/lib/admin-auth";
+import { SERVICIOS_LP } from "@/data/servicios-lp";
+
+// Publicar/despublicar/borrar un servicio cambia si su página propia (/lifting-de-pestanas, etc.)
+// es visible al público, así que hay que refrescarlas todas junto con el inicio y el pie de página.
+function revalidarPaginasDeServicios() {
+  revalidatePath("/");
+  revalidatePath("/tienda");
+  for (const s of SERVICIOS_LP) revalidatePath(`/${s.slug}`);
+}
 
 export async function GET(req: NextRequest) {
   if (!isAdminAuthorized(req)) {
@@ -33,6 +43,7 @@ export async function POST(req: NextRequest) {
       categoria: categoria ?? "",
       orden: Number(orden ?? 0),
     });
+    revalidarPaginasDeServicios();
     return NextResponse.json({ servicio });
   } catch (err) {
     console.error("[admin/servicios POST]", err);
@@ -59,6 +70,7 @@ export async function PATCH(req: NextRequest) {
       ...(categoria !== undefined && { categoria }),
       ...(orden !== undefined && { orden: Number(orden) }),
     });
+    revalidarPaginasDeServicios();
     return NextResponse.json({ servicio: updated });
   } catch (err) {
     console.error("[admin/servicios PATCH]", err);
@@ -74,6 +86,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
     await deleteServicio(id);
+    revalidarPaginasDeServicios();
     return NextResponse.json({ deleted: true });
   } catch (err) {
     console.error("[admin/servicios DELETE]", err);
