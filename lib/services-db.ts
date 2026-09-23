@@ -10,11 +10,13 @@ export type Servicio = {
   duracion: number;
   categoria: string;
   orden: number;
+  /** Si la foto del servicio puede aparecer rotando en la portada (Hero) del inicio. */
+  en_portada: boolean;
   created_at?: string;
   updated_at?: string;
 };
 
-export type CreateServicioData = Omit<Servicio, "id" | "created_at" | "updated_at">;
+export type CreateServicioData = Omit<Servicio, "id" | "created_at" | "updated_at" | "en_portada">;
 export type UpdateServicioData = Partial<Omit<Servicio, "id" | "created_at" | "updated_at">>;
 
 export async function ensureServiciosTable() {
@@ -34,6 +36,7 @@ export async function ensureServiciosTable() {
       updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  await sql`ALTER TABLE servicios ADD COLUMN IF NOT EXISTS en_portada BOOLEAN NOT NULL DEFAULT TRUE`;
 }
 
 export async function getAllServicios(): Promise<Servicio[]> {
@@ -75,6 +78,7 @@ export async function updateServicio(id: string, data: UpdateServicioData): Prom
       duracion    = COALESCE(${data.duracion ?? null}, duracion),
       categoria   = COALESCE(${data.categoria ?? null}, categoria),
       orden       = COALESCE(${data.orden ?? null}, orden),
+      en_portada  = COALESCE(${data.en_portada ?? null}, en_portada),
       updated_at  = NOW()
     WHERE id = ${id}
     RETURNING *

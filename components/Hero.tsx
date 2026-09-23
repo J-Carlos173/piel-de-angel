@@ -39,7 +39,7 @@ export default async function Hero() {
   try {
     const servicios = await getPublishedServicios();
     fotos = servicios
-      .filter((s) => s.thumbnail)
+      .filter((s) => s.thumbnail && s.en_portada !== false)
       .map((s) => ({ src: s.thumbnail, alt: `${s.title} a domicilio — Piel de Ángel` }));
   } catch {}
   if (fotos.length === 0) fotos = [{ src: c.imageUrl, alt: c.imageAlt }];

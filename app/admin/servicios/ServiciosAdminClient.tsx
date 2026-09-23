@@ -14,6 +14,7 @@ type Servicio = {
   duracion: number;
   categoria: string;
   orden: number;
+  en_portada?: boolean;
 };
 
 type NuevoForm = {
@@ -149,6 +150,15 @@ export default function ServiciosAdminClient() {
     });
     setServicios((prev) => prev.map((s) => s.id === id ? { ...s, status: newStatus } : s));
     setToggling(null);
+  }
+
+  async function togglePortada(id: string, actual: boolean) {
+    await fetch("/api/admin/servicios", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, en_portada: !actual }),
+    });
+    setServicios((prev) => prev.map((s) => s.id === id ? { ...s, en_portada: !actual } : s));
   }
 
   async function eliminar(id: string, title: string) {
@@ -434,6 +444,16 @@ export default function ServiciosAdminClient() {
                             ? <><i className="fa-solid fa-eye-slash" style={{ marginRight: 5 }} />Ocultar</>
                             : <><i className="fa-solid fa-eye" style={{ marginRight: 5 }} />Publicar</>}
                       </button>
+                      {s.thumbnail && (
+                        <button
+                          onClick={() => togglePortada(s.id, s.en_portada !== false)}
+                          title="Si está activa, la foto de este servicio rota en la portada del inicio"
+                          style={{ background: "transparent", border: `1px solid ${border}`, borderRadius: 8, padding: "6px 12px", color: s.en_portada !== false ? "#4c7a4c" : textMuted, fontSize: 12, cursor: "pointer", ...MONO }}
+                        >
+                          <i className={`fa-solid ${s.en_portada !== false ? "fa-image" : "fa-image-slash"}`} style={{ marginRight: 5 }} />
+                          {s.en_portada !== false ? "En portada" : "Sin portada"}
+                        </button>
+                      )}
                       <button
                         onClick={() => setEditando(isEditing ? null : s.id)}
                         style={{ background: isEditing ? "rgba(198,138,149,0.15)" : "transparent", border: `1px solid ${border}`, borderRadius: 8, padding: "6px 14px", color: "#C68A95", fontSize: 12, cursor: "pointer", ...MONO }}

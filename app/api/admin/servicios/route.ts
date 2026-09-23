@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const { id, title, description, thumbnail, status, precio, duracion, categoria, orden } = body;
+    const { id, title, description, thumbnail, status, precio, duracion, categoria, orden, en_portada } = body;
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
 
     const updated = await updateServicio(id, {
@@ -69,6 +69,7 @@ export async function PATCH(req: NextRequest) {
       ...(duracion !== undefined && { duracion: Number(duracion) }),
       ...(categoria !== undefined && { categoria }),
       ...(orden !== undefined && { orden: Number(orden) }),
+      ...(en_portada !== undefined && { en_portada: Boolean(en_portada) }),
     });
     revalidarPaginasDeServicios();
     return NextResponse.json({ servicio: updated });
