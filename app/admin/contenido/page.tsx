@@ -9,7 +9,7 @@ const HERO_DEFAULTS = {
   titleItalic: "belleza natural",
   subtitle:
     "Tratamientos faciales personalizados, skincare profesional y momentos de bienestar diseñados para revelar la mejor versión de tu piel. Una experiencia delicada, segura y profundamente transformadora.",
-  imageUrl: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=900&q=80",
+  imageUrl: "",
   imageAlt: "Tratamiento facial Piel de Ángel",
   badgeTitle: "Atención Premium",
   badgeSubtitle: "Cada piel es única",

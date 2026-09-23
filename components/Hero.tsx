@@ -19,8 +19,7 @@ const DEFAULTS: HeroContent = {
   titleItalic: "belleza natural",
   subtitle:
     "Tratamientos faciales personalizados, skincare profesional y momentos de bienestar diseñados para revelar la mejor versión de tu piel. Una experiencia delicada, segura y profundamente transformadora.",
-  imageUrl:
-    "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=900&q=80",
+  imageUrl: "",
   imageAlt: "Tratamiento facial Piel de Ángel",
   badgeTitle: "Atención Premium",
   badgeSubtitle: "Cada piel es única",
@@ -34,7 +33,7 @@ export default async function Hero() {
   } catch {}
 
   // Rota entre las fotos de los servicios activos en vez de mostrar una sola cara fija.
-  // Si ningún servicio activo tiene foto, se usa la imagen configurada en Editar Sitio Web.
+  // Si ningún servicio está en portada, se usa la imagen de Editar Sitio Web (si hay una); si no hay ninguna, la portada va sin imagen.
   let fotos: { src: string; alt: string }[] = [];
   try {
     const servicios = await getPublishedServicios();
@@ -42,10 +41,11 @@ export default async function Hero() {
       .filter((s) => s.thumbnail && s.en_portada !== false)
       .map((s) => ({ src: s.thumbnail, alt: `${s.title} a domicilio — Piel de Ángel` }));
   } catch {}
-  if (fotos.length === 0) fotos = [{ src: c.imageUrl, alt: c.imageAlt }];
+  if (fotos.length === 0 && c.imageUrl) fotos = [{ src: c.imageUrl, alt: c.imageAlt }];
+  const sinImagen = fotos.length === 0;
 
   return (
-    <section className="hero" id="inicio">
+    <section className={`hero${sinImagen ? " hero-sin-imagen" : ""}`} id="inicio">
       <div className="container hero-wrapper">
         <div className="hero-content">
           <span className="eyebrow">{c.eyebrow}</span>
@@ -64,6 +64,7 @@ export default async function Hero() {
           </div>
         </div>
 
+        {!sinImagen && (
         <div className="hero-image">
           <div className="hero-image-wrap">
             <HeroPhotoCarousel fotos={fotos} />
@@ -78,6 +79,7 @@ export default async function Hero() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </section>
   );
