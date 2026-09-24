@@ -284,7 +284,11 @@ export default function CheckoutPage() {
                   <Link href="/terminos" target="_blank" style={{ color: "var(--rosa-deep)", textDecoration: "underline" }}>
                     Términos y Condiciones
                   </Link>
-                  {" "}y la política de despacho y devoluciones.
+                  {" "}y la política de despacho y devoluciones, y conozco la{" "}
+                  <Link href="/privacidad" target="_blank" style={{ color: "var(--rosa-deep)", textDecoration: "underline" }}>
+                    Política de Privacidad
+                  </Link>
+                  .
                 </span>
               </label>
 

@@ -92,6 +92,9 @@ export default async function Footer() {
         <div className="footer-bottom">
           © 2026 Piel de Ángel · Diseñado con <span>♡</span> para realzar tu
           belleza natural
+          <span className="footer-legal">
+            <a href="/terminos">Términos y Condiciones</a> · <a href="/privacidad">Política de Privacidad</a>
+          </span>
           <a href="/admin/login" className="footer-admin-link" aria-label="Staff">
             <i className="fa-solid fa-lock" />
           </a>

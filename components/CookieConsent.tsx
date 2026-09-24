@@ -27,7 +27,7 @@ export default function CookieConsent() {
     <div className="cookie-banner" role="dialog" aria-label="Aviso de cookies">
       <p className="cookie-banner-texto">
         Usamos cookies esenciales para el sitio y el carro de compras. Sin publicidad por ahora.{" "}
-        <Link href="/terminos#cookies">Más información</Link>.
+        <Link href="/terminos#cookies">Más información</Link> · <Link href="/privacidad">Privacidad</Link>.
       </p>
       <div className="cookie-banner-botones">
         <button type="button" className="cookie-btn cookie-btn-outline" onClick={() => elegir("rechazado")}>

@@ -112,9 +112,14 @@ export default function TerminosPage() {
               y para enviarte información relevante sobre tu compra.
             </p>
             <p>
-              No compartimos tu información con terceros, salvo con las empresas de transporte
-              necesarias para el despacho. Tus datos son tratados conforme a la
+              Solo compartimos lo necesario con quienes nos ayudan a operar: Transbank para el pago,
+              las empresas de transporte para el despacho y los proveedores tecnológicos del sitio.
+              Tus datos son tratados conforme a la
               <strong> Ley N° 19.628 de Protección de la Vida Privada</strong> de Chile.
+            </p>
+            <p>
+              El detalle de qué datos recopilamos, con quién los compartimos y cómo ejercer tus derechos
+              está en nuestra <Link href="/privacidad" style={{ color: "var(--rosa-deep)" }}>Política de Privacidad</Link>.
             </p>
           </Section>
 
