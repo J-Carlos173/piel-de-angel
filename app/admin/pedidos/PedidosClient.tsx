@@ -49,7 +49,6 @@ const MENSAJES_TRABAJO = [
 ];
 
 const SEGUNDOS_DEPLOY = 30;
-const PIN_CORRECTO = "159632";
 const PIN_STORAGE_KEY = "pieldeangel_pedidos_pin_ok";
 
 function fmtHora(iso: string) {
@@ -126,9 +125,18 @@ export default function PedidosClient() {
     setPinListo(true);
   }, []);
 
-  function verificarPin(e: React.FormEvent) {
+  async function verificarPin(e: React.FormEvent) {
     e.preventDefault();
-    if (pinIngresado === PIN_CORRECTO) {
+    let ok = false;
+    try {
+      const res = await fetch("/api/admin/pedidos/pin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: pinIngresado }),
+      });
+      ok = res.ok && (await res.json()).ok === true;
+    } catch {}
+    if (ok) {
       setDesbloqueado(true);
       setPinError(false);
       try { localStorage.setItem(PIN_STORAGE_KEY, "1"); } catch {}

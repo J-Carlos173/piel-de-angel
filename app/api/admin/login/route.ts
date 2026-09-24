@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSetting } from "@/lib/db";
 import { sendSecurityAlert } from "@/lib/email";
+import { adminSessionToken } from "@/lib/admin-token";
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS   = 15 * 60 * 1000; // 15 min
@@ -28,10 +29,12 @@ export async function POST(req: NextRequest) {
   }
 
   const { password } = await req.json();
-  const envPass  = process.env.ADMIN_PASSWORD || "pieldeangel2024";
+  const envPass  = process.env.ADMIN_PASSWORD;
   const dbPass   = await getSetting("admin_password").catch(() => null);
   const dbPass2  = await getSetting("admin_password_2").catch(() => null);
   const validas  = [dbPass ?? envPass, dbPass2].filter((p): p is string => !!p);
+  const token    = adminSessionToken();
+  if (!token) return NextResponse.json({ ok: false, error: "El acceso no está configurado." }, { status: 500 });
 
   if (!validas.includes(password)) {
     const cur      = attempts.get(ip) ?? { count: 0, resetAt: now + LOCKOUT_MS };
@@ -48,7 +51,6 @@ export async function POST(req: NextRequest) {
   }
 
   attempts.delete(ip);
-  const token = Buffer.from(envPass).toString("base64");
   const res   = NextResponse.json({ ok: true });
   res.cookies.set("admin_auth", token, {
     httpOnly: true,

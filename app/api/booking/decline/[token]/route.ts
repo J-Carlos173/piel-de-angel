@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { verificarCita } from "@/lib/booking-secret";
 import { sendDeclineToClient } from "@/lib/email";
 
-const SECRET = process.env.BOOKING_SECRET || "piel-de-angel-secret";
 
 export async function GET(
   _req: NextRequest,
@@ -10,12 +9,12 @@ export async function GET(
 ) {
   try {
     const { token } = await params;
-    const data = jwt.verify(token, SECRET) as {
+    const data = verificarCita<{
       name: string;
       email: string;
       date: string;
       time: string;
-    };
+    }>(token);
 
     await sendDeclineToClient(data);
 

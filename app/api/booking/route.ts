@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { firmarCita } from "@/lib/booking-secret";
 import { sendBookingRequestToAdmin } from "@/lib/email";
 import { getSetting } from "@/lib/db";
-
-const SECRET = process.env.BOOKING_SECRET || "piel-de-angel-secret";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,9 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
     }
 
-    const token = jwt.sign({ name, email, phone, service, date, time }, SECRET, {
-      expiresIn: "7d",
-    });
+    const token = firmarCita({ name, email, phone, service, date, time });
 
     const citasOff = await getSetting("notif_citas").catch(() => null);
     if (citasOff !== "false") {
