@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useThemeStore } from "@/store/themeStore";
 import type { Cita } from "@/app/api/admin/agenda/route";
 import AdminHeader from "../AdminHeader";
+import { describirHorario } from "@/lib/horario-agenda-shared";
 
 const DIAS  = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -19,7 +20,8 @@ function todayStr() {
 }
 
 type SlotStatus = { time: string; blocked: boolean; reason: string };
-type Tab = "proximas" | "pasadas" | "bloquear";
+type Tab = "proximas" | "pasadas" | "bloquear" | "horario";
+type HorarioDia = { activo: boolean; inicio: string; fin: string };
 
 export default function AgendaClient() {
   const { dark } = useThemeStore();
@@ -33,6 +35,13 @@ export default function AgendaClient() {
   const [slots, setSlots]                   = useState<SlotStatus[]>([]);
   const [loadingSlots, setLoadingSlots]     = useState(false);
   const [toggling, setToggling]             = useState<string | null>(null);
+
+  // Horario de atención
+  const [horario, setHorario]               = useState<HorarioDia[] | null>(null);
+  const [loadingHorario, setLoadingHorario] = useState(false);
+  const [savingHorario, setSavingHorario]   = useState(false);
+  const [errorHorario, setErrorHorario]     = useState("");
+  const [savedHorario, setSavedHorario]     = useState(false);
 
   const cardBg    = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
   const border    = dark ? "#3a2830" : "#ecddd9";
@@ -61,6 +70,40 @@ export default function AgendaClient() {
       .then((data) => { setSlots(data.slots ?? []); setLoadingSlots(false); })
       .catch(() => setLoadingSlots(false));
   }, [bloqueoFecha, tab]);
+
+  // Se carga una vez al entrar (además de usarse en su pestaña, sirve para el aviso de "Bloquear horas")
+  useEffect(() => {
+    setLoadingHorario(true);
+    fetch("/api/admin/horario-agenda")
+      .then((r) => r.json())
+      .then((data) => { setHorario(data.horario ?? null); setLoadingHorario(false); })
+      .catch(() => setLoadingHorario(false));
+  }, []);
+
+  function actualizarDia(i: number, cambios: Partial<HorarioDia>) {
+    setHorario((prev) => prev ? prev.map((d, idx) => idx === i ? { ...d, ...cambios } : d) : prev);
+  }
+
+  async function guardarHorario() {
+    if (!horario) return;
+    setSavingHorario(true);
+    setErrorHorario("");
+    try {
+      const res = await fetch("/api/admin/horario-agenda", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ horario }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo guardar");
+      setHorario(data.horario);
+      setSavedHorario(true);
+      setTimeout(() => setSavedHorario(false), 2500);
+    } catch (e) {
+      setErrorHorario(e instanceof Error ? e.message : "No se pudo guardar");
+    }
+    setSavingHorario(false);
+  }
 
   async function toggleBloqueo(slot: SlotStatus) {
     setToggling(slot.time);
@@ -105,6 +148,7 @@ export default function AgendaClient() {
             { key: "proximas", icon: "fa-calendar-check", label: `Próximas (${proximas.length})` },
             { key: "pasadas",  icon: "fa-clock-rotate-left", label: `Historial (${pasadas.length})` },
             { key: "bloquear", icon: "fa-lock", label: "Bloquear horas" },
+            { key: "horario", icon: "fa-clock", label: "Horario de atención" },
           ] as { key: Tab; icon: string; label: string }[]).map((t) => (
             <button
               key={t.key}
@@ -156,7 +200,12 @@ export default function AgendaClient() {
                 <div style={{ textAlign: "center", padding: "30px 0", color: textMuted }}>
                   <i className="fa-solid fa-calendar-xmark" style={{ fontSize: 30, display: "block", marginBottom: 12, opacity: 0.4 }} />
                   <p style={{ ...MONO, fontSize: 13 }}>Este día no tiene horarios disponibles.</p>
-                  <p style={{ ...MONO, fontSize: 11, marginTop: 4 }}>Se atiende de lunes a viernes de 16:30 a 20:00, y sábado de 9:00 a 20:00.</p>
+                  <p style={{ ...MONO, fontSize: 11, marginTop: 4 }}>
+                    Se atiende {horario ? describirHorario(horario) : "…"}.{" "}
+                    <button onClick={() => setTab("horario")} style={{ background: "none", border: "none", color: "#C68A95", textDecoration: "underline", cursor: "pointer", fontSize: 11, ...MONO }}>
+                      Cambiar horario
+                    </button>
+                  </p>
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -222,8 +271,90 @@ export default function AgendaClient() {
           </div>
         )}
 
+        {/* ── PESTAÑA HORARIO DE ATENCIÓN ── */}
+        {tab === "horario" && (
+          <div style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 20, padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+            <p style={{ margin: "0 0 20px", fontSize: 13, color: textMuted, ...MONO }}>
+              Elige qué días atiendes y entre qué horas. Las citas se ofrecen en bloques de 1h30, empezando desde la hora de inicio.
+            </p>
+            {loadingHorario || !horario ? (
+              <div style={{ textAlign: "center", padding: "30px 0", color: textMuted, ...MONO }}>
+                <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 22, display: "block", marginBottom: 10 }} />
+                Cargando horario...
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {DIAS.map((nombreDia, i) => {
+                    const d = horario[i];
+                    return (
+                      <div key={nombreDia} style={{
+                        display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+                        padding: "12px 16px", borderRadius: 12,
+                        border: `1.5px solid ${d.activo ? border : "transparent"}`,
+                        background: d.activo ? (dark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.7)") : "transparent",
+                        opacity: d.activo ? 1 : 0.55,
+                      }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 130, cursor: "pointer", fontSize: 13, color: textMain, ...MONO }}>
+                          <input
+                            type="checkbox"
+                            checked={d.activo}
+                            onChange={(e) => actualizarDia(i, { activo: e.target.checked })}
+                            style={{ accentColor: "#C68A95", width: 16, height: 16 }}
+                          />
+                          {nombreDia}
+                        </label>
+                        <span style={{ fontSize: 12, color: textMuted, ...MONO }}>de</span>
+                        <input
+                          type="time"
+                          value={d.inicio}
+                          disabled={!d.activo}
+                          onChange={(e) => actualizarDia(i, { inicio: e.target.value })}
+                          style={{ ...inputStyle, opacity: d.activo ? 1 : 0.5 }}
+                        />
+                        <span style={{ fontSize: 12, color: textMuted, ...MONO }}>a</span>
+                        <input
+                          type="time"
+                          value={d.fin}
+                          disabled={!d.activo}
+                          onChange={(e) => actualizarDia(i, { fin: e.target.value })}
+                          style={{ ...inputStyle, opacity: d.activo ? 1 : 0.5 }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {errorHorario && (
+                  <p style={{ margin: "16px 0 0", fontSize: 12.5, color: "#e57373", ...MONO }}>
+                    <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} />{errorHorario}
+                  </p>
+                )}
+
+                <button
+                  onClick={guardarHorario}
+                  disabled={savingHorario}
+                  style={{
+                    marginTop: 20, padding: "11px 24px", borderRadius: 12, border: "none",
+                    background: "linear-gradient(135deg, #D8A7B1, #C68A95)", color: "#fff",
+                    fontSize: 13, cursor: savingHorario ? "wait" : "pointer",
+                    display: "flex", alignItems: "center", gap: 8, ...MONO,
+                  }}
+                >
+                  <i className={`fa-solid ${savingHorario ? "fa-spinner fa-spin" : savedHorario ? "fa-check" : "fa-floppy-disk"}`} />
+                  {savingHorario ? "Guardando…" : savedHorario ? "¡Guardado!" : "Guardar horario"}
+                </button>
+                <p style={{ margin: "10px 0 0", fontSize: 11, color: textMuted, ...MONO }}>
+                  Esto no se edita desde Google Calendar: Google solo se usa para no ofrecer una hora que ya tengas ocupada ahí.
+                  Este panel es lo único que define qué días y horas existen para reservar.
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
         {/* ── PESTAÑAS CITAS ── */}
-        {tab !== "bloquear" && (
+        {(tab === "proximas" || tab === "pasadas") && (
           <>
             {loading ? (
               <div style={{ textAlign: "center", padding: "60px 0", color: textMuted, ...MONO }}>

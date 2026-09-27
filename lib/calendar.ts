@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { getBlockedSlots } from "./blocked-slots-db";
+import { getHorarioAgenda } from "./horario-agenda";
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "krlos173173@gmail.com";
 
@@ -21,16 +22,8 @@ function generarSlots(inicio: string, fin: string): string[] {
   return slots;
 }
 
-// Horarios disponibles por día (0=Dom,1=Lun,2=Mar,3=Mié,4=Jue,5=Vie,6=Sáb)
-// Definido por Carlos el 21-09-2026: Lunes a viernes 16:30 a 20:00, Sábado 9:00 a 20:00.
-const SCHEDULE: Record<number, string[]> = {
-  1: generarSlots("16:30", "20:00"), // Lunes
-  2: generarSlots("16:30", "20:00"), // Martes
-  3: generarSlots("16:30", "20:00"), // Miércoles
-  4: generarSlots("16:30", "20:00"), // Jueves
-  5: generarSlots("16:30", "20:00"), // Viernes
-  6: generarSlots("09:00", "20:00"), // Sábado
-};
+// El horario (qué días y entre qué horas se puede reservar) lo edita Tere desde
+// Panel → Agenda → Horario de atención. Ya no está fijo acá.
 
 function getAuth() {
   const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
@@ -45,14 +38,17 @@ function getAuth() {
   });
 }
 
-export function getAllSlots(dateStr: string): string[] {
+export async function getAllSlots(dateStr: string): Promise<string[]> {
   const dayOfWeek = new Date(dateStr + "T12:00:00").getDay();
-  return SCHEDULE[dayOfWeek] ?? [];
+  const horario = await getHorarioAgenda();
+  const dia = horario[dayOfWeek];
+  return dia?.activo ? generarSlots(dia.inicio, dia.fin) : [];
 }
 
-export function isWorkingDay(dateStr: string): boolean {
+export async function isWorkingDay(dateStr: string): Promise<boolean> {
   const dayOfWeek = new Date(dateStr + "T12:00:00").getDay();
-  return dayOfWeek in SCHEDULE;
+  const horario = await getHorarioAgenda();
+  return !!horario[dayOfWeek]?.activo;
 }
 
 export async function getBusySlots(dateStr: string): Promise<string[]> {
@@ -83,7 +79,7 @@ export async function getBusySlots(dateStr: string): Promise<string[]> {
 
     const busy = res.data.calendars?.[CALENDAR_ID]?.busy ?? [];
 
-    for (const slot of getAllSlots(dateStr)) {
+    for (const slot of await getAllSlots(dateStr)) {
       const slotStart = new Date(`${dateStr}T${slot}:00`);
       const slotEnd   = new Date(slotStart.getTime() + SLOT_DURATION_MIN * 60 * 1000);
 

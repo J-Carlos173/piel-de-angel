@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     if (date) {
       const blocked = await getBlockedSlots(date);
       const blockedTimes = new Set(blocked.map((b) => b.time));
-      const allSlots = getAllSlots(date);
+      const allSlots = await getAllSlots(date);
       const slots = allSlots.map((time) => ({
         time,
         blocked: blockedTimes.has(time),

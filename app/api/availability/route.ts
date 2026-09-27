@@ -7,11 +7,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid date" }, { status: 400 });
   }
 
-  if (!isWorkingDay(date)) {
+  if (!(await isWorkingDay(date))) {
     return NextResponse.json({ slots: [], workingDay: false });
   }
 
-  const all = getAllSlots(date);
+  const all = await getAllSlots(date);
   const busy = await getBusySlots(date);
   const slots = all.map((time) => ({ time, available: !busy.includes(time) }));
 
