@@ -9,6 +9,7 @@ import Consejos from "@/components/Consejos";
 import Promociones from "@/components/Promociones";
 import Instagram from "@/components/Instagram";
 import Agenda from "@/components/Agenda";
+import Testimonios from "@/components/Testimonios";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import CartDrawer from "@/components/CartDrawer";
@@ -27,7 +28,7 @@ export default function Home() {
         <Promociones />
         <Agenda />
         <About />
-        {/* Testimonios: oculto hasta tener reseñas reales de clientas. Volver a poner <Testimonios /> aquí cuando estén listas. */}
+        <Testimonios />
         <Instagram />
       </RevealObserver>
       <Footer />

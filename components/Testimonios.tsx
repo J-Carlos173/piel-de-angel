@@ -4,12 +4,6 @@ import { useEffect, useState } from "react";
 
 type Review = { id: string; nombre: string; texto: string; corazones: number };
 
-const FALLBACK: Review[] = [
-  { id: "1", corazones: 5, texto: "Un lugar mágico. Salí con la piel renovada y sintiéndome cuidada de verdad. La atención es impecable y los resultados se notaron desde la primera sesión.", nombre: "Camila R." },
-  { id: "2", corazones: 5, texto: "El lifting de pestañas quedó perfecto, totalmente natural. El espacio es precioso, te transporta. Volveré sin duda, encontré mi lugar.", nombre: "Valentina S." },
-  { id: "3", corazones: 5, texto: "Profesionalismo de otro nivel. Me explicaron cada paso y eligieron el tratamiento ideal para mi piel. La hidratación facial fue una experiencia espectacular.", nombre: "Antonia P." },
-];
-
 function Hearts({ n, interactive, onSelect }: { n: number; interactive?: boolean; onSelect?: (v: number) => void }) {
   const [hover, setHover] = useState(0);
   const active = hover || n;
@@ -36,7 +30,7 @@ function Hearts({ n, interactive, onSelect }: { n: number; interactive?: boolean
 }
 
 export default function Testimonios() {
-  const [reviews, setReviews]     = useState<Review[]>(FALLBACK);
+  const [reviews, setReviews]     = useState<Review[]>([]);
   const [showForm, setShowForm]   = useState(false);
   const [nombre, setNombre]       = useState("");
   const [texto, setTexto]         = useState("");
@@ -86,31 +80,34 @@ export default function Testimonios() {
             Lo que dicen nuestras <em>clientas</em>
           </h2>
           <p className="section-subtitle">
-            La confianza que depositan en nosotras es nuestro mayor logro. Estas son
-            algunas de sus experiencias.
+            {reviews.length > 0
+              ? "La confianza que depositan en nosotras es nuestro mayor logro. Estas son algunas de sus experiencias."
+              : "Sé la primera en contar tu experiencia con Piel de Ángel."}
           </p>
         </div>
 
-        <div className="testimonios-grid">
-          {reviews.map((r) => (
-            <div className="testimonio-card" key={r.id}>
-              <div className="testimonio-quote">&quot;</div>
-              <div className="testimonio-stars">
-                <Hearts n={r.corazones} />
-              </div>
-              <p className="testimonio-text">{r.texto}</p>
-              <div className="testimonio-author">
-                <div className="testimonio-avatar" style={{ background: "linear-gradient(135deg, #D8A7B1, #C68A95)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <i className="fa-solid fa-user" style={{ color: "#fff", fontSize: 18 }} />
+        {reviews.length > 0 && (
+          <div className="testimonios-grid">
+            {reviews.map((r) => (
+              <div className="testimonio-card" key={r.id}>
+                <div className="testimonio-quote">&quot;</div>
+                <div className="testimonio-stars">
+                  <Hearts n={r.corazones} />
                 </div>
-                <div>
-                  <div className="testimonio-name">{r.nombre}</div>
-                  <div className="testimonio-role">Clienta Piel de Ángel</div>
+                <p className="testimonio-text">{r.texto}</p>
+                <div className="testimonio-author">
+                  <div className="testimonio-avatar" style={{ background: "linear-gradient(135deg, #D8A7B1, #C68A95)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <i className="fa-solid fa-user" style={{ color: "#fff", fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <div className="testimonio-name">{r.nombre}</div>
+                    <div className="testimonio-role">Clienta Piel de Ángel</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* CTA + formulario */}
         <div className="reveal" style={{ textAlign: "center", marginTop: 48 }}>
