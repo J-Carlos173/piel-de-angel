@@ -1,5 +1,6 @@
 import { SERVICIOS_LP } from "@/data/servicios-lp";
 import { getPublishedServicios } from "@/lib/services-db";
+import { getHorarioAgenda, describirHorario } from "@/lib/horario-agenda";
 
 export default async function Footer() {
   // Solo se listan los servicios que Tere tiene activos en Gestión de Servicios.
@@ -7,6 +8,14 @@ export default async function Footer() {
   try {
     const publicados = await getPublishedServicios();
     serviciosActivos = SERVICIOS_LP.filter((s) => publicados.some((p) => s.match.test(p.title)));
+  } catch {}
+
+  // El mismo horario que Tere configura en Panel → Agenda → Horario de atención.
+  let horarioTexto = "Lunes a viernes 16:30–20:00, sábado 9:00–20:00";
+  try {
+    const horario = await getHorarioAgenda();
+    const texto = describirHorario(horario);
+    horarioTexto = texto.charAt(0).toUpperCase() + texto.slice(1);
   } catch {}
 
   return (
@@ -83,7 +92,7 @@ export default async function Footer() {
                 <i className="fa-solid fa-envelope" /> &nbsp; pieldeangel.contacto@gmail.com
               </li>
               <li>
-                <i className="fa-solid fa-clock" /> &nbsp; Lun — Sáb · 10—20h
+                <i className="fa-solid fa-clock" /> &nbsp; {horarioTexto}
               </li>
             </ul>
           </div>
