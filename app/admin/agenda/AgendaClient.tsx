@@ -15,13 +15,18 @@ function fmtFecha(fechaStr: string) {
   return `${DIAS[date.getDay()]} ${d} ${MESES[m - 1]} ${y}`;
 }
 
+// No usar toISOString() acá: convierte a UTC y de noche en Chile adelanta la fecha un día.
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 type SlotStatus = { time: string; blocked: boolean; reason: string };
 type Tab = "proximas" | "pasadas" | "bloquear" | "horario";
-type HorarioDia = { activo: boolean; inicio: string; fin: string };
+type HorarioDia = { activo: boolean; horas: string[] };
 
 export default function AgendaClient() {
   const { dark } = useThemeStore();
@@ -42,6 +47,7 @@ export default function AgendaClient() {
   const [savingHorario, setSavingHorario]   = useState(false);
   const [errorHorario, setErrorHorario]     = useState("");
   const [savedHorario, setSavedHorario]     = useState(false);
+  const [nuevaHora, setNuevaHora]           = useState<Record<number, string>>({});
 
   const cardBg    = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.97)";
   const border    = dark ? "#3a2830" : "#ecddd9";
@@ -82,6 +88,23 @@ export default function AgendaClient() {
 
   function actualizarDia(i: number, cambios: Partial<HorarioDia>) {
     setHorario((prev) => prev ? prev.map((d, idx) => idx === i ? { ...d, ...cambios } : d) : prev);
+  }
+
+  function agregarHora(i: number) {
+    const valor = (nuevaHora[i] || "").trim();
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(valor)) return;
+    setHorario((prev) => {
+      if (!prev) return prev;
+      const dia = prev[i];
+      if (dia.horas.includes(valor)) return prev;
+      const horas = [...dia.horas, valor].sort();
+      return prev.map((d, idx) => idx === i ? { ...d, horas } : d);
+    });
+    setNuevaHora((prev) => ({ ...prev, [i]: "" }));
+  }
+
+  function quitarHora(i: number, hora: string) {
+    setHorario((prev) => prev ? prev.map((d, idx) => idx === i ? { ...d, horas: d.horas.filter((h) => h !== hora) } : d) : prev);
   }
 
   async function guardarHorario() {
@@ -275,7 +298,7 @@ export default function AgendaClient() {
         {tab === "horario" && (
           <div style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 20, padding: "24px 28px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
             <p style={{ margin: "0 0 20px", fontSize: 13, color: textMuted, ...MONO }}>
-              Elige qué días atiendes y entre qué horas. Las citas se ofrecen en bloques de 1h30, empezando desde la hora de inicio.
+              Elige qué días atiendes y agrega exactamente las horas en que se puede reservar ese día. Cada cita dura 1h30; si agregas horas muy seguidas, es tu criterio — el sitio ofrece las que pongas acá.
             </p>
             {loadingHorario || !horario ? (
               <div style={{ textAlign: "center", padding: "30px 0", color: textMuted, ...MONO }}>
@@ -289,13 +312,12 @@ export default function AgendaClient() {
                     const d = horario[i];
                     return (
                       <div key={nombreDia} style={{
-                        display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
-                        padding: "12px 16px", borderRadius: 12,
+                        padding: "14px 16px", borderRadius: 12,
                         border: `1.5px solid ${d.activo ? border : "transparent"}`,
                         background: d.activo ? (dark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.7)") : "transparent",
                         opacity: d.activo ? 1 : 0.55,
                       }}>
-                        <label style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 130, cursor: "pointer", fontSize: 13, color: textMain, ...MONO }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 130, cursor: "pointer", fontSize: 13, color: textMain, ...MONO, marginBottom: d.activo ? 12 : 0 }}>
                           <input
                             type="checkbox"
                             checked={d.activo}
@@ -303,23 +325,51 @@ export default function AgendaClient() {
                             style={{ accentColor: "#C68A95", width: 16, height: 16 }}
                           />
                           {nombreDia}
+                          {d.activo && d.horas.length === 0 && (
+                            <span style={{ fontSize: 11, color: "#e57373", fontWeight: 400 }}>— sin horas, no se verá disponible</span>
+                          )}
                         </label>
-                        <span style={{ fontSize: 12, color: textMuted, ...MONO }}>de</span>
-                        <input
-                          type="time"
-                          value={d.inicio}
-                          disabled={!d.activo}
-                          onChange={(e) => actualizarDia(i, { inicio: e.target.value })}
-                          style={{ ...inputStyle, opacity: d.activo ? 1 : 0.5 }}
-                        />
-                        <span style={{ fontSize: 12, color: textMuted, ...MONO }}>a</span>
-                        <input
-                          type="time"
-                          value={d.fin}
-                          disabled={!d.activo}
-                          onChange={(e) => actualizarDia(i, { fin: e.target.value })}
-                          style={{ ...inputStyle, opacity: d.activo ? 1 : 0.5 }}
-                        />
+
+                        {d.activo && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+                            {d.horas.map((hora) => (
+                              <span key={hora} style={{
+                                display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 6px 6px 12px",
+                                borderRadius: 999, fontSize: 12.5, fontWeight: 600, color: "#C68A95", ...MONO,
+                                background: dark ? "rgba(198,138,149,0.15)" : "rgba(198,138,149,0.1)",
+                                border: "1px solid rgba(198,138,149,0.3)",
+                              }}>
+                                {hora}
+                                <button
+                                  onClick={() => quitarHora(i, hora)}
+                                  title="Quitar esta hora"
+                                  style={{ background: "rgba(198,138,149,0.25)", border: "none", borderRadius: "50%", width: 18, height: 18, color: "#8B5E6A", cursor: "pointer", fontSize: 11, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}
+                                >
+                                  <i className="fa-solid fa-xmark" />
+                                </button>
+                              </span>
+                            ))}
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                              <input
+                                type="time"
+                                value={nuevaHora[i] || ""}
+                                onChange={(e) => setNuevaHora((prev) => ({ ...prev, [i]: e.target.value }))}
+                                style={{ ...inputStyle, padding: "6px 10px", fontSize: 12.5 }}
+                              />
+                              <button
+                                onClick={() => agregarHora(i)}
+                                disabled={!nuevaHora[i]}
+                                style={{
+                                  background: "transparent", border: `1.5px solid ${border}`, borderRadius: 999,
+                                  padding: "6px 14px", color: "#C68A95", fontSize: 12, cursor: nuevaHora[i] ? "pointer" : "default",
+                                  ...MONO, display: "flex", alignItems: "center", gap: 5,
+                                }}
+                              >
+                                <i className="fa-solid fa-plus" /> Agregar hora
+                              </button>
+                            </span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

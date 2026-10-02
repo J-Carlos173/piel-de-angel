@@ -15,8 +15,14 @@ const SERVICIOS = [
 type Slot = { time: string; available: boolean };
 type Step = "date" | "time" | "form" | "done";
 
+// OJO: no usar toISOString() acá — convierte a UTC y en la noche en Chile (UTC-3/-4)
+// eso adelanta la fecha un día, lo que hacía que el celular bloqueara "hoy" y "mañana" sin avisar.
 function getTodayStr() {
-  return new Date().toISOString().split("T")[0];
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 function addDays(dateStr: string, days: number) {

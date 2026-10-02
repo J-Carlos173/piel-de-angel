@@ -4,26 +4,13 @@ import { getHorarioAgenda } from "./horario-agenda";
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || "krlos173173@gmail.com";
 
-// Bloques de 90 min (1h30) — Tere indicó entre 1.5 y 2 hrs según servicio
+// Duración de cada cita — Tere indicó entre 1.5 y 2 hrs según servicio. No es "cuántas horas
+// hay para elegir" (eso lo decide Tere directamente, ver abajo), es cuánto tiempo se bloquea
+// en el Google Calendar cuando se confirma una.
 const SLOT_DURATION_MIN = 90;
 
-/** Genera horas de inicio cada SLOT_DURATION_MIN dentro de una ventana, sin pasarse del cierre. */
-function generarSlots(inicio: string, fin: string): string[] {
-  const [hIni, mIni] = inicio.split(":").map(Number);
-  const [hFin, mFin] = fin.split(":").map(Number);
-  const inicioMin = hIni * 60 + mIni;
-  const finMin = hFin * 60 + mFin;
-  const slots: string[] = [];
-  for (let t = inicioMin; t + SLOT_DURATION_MIN <= finMin; t += SLOT_DURATION_MIN) {
-    const h = Math.floor(t / 60);
-    const m = t % 60;
-    slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-  }
-  return slots;
-}
-
-// El horario (qué días y entre qué horas se puede reservar) lo edita Tere desde
-// Panel → Agenda → Horario de atención. Ya no está fijo acá.
+// El horario (qué días y qué horas exactas se pueden reservar) lo edita Tere desde
+// Panel → Agenda → Horario de atención: una lista de horas por día, no un rango calculado.
 
 function getAuth() {
   const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
@@ -42,7 +29,7 @@ export async function getAllSlots(dateStr: string): Promise<string[]> {
   const dayOfWeek = new Date(dateStr + "T12:00:00").getDay();
   const horario = await getHorarioAgenda();
   const dia = horario[dayOfWeek];
-  return dia?.activo ? generarSlots(dia.inicio, dia.fin) : [];
+  return dia?.activo ? dia.horas : [];
 }
 
 export async function isWorkingDay(dateStr: string): Promise<boolean> {
