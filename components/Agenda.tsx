@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const SERVICIOS = [
   "Limpieza facial profunda",
@@ -63,6 +63,14 @@ export default function Agenda() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", service: SERVICIOS[0] });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [horarioTexto, setHorarioTexto] = useState("");
+
+  useEffect(() => {
+    fetch("/api/horario")
+      .then((r) => r.json())
+      .then((d) => { if (d.texto) setHorarioTexto(d.texto); })
+      .catch(() => {});
+  }, []);
 
   const today = getTodayStr();
   const minDate = addDays(today, 1);
@@ -232,7 +240,7 @@ export default function Agenda() {
                     <div className="agenda-empty">
                       {diaLaboral
                         ? "Ese día ya no quedan horas disponibles. Prueba con otro día."
-                        : "Ese día no atendemos. Elige otra fecha: lunes a viernes de 16:30 a 20:00, o sábado de 9:00 a 20:00."}
+                        : `Ese día no atendemos. Elige otra fecha${horarioTexto ? `: ${horarioTexto}` : "."}`}
                     </div>
                   ) : (
                     <div className="slots-grid">
