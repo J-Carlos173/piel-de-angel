@@ -36,6 +36,23 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" });
 }
 
+const DIAS_SEMANA = ["L", "M", "M", "J", "V", "S", "D"];
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+/** 0 = lunes … 6 = domingo (la semana parte en lunes, no en domingo como el getDay() nativo). */
+function diaSemanaLunesPrimero(dateStr: string) {
+  const dow = new Date(dateStr + "T12:00:00").getDay();
+  return (dow + 6) % 7;
+}
+
+function diasEnMes(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function ymd(year: number, month: number, day: number) {
+  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 export default function Agenda() {
   const [step, setStep] = useState<Step>("date");
   const [selectedDate, setSelectedDate] = useState("");
@@ -48,7 +65,11 @@ export default function Agenda() {
   const [error, setError] = useState("");
 
   const today = getTodayStr();
+  const minDate = addDays(today, 1);
   const maxDate = addDays(today, 60);
+  const [minY, minM] = minDate.split("-").map(Number);
+  const [maxY, maxM] = maxDate.split("-").map(Number);
+  const [mesVisible, setMesVisible] = useState({ year: minY, month: minM - 1 });
 
   async function handleDateSelect(date: string) {
     setSelectedDate(date);
@@ -137,20 +158,64 @@ export default function Agenda() {
                 ))}
               </div>
 
-              {step === "date" && (
-                <div className="agenda-date-picker">
-                  <p className="agenda-hint">Selecciona el día de tu cita</p>
-                  <div className="agenda-date-wrapper">
-                    <input
-                      type="date"
-                      min={addDays(today, 1)}
-                      max={maxDate}
-                      className="agenda-date-input"
-                      onChange={(e) => e.target.value && handleDateSelect(e.target.value)}
-                    />
+              {step === "date" && (() => {
+                const puedeAtras = mesVisible.year > minY || (mesVisible.year === minY && mesVisible.month > minM - 1);
+                const puedeAdelante = mesVisible.year < maxY || (mesVisible.year === maxY && mesVisible.month < maxM - 1);
+                const primerDia = diaSemanaLunesPrimero(ymd(mesVisible.year, mesVisible.month, 1));
+                const totalDias = diasEnMes(mesVisible.year, mesVisible.month);
+                const celdas: (number | null)[] = [...Array(primerDia).fill(null), ...Array.from({ length: totalDias }, (_, i) => i + 1)];
+
+                return (
+                  <div className="agenda-date-picker">
+                    <p className="agenda-hint">Selecciona el día de tu cita</p>
+                    {/* Calendario siempre visible — nada que abrir ni cerrar, para que funcione igual en cualquier celular. */}
+                    <div className="agenda-calendar">
+                      <div className="agenda-calendar-header">
+                        <button
+                          type="button"
+                          className="agenda-calendar-nav"
+                          disabled={!puedeAtras}
+                          onClick={() => setMesVisible((m) => m.month === 0 ? { year: m.year - 1, month: 11 } : { year: m.year, month: m.month - 1 })}
+                          aria-label="Mes anterior"
+                        >
+                          <i className="fa-solid fa-chevron-left" />
+                        </button>
+                        <span className="agenda-calendar-titulo">{MESES[mesVisible.month]} {mesVisible.year}</span>
+                        <button
+                          type="button"
+                          className="agenda-calendar-nav"
+                          disabled={!puedeAdelante}
+                          onClick={() => setMesVisible((m) => m.month === 11 ? { year: m.year + 1, month: 0 } : { year: m.year, month: m.month + 1 })}
+                          aria-label="Mes siguiente"
+                        >
+                          <i className="fa-solid fa-chevron-right" />
+                        </button>
+                      </div>
+                      <div className="agenda-calendar-semana">
+                        {DIAS_SEMANA.map((d, i) => <span key={i}>{d}</span>)}
+                      </div>
+                      <div className="agenda-calendar-grid">
+                        {celdas.map((dia, i) => {
+                          if (dia === null) return <span key={`b${i}`} className="agenda-calendar-vacio" />;
+                          const fecha = ymd(mesVisible.year, mesVisible.month, dia);
+                          const habilitado = fecha >= minDate && fecha <= maxDate;
+                          return (
+                            <button
+                              type="button"
+                              key={fecha}
+                              disabled={!habilitado}
+                              onClick={() => handleDateSelect(fecha)}
+                              className={`agenda-calendar-dia${fecha === selectedDate ? " activo" : ""}`}
+                            >
+                              {dia}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {step === "time" && (
                 <div className="agenda-slots">

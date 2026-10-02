@@ -1512,55 +1512,73 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 .agenda-step.active .agenda-step-num { background: var(--rosa-deep); color: white; }
 .agenda-step-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--texto); }
 .agenda-hint { font-size: 0.92rem; color: var(--texto-soft); margin-bottom: 22px; }
-.agenda-date-wrapper {
-  position: relative;
-  display: block;
-}
-.agenda-date-wrapper::before {
-  content: "\f073"; /* fa-calendar-days */
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--rosa);
-  font-size: 1rem;
-  pointer-events: none;
-  z-index: 1;
-}
-.agenda-date-input {
-  width: 100%;
-  padding: 16px 18px 16px 46px;
+/* Calendario de la Agenda: siempre expandido en la página, no un picker nativo que se
+   abra y se cierre — así se evita el parpadeo que daba problemas en algunos celulares. */
+.agenda-calendar {
   border: 1.5px solid var(--gris-suave);
-  border-radius: 12px;
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--negro-soft);
+  border-radius: 16px;
+  padding: 18px 16px 20px;
   background: var(--crema-pure);
-  transition: var(--transicion);
+}
+.agenda-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.agenda-calendar-titulo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.15rem;
+  color: var(--negro-soft);
+  text-transform: capitalize;
+}
+.agenda-calendar-nav {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gris-suave);
+  background: white;
+  color: var(--rosa-deep);
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  position: relative;
-  box-sizing: border-box;
+  transition: var(--transicion);
+  flex-shrink: 0;
 }
-.agenda-date-input:hover {
-  border-color: var(--rosa);
-  box-shadow: 0 0 0 3px rgba(216,167,177,0.12);
+.agenda-calendar-nav:hover:not(:disabled) { background: var(--rosa-soft); border-color: var(--rosa); }
+.agenda-calendar-nav:disabled { opacity: 0.25; cursor: default; }
+.agenda-calendar-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
 }
-.agenda-date-input:focus { outline: none; border-color: var(--rosa); box-shadow: 0 0 0 4px rgba(216,167,177,0.18); }
-/* Expande el indicador nativo a todo el ancho para que el click funcione en cualquier parte.
-   Solo en desktop (mouse): en el celular todo el campo ya abre el calendario nativo,
-   y este mismo truco hace que se abra y se cierre de inmediato (parpadeo). */
-@media (hover: hover) and (pointer: fine) {
-  .agenda-date-input::-webkit-calendar-picker-indicator {
-    position: absolute;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    margin: 0; padding: 0;
-    opacity: 0;
-    cursor: pointer;
-  }
+.agenda-calendar-semana span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--texto-soft);
+  text-transform: uppercase;
 }
+.agenda-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.agenda-calendar-vacio { aspect-ratio: 1; }
+.agenda-calendar-dia {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--negro-soft);
+  font-size: 0.92rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: var(--transicion);
+}
+.agenda-calendar-dia:hover:not(:disabled) { background: var(--rosa-soft); border-color: var(--rosa); }
+.agenda-calendar-dia.activo { background: var(--rosa-deep); border-color: var(--rosa-deep); color: white; }
+.agenda-calendar-dia:disabled { color: var(--gris-calido); opacity: 0.35; cursor: default; }
 .slots-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1652,6 +1670,11 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 .agenda-reset:hover { background: var(--crema); border-color: var(--rosa); }
 [data-theme="dark"] .agenda-card { background: #2A2523; }
 [data-theme="dark"] .slot-btn.available { background: #3D3533; color: var(--texto); border-color: var(--gris-calido); }
+[data-theme="dark"] .agenda-calendar { background: #241f1d; border-color: var(--gris-calido); }
+[data-theme="dark"] .agenda-calendar-nav { background: #3D3533; border-color: var(--gris-calido); }
+[data-theme="dark"] .agenda-calendar-titulo { color: var(--texto); }
+[data-theme="dark"] .agenda-calendar-dia { color: var(--texto); }
+[data-theme="dark"] .agenda-calendar-dia:hover:not(:disabled) { background: #3D3533; }
 @media (max-width: 768px) {
   .agenda-card { padding: 32px 24px; }
   .slots-grid { grid-template-columns: repeat(3, 1fr); }
