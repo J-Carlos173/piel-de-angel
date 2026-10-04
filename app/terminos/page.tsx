@@ -105,7 +105,21 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="7. Privacidad y Protección de Datos">
+          <Section title="7. Reservas de servicios a domicilio">
+            <p>
+              Para reservar una hora de atención a domicilio se solicita un <strong>abono de $20.000</strong>, que se
+              descuenta del valor total del servicio. El abono confirma la reserva.
+            </p>
+            <ul>
+              <li><strong>Dirección y zona:</strong> el servicio está disponible en las comunas y sectores informados en el sitio.
+                La dirección se confirma antes de coordinar la cita. Para algunas comunas y sectores alejados se aplica un recargo de <strong>$7.000</strong> por concepto de traslado.</li>
+              <li><strong>Reagendamiento:</strong> puedes solicitar un cambio de fecha avisando con al menos 24 horas de anticipación. El abono se mantiene para la nueva reserva, sujeto a disponibilidad.</li>
+              <li><strong>Cancelaciones:</strong> las cancelaciones con menos de 24 horas de anticipación implican la pérdida del abono.</li>
+              <li><strong>Pago del saldo:</strong> el monto restante se paga el día de la atención, una vez finalizado el servicio.</li>
+            </ul>
+          </Section>
+
+          <Section title="8. Privacidad y Protección de Datos">
             <p>
               Los datos personales recopilados durante la compra (nombre, correo, teléfono,
               dirección) son utilizados exclusivamente para procesar y despachar tu pedido,
@@ -123,7 +137,7 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="8. Cookies">
+          <Section title="9. Cookies">
             <p id="cookies">
               Usamos cookies propias y esenciales para que el sitio funcione correctamente:
               mantener tu carro de compras y, en el panel administrativo, la sesión de acceso.
@@ -138,7 +152,7 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="9. Responsabilidad">
+          <Section title="10. Responsabilidad">
             <p>
               Piel de Ángel no se hace responsable por retrasos ocasionados por las empresas
               de transporte, fuerza mayor o errores en los datos de envío proporcionados
@@ -146,7 +160,7 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="10. Legislación Aplicable">
+          <Section title="11. Legislación Aplicable">
             <p>
               Los presentes Términos y Condiciones se rigen por las leyes de la República de Chile.
               Cualquier controversia será sometida a la jurisdicción de los tribunales ordinarios
@@ -154,7 +168,7 @@ export default function TerminosPage() {
             </p>
           </Section>
 
-          <Section title="11. Contacto">
+          <Section title="12. Contacto">
             <p>
               Para consultas, reclamos o ejercer tus derechos como consumidor:
             </p>

@@ -85,6 +85,19 @@ export async function sendConfirmationToClient(data: {
           <tr><td style="padding: 6px 0; color: #888;">Fecha</td><td><strong>${dateLabel}</strong></td></tr>
           <tr><td style="padding: 6px 0; color: #888;">Hora</td><td><strong>${data.time} hrs</strong></td></tr>
         </table>
+        <div style="margin-top: 24px; padding: 16px 18px; background: #fff; border: 1px solid #e8d5cc; border-radius: 10px;">
+          <p style="margin: 0 0 8px; color: #8B6F6F; font-weight: bold;">Para confirmar tu hora</p>
+          <p style="margin: 0 0 10px; color: #444; font-size: 14px; line-height: 1.6;">
+            Debes abonar <strong>$20.000</strong> para asegurar tu cita. Este abono se descuenta del valor total del servicio.
+            Te enviaremos por WhatsApp las instrucciones para hacer el abono.
+          </p>
+          <ul style="margin: 0; padding-left: 18px; color: #555; font-size: 13px; line-height: 1.6;">
+            <li><strong>Atención a domicilio:</strong> la dirección se confirma antes de coordinar tu cita. En algunas comunas y sectores alejados se agrega un recargo de $7.000 por traslado.</li>
+            <li><strong>Reagendar:</strong> puedes cambiar la fecha avisando con al menos 24 horas de anticipación. Tu abono se mantiene para la nueva reserva, sujeto a disponibilidad.</li>
+            <li><strong>Cancelar:</strong> las cancelaciones con menos de 24 horas de anticipación implican la pérdida del abono.</li>
+            <li><strong>Saldo:</strong> el monto restante se paga el día de la atención, una vez finalizado el servicio.</li>
+          </ul>
+        </div>
         <p style="margin-top: 24px; color: #888; font-size: 14px;">Si necesitas reagendar, contáctanos por WhatsApp.</p>
         <p style="margin-top: 8px; font-size: 12px; color: #aaa;">Piel de Ángel · Estética & Belleza Premium</p>
       </div>
