@@ -11,6 +11,7 @@ export type ServicioLPOverride = {
   paraTi?: string[];
   faq?: { q: string; a: string }[];
   waTexto?: string;
+  faqCuanto?: string;
 };
 
 const KEY_CONTENIDO = "servicios_lp_contenido";
@@ -56,6 +57,7 @@ export function mergeServicioLP(base: ServicioLP, ov?: ServicioLPOverride): Serv
     paraTi: ov.paraTi && ov.paraTi.length > 0 ? ov.paraTi : base.paraTi,
     faq: ov.faq && ov.faq.length > 0 ? ov.faq : base.faq,
     waTexto: ov.waTexto?.trim() || base.waTexto,
+    faqCuanto: ov.faqCuanto?.trim() || base.faqCuanto,
     queEs: {
       titulo: ov.queEsTitulo?.trim() || base.queEs.titulo,
       texto: ov.queEsTexto?.trim() || base.queEs.texto,

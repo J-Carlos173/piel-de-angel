@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
         ? value.faq.map((f) => ({ q: f.q?.trim() || "", a: f.a?.trim() || "" })).filter((f) => f.q && f.a)
         : undefined,
       waTexto: value.waTexto?.trim() || undefined,
+      faqCuanto: value.faqCuanto?.trim() || undefined,
     };
 
     await saveServicioLPOverride(slug, limpio);

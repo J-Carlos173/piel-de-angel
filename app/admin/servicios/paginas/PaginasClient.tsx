@@ -17,6 +17,7 @@ type PaginaServicio = {
   paraTi: string[];
   faq: Faq[];
   waTexto: string;
+  faqCuanto: string;
 };
 
 export default function PaginasClient({
@@ -92,7 +93,7 @@ export default function PaginasClient({
         value: {
           lead: p.lead, metaDescription: p.metaDescription,
           queEsTitulo: p.queEsTitulo, queEsTexto: p.queEsTexto,
-          sesion: p.sesion, paraTi: p.paraTi, faq: p.faq, waTexto: p.waTexto,
+          sesion: p.sesion, paraTi: p.paraTi, faq: p.faq, waTexto: p.waTexto, faqCuanto: p.faqCuanto,
         },
       }),
     });
@@ -281,6 +282,14 @@ export default function PaginasClient({
               <i className="fa-solid fa-plus" /> Agregar pregunta
             </button>
           </div>
+
+          <Field
+            label="Respuesta: ¿Cuánto cuesta y cómo reservo?"
+            value={p.faqCuanto}
+            onChange={(v) => set("faqCuanto", v)}
+            rows={2}
+            hint="Déjalo vacío para usar la respuesta general del sitio."
+          />
 
           <Field
             label="Mensaje al escribir por WhatsApp desde esta página"

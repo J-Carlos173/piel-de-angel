@@ -15,6 +15,8 @@ export type ServicioLP = {
   paraTi: string[];
   faq: { q: string; a: string }[];
   waTexto: string;
+  /** Respuesta editable de "¿Cuánto cuesta y cómo reservo?" (si no existe, se usa la general). */
+  faqCuanto?: string;
 };
 
 export const SERVICIOS_LP: ServicioLP[] = [

@@ -19,6 +19,7 @@ export default async function PaginasServiciosPage() {
       paraTi: actual.paraTi,
       faq: actual.faq,
       waTexto: actual.waTexto,
+      faqCuanto: actual.faqCuanto ?? "",
     };
   });
 

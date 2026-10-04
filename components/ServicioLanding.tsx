@@ -22,7 +22,7 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
     },
     {
       q: "¿Cuánto cuesta y cómo reservo?",
-      a: "El valor se coordina según tu caso. Puedes reservar tu hora desde la sección Agenda del sitio o escribirnos por WhatsApp.",
+      a: s.faqCuanto || "El valor se coordina según tu caso. Puedes reservar tu hora desde la sección Agenda del sitio o escribirnos por WhatsApp.",
     },
   ];
 
