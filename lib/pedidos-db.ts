@@ -49,7 +49,7 @@ export async function getAllPedidos(): Promise<Pedido[]> {
 
 export async function updatePedido(
   id: number,
-  data: { estado?: Pedido["estado"]; respuesta?: string; con_cambio?: boolean }
+  data: { estado?: Pedido["estado"]; respuesta?: string; con_cambio?: boolean; hilo_id?: number | null }
 ): Promise<Pedido | null> {
   const sql = getDb();
   const completedAt = data.estado === "hecho" || data.estado === "error" ? new Date().toISOString() : null;
@@ -58,6 +58,7 @@ export async function updatePedido(
       estado       = COALESCE(${data.estado ?? null}, estado),
       respuesta    = COALESCE(${data.respuesta ?? null}, respuesta),
       con_cambio   = CASE WHEN ${data.con_cambio !== undefined} THEN ${data.con_cambio ?? true} ELSE con_cambio END,
+      hilo_id      = CASE WHEN ${data.hilo_id !== undefined} THEN ${data.hilo_id ?? null} ELSE hilo_id END,
       completed_at = COALESCE(${completedAt}, completed_at)
     WHERE id = ${id}
     RETURNING *

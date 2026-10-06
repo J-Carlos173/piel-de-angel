@@ -37,9 +37,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   try {
-    const { id, estado, respuesta, con_cambio } = await req.json();
+    const { id, estado, respuesta, con_cambio, hilo_id } = await req.json();
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
-    const pedido = await updatePedido(id, { estado, respuesta, con_cambio });
+    const pedido = await updatePedido(id, { estado, respuesta, con_cambio, hilo_id });
     return NextResponse.json({ pedido });
   } catch (err) {
     console.error("[admin/pedidos PATCH]", err);
