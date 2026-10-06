@@ -40,12 +40,12 @@ export default function Home() {
       <RevealObserver>
         <Productos />
         <Servicios />
-        <Consejos />
         <Promociones />
         <Agenda />
         <About />
         <Testimonios />
         <Instagram />
+        <Consejos />
       </RevealObserver>
       <Footer />
       <WhatsappFloat />
