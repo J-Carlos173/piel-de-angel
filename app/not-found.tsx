@@ -27,7 +27,7 @@ export default function NotFound() {
             Puede que el enlace haya cambiado. Te dejamos algunos lugares para seguir.
           </p>
           <div className="lp-actions" style={{ justifyContent: "center" }}>
-            <Link href="/tienda" className="btn-primary">
+            <Link href="/#productos" className="btn-primary">
               <i className="fa-solid fa-bag-shopping" /> Ir a la tienda
             </Link>
             <a href="/#servicios" className="btn-secondary">

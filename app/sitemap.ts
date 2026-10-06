@@ -35,7 +35,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/#promociones`,  lastModified: new Date(), changeFrequency: "weekly",  priority: 0.75 },
     { url: `${BASE}/#nosotros`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
     { url: `${BASE}/#contacto`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.6  },
-    { url: `${BASE}/tienda`,        lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9  },
     ...serviciosPublicados.map((s) => ({
       url: `${BASE}/${s.slug}`,
       lastModified: new Date(),

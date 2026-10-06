@@ -52,7 +52,7 @@ export default async function Footer() {
             <ul>
               {[
                 ["/#inicio", "Inicio"],
-                ["/tienda", "Tienda"],
+                ["/#productos", "Tienda"],
                 ["/#servicios", "Servicios"],
                 ["/#promociones", "Promos"],
                 ["/#agenda", "Agenda"],

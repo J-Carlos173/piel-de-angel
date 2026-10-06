@@ -42,7 +42,7 @@ export default function Navbar() {
 
           {/* Extras visibles solo en el menú móvil */}
           <li className="mobile-menu-extras">
-            <a href="/tienda" onClick={closeMenu} className="nav-cta mobile-cta">
+            <a href="/#productos" onClick={closeMenu} className="nav-cta mobile-cta">
               <i className="fa-solid fa-bag-shopping" /> Tienda
             </a>
             <div className="mobile-menu-icons">
@@ -58,7 +58,7 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
-          <a href="/tienda" className="nav-cta">
+          <a href="/#productos" className="nav-cta">
             <i className="fa-solid fa-bag-shopping" /> Tienda
           </a>
           <button

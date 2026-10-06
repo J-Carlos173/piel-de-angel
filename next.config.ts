@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
       { source: "/collections/:path*", destination: "/#productos", permanent: true },
       { source: "/products/:path*", destination: "/#productos", permanent: true },
       { source: "/blogs/:path*", destination: "/consejos", permanent: true },
+      // La tienda vive en la home: /tienda queda redirigida a la seccion de productos.
+      { source: "/tienda", destination: "/#productos", permanent: true },
     ];
   },
 };

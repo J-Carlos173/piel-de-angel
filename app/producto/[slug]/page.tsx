@@ -66,7 +66,7 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
   const { producto: p, todos } = await buscar(slug);
 
   // Producto borrado u oculto: se manda a la tienda en vez de mostrar un error.
-  if (!p) redirect("/tienda");
+  if (!p) redirect("/#productos");
 
   // Si cambió el nombre, la dirección vieja lleva a la nueva.
   const slugActual = slugProducto(p.title, p.id);
@@ -108,7 +108,7 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Inicio", item: SITE },
-          { "@type": "ListItem", position: 2, name: "Tienda", item: `${SITE}/tienda` },
+          { "@type": "ListItem", position: 2, name: "Tienda", item: `${SITE}/#productos` },
           { "@type": "ListItem", position: 3, name: p.title, item: url },
         ],
       },
@@ -142,7 +142,7 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
               {p.description && <p className="lp-lead">{p.description}</p>}
 
               <div className="lp-actions">
-                <Link href="/tienda" className="btn-primary">
+                <Link href="/#productos" className="btn-primary">
                   <i className="fa-solid fa-bag-shopping" /> {agotado ? "Ver la tienda" : "Comprar en la tienda"}
                 </Link>
                 <a href={wa} className="btn-secondary" target="_blank" rel="noopener noreferrer">
@@ -169,7 +169,7 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
                 ))}
               </div>
               <p className="lp-related">
-                <Link href="/tienda">Ver toda la tienda</Link> · <Link href="/consejos">consejos de piel</Link>
+                <Link href="/#productos">Ver toda la tienda</Link> · <Link href="/consejos">consejos de piel</Link>
               </p>
             </div>
           )}
