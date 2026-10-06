@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       finalizado: Boolean(body.finalizado),
       activo: body.activo !== undefined ? Boolean(body.activo) : true,
       orden: Number(body.orden ?? 0),
+      producto_id: body.producto_id ? String(body.producto_id) : null,
     });
     revalidatePath("/");
     return NextResponse.json({ promo });
@@ -58,6 +59,7 @@ export async function PATCH(req: NextRequest) {
       ...(campos.finalizado !== undefined && { finalizado: Boolean(campos.finalizado) }),
       ...(campos.activo !== undefined && { activo: Boolean(campos.activo) }),
       ...(campos.orden !== undefined && { orden: Number(campos.orden) }),
+      ...(campos.producto_id !== undefined && { producto_id: campos.producto_id ? String(campos.producto_id) : null }),
     });
     revalidatePath("/");
     return NextResponse.json({ promo });

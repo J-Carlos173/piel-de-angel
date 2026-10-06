@@ -11,6 +11,8 @@ export type PromoWeb = {
   finalizado: boolean;
   activo: boolean;
   orden: number;
+  /** Si viene, la tarjeta muestra ese producto (precio real, oferta, carrito) en vez de texto libre. */
+  producto_id: string | null;
   created_at: string;
 };
 
@@ -19,6 +21,7 @@ type UpdatePromoWebData = Partial<CreatePromoWebData>;
 
 export async function ensurePromosWebTable() {
   const sql = getDb();
+  await sql`ALTER TABLE promos_web ADD COLUMN IF NOT EXISTS producto_id TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS promos_web (
       id          SERIAL PRIMARY KEY,
@@ -70,10 +73,11 @@ export async function createPromoWeb(d: CreatePromoWebData): Promise<PromoWeb> {
   const sql = getDb();
   await ensurePromosWebTable();
   const rows = await sql`
-    INSERT INTO promos_web (tag, title, description, prizes, cta, href, finalizado, activo, orden)
+    INSERT INTO promos_web (tag, title, description, prizes, cta, href, finalizado, activo, orden, producto_id)
     VALUES (
       ${d.tag}, ${d.title}, ${d.description}, ${JSON.stringify(d.prizes ?? [])}::jsonb,
-      ${d.cta || "Ver publicación"}, ${d.href || ""}, ${d.finalizado ?? false}, ${d.activo ?? true}, ${d.orden ?? 0}
+      ${d.cta || "Ver publicación"}, ${d.href || ""}, ${d.finalizado ?? false}, ${d.activo ?? true}, ${d.orden ?? 0},
+      ${d.producto_id ?? null}
     )
     RETURNING *
   `;
@@ -93,7 +97,8 @@ export async function updatePromoWeb(id: number, d: UpdatePromoWebData): Promise
       href        = CASE WHEN ${d.href !== undefined} THEN ${d.href ?? ""} ELSE href END,
       finalizado  = CASE WHEN ${d.finalizado !== undefined} THEN ${d.finalizado ?? false} ELSE finalizado END,
       activo      = CASE WHEN ${d.activo !== undefined} THEN ${d.activo ?? true} ELSE activo END,
-      orden       = CASE WHEN ${d.orden !== undefined} THEN ${d.orden ?? 0} ELSE orden END
+      orden       = CASE WHEN ${d.orden !== undefined} THEN ${d.orden ?? 0} ELSE orden END,
+      producto_id = CASE WHEN ${d.producto_id !== undefined} THEN ${d.producto_id ?? null} ELSE producto_id END
     WHERE id = ${id}
     RETURNING *
   `;
