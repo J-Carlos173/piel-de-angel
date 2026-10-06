@@ -1,6 +1,7 @@
 import { getSetting } from "@/lib/db";
 import { getPublishedServicios } from "@/lib/services-db";
 import HeroPhotoCarousel from "./HeroPhotoCarousel";
+import { ciberdayActivo, ciberdayDiasRestantes } from "@/lib/ciberday";
 
 type HeroContent = {
   eyebrow: string;
@@ -48,6 +49,12 @@ export default async function Hero() {
     <section className={`hero${sinImagen ? " hero-sin-imagen" : ""}`} id="inicio">
       <div className="container hero-wrapper">
         <div className="hero-content">
+          {ciberdayActivo() && (
+            <a href="#promociones" className="ciber-hero-banner">
+              <span>✦ Ciberday</span> Protectores solares −30% y ojos y pestañas −20%
+              <small>Quedan {ciberdayDiasRestantes()} {ciberdayDiasRestantes() === 1 ? "día" : "días"} · Ver ofertas →</small>
+            </a>
+          )}
           <span className="eyebrow">{c.eyebrow}</span>
           <h1 className="hero-title">
             {c.titleLine1}

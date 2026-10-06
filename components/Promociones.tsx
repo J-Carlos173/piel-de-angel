@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrecio } from "@/data/productos";
 import { slugProducto } from "@/lib/slug";
+import { ciberdayActivo } from "@/lib/ciberday";
 
 type Promo = {
   id: number;
@@ -44,17 +45,19 @@ export default function Promociones() {
       .catch(() => {});
   }, []);
 
-  const hayCiberday = productos.length > 0 && (promos ?? []).some((p) => p.producto_id);
+  const cibervigente = ciberdayActivo();
+  const hayCiberday = cibervigente && productos.length > 0 && (promos ?? []).some((p) => p.producto_id);
 
   // Mientras carga no se muestra nada (evita un parpadeo); si no hay promos activas, la sección desaparece.
   if (!promos || promos.length === 0) return null;
 
   // Tarjetas de producto con su producto ya cargado; las que aún no cargan no se muestran (evita parpadeo).
-  const conProducto = promos.flatMap((p) => {
+  const conProducto = !cibervigente ? [] : promos.flatMap((p) => {
     const prod = p.producto_id ? productos.find((x) => x.id === p.producto_id) : undefined;
     return prod ? [{ p, prod }] : [];
   });
   const promosTexto = promos.filter((p) => !p.producto_id);
+  if (!cibervigente && promosTexto.length === 0) return null;
 
   const desplazar = (dir: number) => {
     const el = carruselRef.current;
