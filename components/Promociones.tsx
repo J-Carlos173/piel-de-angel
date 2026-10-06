@@ -52,8 +52,8 @@ export default function Promociones() {
     <section className="promos-section" id="promociones">
       <div className="promos-container">
         <div className="section-header">
-          <span className="section-tag">Ofertas & Concursos</span>
-          <h2 className="section-title">Promociones</h2>
+          <span className="section-tag">{hayCiberday ? "✦ Ciberday ✦" : "Ofertas & Concursos"}</span>
+          <h2 className="section-title">{hayCiberday ? "Ofertas Ciberday" : "Promociones"}</h2>
           <p className="section-subtitle">
             {hayCiberday
               ? "Ciberday: precios rebajados por tiempo limitado en protectores solares y ojos y pestañas."
@@ -69,7 +69,7 @@ export default function Promociones() {
               const precioVigente = tieneOferta ? prod.precio_oferta! : prod.precio;
               const agotado = prod.stock <= 0;
               return (
-                <div key={p.id} className="promo-card">
+                <div key={p.id} className="promo-card promo-card-ciberday">
                   {p.tag && <span className="producto-badge-oferta" style={{ alignSelf: "flex-start", marginBottom: 8 }}>{p.tag}</span>}
                   {prod.thumbnail && (
                     // eslint-disable-next-line @next/next/no-img-element
