@@ -1795,6 +1795,31 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 }
 .promo-card-ciberday .producto-badge-oferta { font-size: 0.8rem; letter-spacing: .14em; padding: 6px 14px; }
 [data-theme="dark"] .promo-card-ciberday { background: linear-gradient(160deg, rgba(42,37,35,0.95) 0%, rgba(60,40,44,0.95) 100%); border-color: rgba(216,167,177,0.45); border-top-color: var(--rosa); }
+
+/* Carrusel de tarjetas Ciberday: una fila deslizable con flechas, en vez de una columna muy alta */
+.ciber-carrusel-wrap { margin-top: 48px; }
+.ciber-controles { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px; }
+.ciber-flecha {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(198,138,149,0.5);
+  background: rgba(255,255,255,0.9);
+  color: var(--rosa-deep);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--sombra-suave);
+  transition: var(--transicion);
+}
+.ciber-flecha:hover { background: var(--rosa-deep); color: #fff; }
+.ciber-carrusel {
+  display: flex; gap: 20px;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 8px 4px 24px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.ciber-carrusel::-webkit-scrollbar { display: none; }
+.ciber-carrusel .promo-card { flex: 0 0 280px; scroll-snap-align: start; padding: 24px; gap: 10px; }
+@media (max-width: 600px) { .ciber-carrusel .promo-card { flex-basis: 78%; } }
+[data-theme="dark"] .ciber-flecha { background: rgba(42,37,35,0.9); border-color: rgba(216,167,177,0.4); color: var(--rosa); }
+[data-theme="dark"] .ciber-flecha:hover { background: var(--rosa-deep); color: #fff; }
 [data-theme="dark"] .promos-section { background: linear-gradient(150deg, #1e1a18 0%, #251c1e 50%, #1c1917 100%); }
 [data-theme="dark"] .promos-section::before { background: radial-gradient(circle, rgba(216,167,177,0.08) 0%, transparent 65%); }
 [data-theme="dark"] .promos-section::after { background: radial-gradient(circle, rgba(198,138,149,0.06) 0%, transparent 65%); }
