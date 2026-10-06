@@ -25,12 +25,15 @@ type ProductoApi = {
   precio_oferta: number | null;
   stock: number;
   thumbnail?: string;
+  categoria?: string;
 };
 
 export default function Promociones() {
   const [promos, setPromos] = useState<Promo[] | null>(null);
   const [productos, setProductos] = useState<ProductoApi[]>([]);
   const carruselRef = useRef<HTMLDivElement>(null);
+  const pausadoRef = useRef(false);
+  const [categoria, setCategoria] = useState("Todas");
   const add = useCartStore((s) => s.add);
   const openCart = useCartStore((s) => s.open);
 
@@ -46,6 +49,24 @@ export default function Promociones() {
   }, []);
 
   const cibervigente = ciberdayActivo();
+  // Avance automático en bucle: al llegar al final vuelve al inicio. Se pausa al pasar el mouse o tocar.
+  useEffect(() => {
+    const id = setInterval(() => {
+      const el = carruselRef.current;
+      if (!el || pausadoRef.current) return;
+      const tarjeta = el.firstElementChild as HTMLElement | null;
+      const paso = tarjeta ? tarjeta.offsetWidth + 20 : el.clientWidth * 0.8; // 20 = gap del carrusel
+      const alFinal = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+      if (alFinal) el.scrollTo({ left: 0, behavior: "smooth" });
+      else el.scrollBy({ left: paso, behavior: "smooth" });
+    }, 4000);
+    return () => clearInterval(id);
+  }, [promos, categoria]);
+
+  useEffect(() => {
+    carruselRef.current?.scrollTo({ left: 0 });
+  }, [categoria]);
+
   const hayCiberday = cibervigente && productos.length > 0 && (promos ?? []).some((p) => p.producto_id);
 
   // Mientras carga no se muestra nada (evita un parpadeo); si no hay promos activas, la sección desaparece.
@@ -56,6 +77,8 @@ export default function Promociones() {
     const prod = p.producto_id ? productos.find((x) => x.id === p.producto_id) : undefined;
     return prod ? [{ p, prod }] : [];
   });
+  const categorias = Array.from(new Set(conProducto.map(({ prod }) => prod.categoria).filter(Boolean))) as string[];
+  const visibles = categoria === "Todas" ? conProducto : conProducto.filter(({ prod }) => prod.categoria === categoria);
   const promosTexto = promos.filter((p) => !p.producto_id);
   if (!cibervigente && promosTexto.length === 0) return null;
 
@@ -80,6 +103,20 @@ export default function Promociones() {
         {conProducto.length > 0 && (
           <div className="ciber-carrusel-wrap">
             <div className="ciber-controles">
+              {categorias.length > 1 && (
+                <div className="ciber-chips">
+                  {["Todas", ...categorias].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      className={`ciber-chip${categoria === c ? " activo" : ""}`}
+                      onClick={() => setCategoria(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
               <button type="button" className="ciber-flecha" aria-label="Ver anteriores" onClick={() => desplazar(-1)}>
                 <i className="fa-solid fa-chevron-left" />
               </button>
@@ -87,8 +124,15 @@ export default function Promociones() {
                 <i className="fa-solid fa-chevron-right" />
               </button>
             </div>
-            <div className="ciber-carrusel" ref={carruselRef}>
-              {conProducto.map(({ p, prod }) => {
+            <div
+              className="ciber-carrusel"
+              ref={carruselRef}
+              onMouseEnter={() => (pausadoRef.current = true)}
+              onMouseLeave={() => (pausadoRef.current = false)}
+              onTouchStart={() => (pausadoRef.current = true)}
+              onTouchEnd={() => (pausadoRef.current = false)}
+            >
+              {visibles.map(({ p, prod }) => {
                 const tieneOferta = prod.precio_oferta != null && prod.precio_oferta > 0 && prod.precio_oferta < prod.precio;
                 const precioVigente = tieneOferta ? prod.precio_oferta! : prod.precio;
                 const agotado = prod.stock <= 0;

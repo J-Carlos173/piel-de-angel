@@ -1812,7 +1812,7 @@ section { padding: 120px 0; position: relative; z-index: 1; }
 
 /* Carrusel de tarjetas Ciberday: una fila deslizable con flechas, en vez de una columna muy alta */
 .ciber-carrusel-wrap { margin-top: 48px; }
-.ciber-controles { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px; }
+.ciber-controles { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 16px; }
 .ciber-flecha {
   width: 44px; height: 44px; border-radius: 50%;
   border: 1px solid rgba(198,138,149,0.5);
@@ -1823,10 +1823,25 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   transition: var(--transicion);
 }
 .ciber-flecha:hover { background: var(--rosa-deep); color: #fff; }
+.ciber-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-right: auto; align-self: center; }
+.ciber-chip {
+  padding: 8px 16px; border-radius: 50px;
+  border: 1px solid rgba(198,138,149,0.5);
+  background: rgba(255,255,255,0.85);
+  color: var(--negro-soft); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: var(--transicion);
+}
+.ciber-chip:hover { border-color: var(--rosa-deep); }
+.ciber-chip.activo { background: var(--rosa-deep); border-color: var(--rosa-deep); color: #fff; }
+[data-theme="dark"] .ciber-chip { background: rgba(42,37,35,0.9); border-color: rgba(216,167,177,0.4); color: var(--texto); }
+[data-theme="dark"] .ciber-chip.activo { background: var(--rosa-deep); color: #fff; }
 .ciber-carrusel {
   display: flex; gap: 20px;
   overflow-x: auto; scroll-snap-type: x mandatory;
   padding: 8px 4px 24px;
+  /* Efecto óptico: las tarjetas se desvanecen en los bordes en vez de cortarse de golpe */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 48px), transparent 100%);
   scrollbar-width: none; -ms-overflow-style: none;
 }
 .ciber-carrusel::-webkit-scrollbar { display: none; }
