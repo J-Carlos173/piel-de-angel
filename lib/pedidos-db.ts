@@ -58,11 +58,15 @@ export async function updatePedido(
       estado       = COALESCE(${data.estado ?? null}, estado),
       respuesta    = COALESCE(${data.respuesta ?? null}, respuesta),
       con_cambio   = CASE WHEN ${data.con_cambio !== undefined} THEN ${data.con_cambio ?? true} ELSE con_cambio END,
-      hilo_id      = CASE WHEN ${data.hilo_id !== undefined} THEN ${data.hilo_id ?? null} ELSE hilo_id END,
       completed_at = COALESCE(${completedAt}, completed_at)
     WHERE id = ${id}
     RETURNING *
   `;
+  if (data.hilo_id !== undefined) {
+    const hilo = data.hilo_id === null ? null : Number(data.hilo_id);
+    const movidos = await sql`UPDATE ia_pedidos SET hilo_id = ${hilo} WHERE id = ${id} RETURNING *`;
+    return (movidos[0] as unknown as Pedido) ?? null;
+  }
   return (rows[0] as unknown as Pedido) ?? null;
 }
 
