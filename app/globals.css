@@ -1840,8 +1840,8 @@ section { padding: 120px 0; position: relative; z-index: 1; }
   overflow-x: auto; scroll-snap-type: x mandatory;
   padding: 8px 4px 24px;
   /* Efecto óptico: las tarjetas se desvanecen en los bordes en vez de cortarse de golpe */
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 48px), transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 48px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
   scrollbar-width: none; -ms-overflow-style: none;
 }
 .ciber-carrusel::-webkit-scrollbar { display: none; }
