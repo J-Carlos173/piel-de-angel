@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   keywords: [
+    "ciberday",
+    "ciberday chile",
+    "ciberday 2026 skincare",
+    "ofertas ciberday protector solar",
+    "descuento protector solar chile",
+    "ofertas skincare coreano chile",
+    "cyber day chile cosmética",
     "skincare premium Chile",
     "cosmética coreana Chile",
     "sérum coreano Santiago",

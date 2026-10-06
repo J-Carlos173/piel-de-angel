@@ -43,6 +43,8 @@ export default function Promociones() {
       .catch(() => {});
   }, []);
 
+  const hayCiberday = productos.length > 0 && (promos ?? []).some((p) => p.producto_id);
+
   // Mientras carga no se muestra nada (evita un parpadeo); si no hay promos activas, la sección desaparece.
   if (!promos || promos.length === 0) return null;
 
@@ -52,7 +54,11 @@ export default function Promociones() {
         <div className="section-header">
           <span className="section-tag">Ofertas & Concursos</span>
           <h2 className="section-title">Promociones</h2>
-          <p className="section-subtitle">Síguenos en Instagram para no perderte ninguna novedad</p>
+          <p className="section-subtitle">
+            {hayCiberday
+              ? "Ciberday: precios rebajados por tiempo limitado en protectores solares y ojos y pestañas."
+              : "Síguenos en Instagram para no perderte ninguna novedad"}
+          </p>
         </div>
 
         <div className="promos-grid">
@@ -64,7 +70,7 @@ export default function Promociones() {
               const agotado = prod.stock <= 0;
               return (
                 <div key={p.id} className="promo-card">
-                  {p.tag && <span className="promo-tag">{p.tag}</span>}
+                  {p.tag && <span className="producto-badge-oferta" style={{ alignSelf: "flex-start", marginBottom: 8 }}>{p.tag}</span>}
                   {prod.thumbnail && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={prod.thumbnail} alt={prod.title} loading="lazy" decoding="async" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "contain", borderRadius: 12, margin: "8px 0 12px", background: "#fff" }} />
