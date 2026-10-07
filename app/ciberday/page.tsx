@@ -91,6 +91,9 @@ export default async function CiberdayPage() {
           <p style={{ marginTop: 48, color: "var(--texto)", lineHeight: 1.7 }}>
             Los precios de oferta aplican solo durante Ciberday. Para ver todo el catálogo, visita la <a href="/#productos">tienda</a>.
           </p>
+          <p style={{ marginTop: 16, color: "var(--texto)", lineHeight: 1.7 }}>
+            También te puede interesar: <a href="/lifting-de-pestanas">lifting de pestañas a domicilio</a>, <a href="/limpieza-facial-profunda">limpieza facial profunda</a> y <a href="/consejos">consejos de cuidado de la piel</a>.
+          </p>
         </div>
       </main>
       <Footer />
