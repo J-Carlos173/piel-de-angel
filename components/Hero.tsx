@@ -50,7 +50,7 @@ export default async function Hero() {
       <div className="container hero-wrapper">
         <div className="hero-content">
           {ciberdayActivo() && (
-            <a href="#promociones" className="ciber-hero-banner">
+            <a href="/ciberday" className="ciber-hero-banner">
               <span>✦ Ciberday</span> Protectores solares −30% y ojos y pestañas −20%
               <small>Quedan {ciberdayDiasRestantes()} {ciberdayDiasRestantes() === 1 ? "día" : "días"} · Ver ofertas →</small>
             </a>
