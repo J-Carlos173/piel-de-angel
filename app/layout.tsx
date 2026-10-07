@@ -172,17 +172,6 @@ const jsonLd = {
       currenciesAccepted: "CLP",
       paymentAccepted: "WebPay, Transbank",
       areaServed: "Chile",
-      hasOfferCatalog: {
-        "@type": "OfferCatalog",
-        name: "Skincare & Cosmética",
-        itemListElement: [
-          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Sérums con ácido hialurónico", category: "Skincare", offers: { "@type": "Offer", priceCurrency: "CLP", availability: "https://schema.org/InStock" } } },
-          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Vitamina C sérum", category: "Skincare", offers: { "@type": "Offer", priceCurrency: "CLP", availability: "https://schema.org/InStock" } } },
-          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Protector solar facial", category: "Protección Solar", offers: { "@type": "Offer", priceCurrency: "CLP", availability: "https://schema.org/InStock" } } },
-          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Crema hidratante", category: "Hidratación", offers: { "@type": "Offer", priceCurrency: "CLP", availability: "https://schema.org/InStock" } } },
-          { "@type": "Offer", itemOffered: { "@type": "Product", name: "Limpiador facial", category: "Limpieza", offers: { "@type": "Offer", priceCurrency: "CLP", availability: "https://schema.org/InStock" } } },
-        ],
-      },
     },
     {
       "@type": "Service",
