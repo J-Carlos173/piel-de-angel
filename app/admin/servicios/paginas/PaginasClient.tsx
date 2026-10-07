@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useThemeStore } from "@/store/themeStore";
 import AdminHeader from "../../AdminHeader";
 
@@ -39,6 +39,11 @@ export default function PaginasClient({
   const [savingZonas, setSavingZonas] = useState(false);
   const [savedZonas, setSavedZonas] = useState(false);
 
+  // Borrador local: cada cambio se guarda en el navegador para no perder texto si se cierra la página.
+  const [borrador, setBorrador] = useState<PaginaServicio | null>(null);
+  const sinGuardar = useRef(false);
+  const claveBorrador = (slug: string) => `pa_borrador_servicio_${slug}`;
+
   const cardBg   = dark ? "rgba(42,28,34,0.95)" : "rgba(255,255,255,0.95)";
   const border   = dark ? "#3a2830" : "#ecddd9";
   const textMain = dark ? "#f0dde6" : "#2e1e24";
@@ -63,8 +68,45 @@ export default function PaginasClient({
 
   const p = paginas[activo];
 
+  // Al cambiar de servicio, revisa si quedó un borrador sin guardar.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(claveBorrador(activo));
+      setBorrador(raw ? (JSON.parse(raw) as PaginaServicio) : null);
+    } catch {
+      setBorrador(null);
+    }
+  }, [activo]);
+
+  // Avisa antes de cerrar la página si hay cambios sin guardar.
+  useEffect(() => {
+    const avisar = (e: BeforeUnloadEvent) => {
+      if (sinGuardar.current) e.preventDefault();
+    };
+    window.addEventListener("beforeunload", avisar);
+    return () => window.removeEventListener("beforeunload", avisar);
+  }, []);
+
   function set<K extends keyof PaginaServicio>(field: K, value: PaginaServicio[K]) {
-    setPaginas((prev) => ({ ...prev, [activo]: { ...prev[activo], [field]: value } }));
+    const siguiente = { ...p, [field]: value };
+    setPaginas((prev) => ({ ...prev, [activo]: siguiente }));
+    sinGuardar.current = true;
+    try {
+      localStorage.setItem(claveBorrador(activo), JSON.stringify(siguiente));
+    } catch {}
+  }
+
+  function restaurarBorrador() {
+    if (!borrador) return;
+    setPaginas((prev) => ({ ...prev, [activo]: borrador }));
+    sinGuardar.current = true;
+    setBorrador(null);
+  }
+
+  function descartarBorrador() {
+    try { localStorage.removeItem(claveBorrador(activo)); } catch {}
+    setBorrador(null);
+    sinGuardar.current = false;
   }
 
   function Field({ label, value, onChange, rows, hint }: {
@@ -85,7 +127,7 @@ export default function PaginasClient({
 
   async function guardarPagina() {
     setSaving(activo);
-    await fetch("/api/admin/servicios-contenido", {
+    const res = await fetch("/api/admin/servicios-contenido", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -98,8 +140,15 @@ export default function PaginasClient({
       }),
     });
     setSaving(null);
-    setSaved(activo);
-    setTimeout(() => setSaved(null), 2500);
+    if (res.ok) {
+      try { localStorage.removeItem(claveBorrador(activo)); } catch {}
+      sinGuardar.current = false;
+      setBorrador(null);
+      setSaved(activo);
+      setTimeout(() => setSaved(null), 2500);
+    } else {
+      alert("No se pudo guardar. Tus cambios siguen en este navegador; intenta de nuevo.");
+    }
   }
 
   async function guardarZonas() {
@@ -133,6 +182,15 @@ export default function PaginasClient({
       />
 
       <div style={{ maxWidth: 780, margin: "0 auto", padding: "28px 20px 60px" }}>
+        {borrador && (
+          <div style={{ background: "#fff4e5", border: "1.5px solid #e8c48a", borderRadius: 14, padding: 16, marginBottom: 20, color: "#6b4a12", fontSize: 14, ...MONO }}>
+            <strong>Tienes cambios sin guardar en este servicio.</strong> ¿Quieres recuperarlos?
+            <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button onClick={restaurarBorrador} style={{ ...btnStyle, background: "#C68A95", color: "#fff", border: "none" }}>Recuperar cambios</button>
+              <button onClick={descartarBorrador} style={btnStyle}>Descartar</button>
+            </div>
+          </div>
+        )}
         {/* Zonas de atención — compartidas por todas las páginas */}
         <div style={{ background: cardBg, border: `1.5px solid ${border}`, borderRadius: 18, padding: 22, marginBottom: 24 }}>
           <h3 style={{ margin: "0 0 4px", color: textMain, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: "normal" }}>
