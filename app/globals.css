@@ -2935,6 +2935,11 @@ html[data-bg="bokeh"]:not([data-theme="dark"]) .hero::after {
 }
 /* Minimalista: sin overrides, es el look actual del sitio sin decoración extra */
 
+/* ============ FAQ GENERAL (home) ============ */
+.faq-general { background: var(--crema-pure); }
+.faq-general-list { max-width: 760px; margin: 0 auto; }
+
+
 /* ===== PAGINA DE SERVICIO: LIFTING DE PESTAÑAS ===== */
 .lp { background: var(--crema); padding: 130px 0 90px; }
 .lp-hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }

@@ -11,6 +11,7 @@ import Promociones from "@/components/Promociones";
 import Instagram from "@/components/Instagram";
 import Agenda from "@/components/Agenda";
 import Testimonios from "@/components/Testimonios";
+import FaqGeneral from "@/components/FaqGeneral";
 import Footer from "@/components/Footer";
 import WhatsappFloat from "@/components/WhatsappFloat";
 import CartDrawer from "@/components/CartDrawer";
@@ -46,6 +47,7 @@ export default function Home() {
         <Testimonios />
         <Instagram />
         <Consejos />
+        <FaqGeneral />
       </RevealObserver>
       <Footer />
       <WhatsappFloat />
