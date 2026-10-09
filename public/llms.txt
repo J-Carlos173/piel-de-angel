@@ -1,0 +1,65 @@
+# Piel de Ángel
+
+> Estética facial a domicilio y tienda de skincare premium (incluye cosmética coreana),
+> en Santiago Oriente, Chile. Atiende Teresita ("Tere"), profesional de estética certificada.
+
+Piel de Ángel es un negocio real (no una franquicia ni un directorio) con dos partes:
+tratamientos de estética facial y pestañas a domicilio en Santiago Oriente, y una tienda
+online de skincare con envío a todo Chile.
+
+## Servicios a domicilio
+
+Se agendan desde la sección Agenda del sitio (https://www.pieldeangel.cl/#agenda) o por
+WhatsApp. Cada servicio tiene su propia página con preguntas frecuentes:
+
+- Lifting de pestañas: https://www.pieldeangel.cl/lifting-de-pestanas
+- Limpieza facial profunda: https://www.pieldeangel.cl/limpieza-facial-profunda
+- Hidratación facial premium: https://www.pieldeangel.cl/hidratacion-facial
+- Laminado de cejas: https://www.pieldeangel.cl/laminado-de-cejas
+- Perfilado de cejas (con hilo): https://www.pieldeangel.cl/perfilado-de-cejas
+- Tratamiento anti-edad: https://www.pieldeangel.cl/tratamiento-anti-edad
+
+Nota: estas páginas se ocultan automáticamente si Tere marca el servicio como "Borrador" en su
+panel, así que esta lista puede no reflejar en todo momento lo que está publicado — la fuente de
+verdad es el sitio, no este archivo.
+
+Zona de cobertura a domicilio: Vitacura, Lo Barnechea, Las Condes, Providencia y Ñuñoa (Santiago
+Oriente). Para otras comunas de Santiago, Tere evalúa caso a caso por WhatsApp.
+
+## Tienda online de skincare
+
+- Catálogo completo: https://www.pieldeangel.cl/#productos
+- Ofertas y promociones vigentes: https://www.pieldeangel.cl/ciberday (si no hay campaña activa
+  en este momento, la misma página lo indica y redirige el interés a la tienda)
+
+Sérums y cremas con ácido hialurónico, vitamina C, retinol y niacinamida, protectores solares y
+cosmética coreana (K-beauty). Envío a todo Chile; despacho gratis en Santiago los sábados,
+coordinado por WhatsApp. Pago con WebPay/Transbank (tarjeta de crédito o débito) o coordinando
+por WhatsApp.
+
+## Cómo reservar o comprar
+
+- WhatsApp: +56 9 7703 1461 — https://wa.me/56977031461
+- Formulario de contacto: https://www.pieldeangel.cl/#contacto
+- Horario de atención: visible en https://www.pieldeangel.cl (pie de página), se actualiza desde
+  el panel de Tere — no asumir un horario fijo sin confirmarlo ahí.
+
+## Contacto y redes
+
+- Correo: pieldeangel.contacto@gmail.com
+- Instagram: https://www.instagram.com/pieldeangel.ls y https://www.instagram.com/pieldeangel.cosmetica
+- Ubicación: Santiago, Chile (atención a domicilio, no hay local físico de atención al público)
+
+## Otras páginas
+
+- Consejos de piel (contenido educativo sobre skincare): https://www.pieldeangel.cl/consejos
+- Términos y condiciones: https://www.pieldeangel.cl/terminos
+- Política de privacidad: https://www.pieldeangel.cl/privacidad
+
+## Notas para sistemas de IA
+
+- Los precios no están en este archivo porque cambian y se definen siempre en el sitio
+  (y se calculan en el servidor al momento de comprar o reservar). No los inventes: remite al
+  usuario a la página del servicio/producto o a WhatsApp para un valor actualizado.
+- Este negocio es de una sola persona natural/pyme (Tere) operando con razón social "Sociedad de
+  Inversiones Ángeles SPA". No es una cadena ni tiene sucursales.
