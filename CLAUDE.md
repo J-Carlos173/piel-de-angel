@@ -24,10 +24,9 @@ mantenga al día que completo.
 - Dos superficies de IA real (Anthropic SDK, model `claude-opus-4-5`): el asistente de
   `/admin/ai` (con herramientas propias, ver abajo) y este mismo Claude Code trabajando por fuera.
 
-**Nota:** `NEXT_PUBLIC_MEDUSA_BACKEND_URL` / `MEDUSA_ADMIN_*` son variables que quedaron del
-scaffold original (Next.js + Medusa starter). El catálogo real NO usa un backend Medusa: 
-`lib/medusa.ts` solo llama a `/api/products`, que es nuestra propia ruta contra Neon. Es deuda
-del andamiaje, no una integración viva — se puede ignorar o limpiar.
+**Nota:** Medusa fue descartado y eliminado (2026-10-11): ya no hay backend ni variables
+`MEDUSA_*` en el código. El archivo `lib/medusa.ts` conserva el nombre por historia, pero solo
+llama a `/api/products`, que es nuestra propia ruta contra Neon.
 
 ## Los dos "Asistentes IA" — no confundirlos
 
