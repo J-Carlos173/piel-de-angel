@@ -20,7 +20,6 @@ export default async function PaginasServiciosPage() {
       faq: actual.faq,
       waTexto: actual.waTexto,
       faqCuanto: actual.faqCuanto ?? "",
-      incluye: actual.incluye ?? [],
       foto2: actual.foto2 ?? "",
     };
   });

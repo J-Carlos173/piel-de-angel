@@ -17,8 +17,6 @@ export type ServicioLP = {
   waTexto: string;
   /** Respuesta editable de "¿Cuánto cuesta y cómo reservo?" (si no existe, se usa la general). */
   faqCuanto?: string;
-  /** Pasos o ítems de la sesión; si está vacío, la sección "Qué incluye" no se muestra. */
-  incluye?: string[];
   /** Segunda foto, dentro del cuerpo de la página. */
   foto2?: string;
 };

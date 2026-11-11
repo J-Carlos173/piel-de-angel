@@ -58,23 +58,15 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
   };
 
   let foto = "";
-  let duracion = 0;
   let otros: ServicioLP[] = [];
   try {
     const servicios = await getAllServicios();
     const publicados = servicios.filter((x) => x.status === "published");
     const propio = publicados.find((x) => s.match.test(x.title));
     foto = propio?.thumbnail ?? "";
-    duracion = Number(propio?.duracion) || 0;
     // Solo se enlazan páginas de servicios que Tere tiene publicados, para no llevar a una página oculta.
     otros = SERVICIOS_LP.filter((o) => o.slug !== s.slug && publicados.some((p) => o.match.test(p.title)));
   } catch {}
-
-  const zonasResumen = zonas.length > 3 ? `${zonas.slice(0, 3).join(", ")} y ${zonas.length - 3} más` : zonas.join(", ");
-  const datos = [
-    duracion > 0 && { k: "Duración", v: `${duracion} min` },
-    zonas.length > 0 && { k: "Atención en tu casa", v: zonasResumen },
-  ].filter((d): d is { k: string; v: string } => !!d);
 
   return (
     <>
@@ -90,16 +82,6 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
                 <em>{s.h1em}</em>
               </h1>
               <p className="lp-lead">{s.lead}</p>
-              {datos.length > 0 && (
-                <dl className="lp-facts">
-                  {datos.map((d) => (
-                    <div key={d.k}>
-                      <dt>{d.k}</dt>
-                      <dd>{d.v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
               <div className="lp-actions">
                 <a href="/#agenda" className="btn-primary">
                   <i className="fa-regular fa-calendar" /> Reservar Hora
@@ -129,17 +111,6 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={s.foto2} alt={`${s.nombre} a domicilio, durante la sesión`} loading="lazy" />
               </figure>
-            )}
-
-            {s.incluye && s.incluye.length > 0 && (
-              <>
-                <h2>Qué incluye la sesión</h2>
-                <ol className="lp-pasos">
-                  {s.incluye.map((t) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ol>
-              </>
             )}
 
             <h2>Es para ti si…</h2>

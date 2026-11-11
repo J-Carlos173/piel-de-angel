@@ -12,7 +12,6 @@ export type ServicioLPOverride = {
   faq?: { q: string; a: string }[];
   waTexto?: string;
   faqCuanto?: string;
-  incluye?: string[];
   foto2?: string;
 };
 
@@ -60,7 +59,6 @@ export function mergeServicioLP(base: ServicioLP, ov?: ServicioLPOverride): Serv
     faq: ov.faq && ov.faq.length > 0 ? ov.faq : base.faq,
     waTexto: ov.waTexto?.trim() || base.waTexto,
     faqCuanto: ov.faqCuanto?.trim() || base.faqCuanto,
-    incluye: ov.incluye && ov.incluye.length > 0 ? ov.incluye : base.incluye,
     foto2: ov.foto2?.trim() || base.foto2,
     queEs: {
       titulo: ov.queEsTitulo?.trim() || base.queEs.titulo,

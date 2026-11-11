@@ -18,7 +18,6 @@ type PaginaServicio = {
   faq: Faq[];
   waTexto: string;
   faqCuanto: string;
-  incluye: string[];
   foto2: string;
 };
 
@@ -74,7 +73,7 @@ export default function PaginasClient({
   useEffect(() => {
     try {
       const raw = localStorage.getItem(claveBorrador(activo));
-      setBorrador(raw ? ({ incluye: [], foto2: "", ...JSON.parse(raw) } as PaginaServicio) : null);
+      setBorrador(raw ? ({ foto2: "", ...JSON.parse(raw) } as PaginaServicio) : null);
     } catch {
       setBorrador(null);
     }
@@ -138,7 +137,7 @@ export default function PaginasClient({
           lead: p.lead, metaDescription: p.metaDescription,
           queEsTitulo: p.queEsTitulo, queEsTexto: p.queEsTexto,
           sesion: p.sesion, paraTi: p.paraTi, faq: p.faq, waTexto: p.waTexto, faqCuanto: p.faqCuanto,
-          incluye: p.incluye, foto2: p.foto2,
+          foto2: p.foto2,
         },
       }),
     });
@@ -293,35 +292,6 @@ export default function PaginasClient({
           <Field label="Título de la sección “¿Qué es…?”" value={p.queEsTitulo} onChange={(v) => set("queEsTitulo", v)} />
           <Field label="Texto de “¿Qué es…?”" value={p.queEsTexto} onChange={(v) => set("queEsTexto", v)} rows={4} />
           <Field label="Cómo es la sesión" value={p.sesion} onChange={(v) => set("sesion", v)} rows={3} />
-
-          <div style={{ marginBottom: 18 }}>
-            <label style={labelStyle}>Qué incluye la sesión (pasos, en orden)</label>
-            {p.incluye.map((linea, i) => (
-              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                <input
-                  type="text"
-                  value={linea}
-                  onChange={(e) => {
-                    const nuevo = [...p.incluye];
-                    nuevo[i] = e.target.value;
-                    set("incluye", nuevo);
-                  }}
-                  style={{ ...inputStyle, flex: 1 }}
-                />
-                <button
-                  onClick={() => set("incluye", p.incluye.filter((_, idx) => idx !== i))}
-                  style={{ ...btnStyle, padding: "8px 12px", color: "#b04a5a" }}
-                  aria-label="Quitar paso"
-                >
-                  <i className="fa-solid fa-trash" />
-                </button>
-              </div>
-            ))}
-            <button onClick={() => set("incluye", [...p.incluye, ""])} style={btnStyle}>
-              <i className="fa-solid fa-plus" /> Agregar paso
-            </button>
-            <p style={{ margin: "6px 0 0", fontSize: 10, color: textMuted, ...MONO }}>Si lo dejas vacío, esta sección no aparece en la página.</p>
-          </div>
 
           <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Segunda foto (aparece junto a “Cómo es la sesión”)</label>
