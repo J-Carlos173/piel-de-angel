@@ -58,7 +58,6 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
   };
 
   let foto = "";
-  let precio = 0;
   let duracion = 0;
   let otros: ServicioLP[] = [];
   try {
@@ -66,16 +65,13 @@ export default async function ServicioLanding({ s, zonas = COMUNAS }: { s: Servi
     const publicados = servicios.filter((x) => x.status === "published");
     const propio = publicados.find((x) => s.match.test(x.title));
     foto = propio?.thumbnail ?? "";
-    precio = Number(propio?.precio) || 0;
     duracion = Number(propio?.duracion) || 0;
     // Solo se enlazan páginas de servicios que Tere tiene publicados, para no llevar a una página oculta.
     otros = SERVICIOS_LP.filter((o) => o.slug !== s.slug && publicados.some((p) => o.match.test(p.title)));
   } catch {}
 
-  const valor = precio > 0 ? "$" + Math.round(precio).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "";
   const zonasResumen = zonas.length > 3 ? `${zonas.slice(0, 3).join(", ")} y ${zonas.length - 3} más` : zonas.join(", ");
   const datos = [
-    valor && { k: "Valor", v: valor },
     duracion > 0 && { k: "Duración", v: `${duracion} min` },
     zonas.length > 0 && { k: "Atención en tu casa", v: zonasResumen },
   ].filter((d): d is { k: string; v: string } => !!d);
