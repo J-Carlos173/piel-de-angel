@@ -18,6 +18,8 @@ type PaginaServicio = {
   faq: Faq[];
   waTexto: string;
   faqCuanto: string;
+  incluye: string[];
+  foto2: string;
 };
 
 export default function PaginasClient({
@@ -72,7 +74,7 @@ export default function PaginasClient({
   useEffect(() => {
     try {
       const raw = localStorage.getItem(claveBorrador(activo));
-      setBorrador(raw ? (JSON.parse(raw) as PaginaServicio) : null);
+      setBorrador(raw ? ({ incluye: [], foto2: "", ...JSON.parse(raw) } as PaginaServicio) : null);
     } catch {
       setBorrador(null);
     }
@@ -136,6 +138,7 @@ export default function PaginasClient({
           lead: p.lead, metaDescription: p.metaDescription,
           queEsTitulo: p.queEsTitulo, queEsTexto: p.queEsTexto,
           sesion: p.sesion, paraTi: p.paraTi, faq: p.faq, waTexto: p.waTexto, faqCuanto: p.faqCuanto,
+          incluye: p.incluye, foto2: p.foto2,
         },
       }),
     });
@@ -149,6 +152,23 @@ export default function PaginasClient({
     } else {
       alert("No se pudo guardar. Tus cambios siguen en este navegador; intenta de nuevo.");
     }
+  }
+
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
+
+  async function subirFoto2(file: File) {
+    setSubiendoFoto(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "servicios");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      set("foto2", (await res.json()).url);
+    } catch {
+      alert("No se pudo subir la foto. Intenta de nuevo.");
+    }
+    setSubiendoFoto(false);
   }
 
   async function guardarZonas() {
@@ -273,6 +293,60 @@ export default function PaginasClient({
           <Field label="Título de la sección “¿Qué es…?”" value={p.queEsTitulo} onChange={(v) => set("queEsTitulo", v)} />
           <Field label="Texto de “¿Qué es…?”" value={p.queEsTexto} onChange={(v) => set("queEsTexto", v)} rows={4} />
           <Field label="Cómo es la sesión" value={p.sesion} onChange={(v) => set("sesion", v)} rows={3} />
+
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Qué incluye la sesión (pasos, en orden)</label>
+            {p.incluye.map((linea, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                <input
+                  type="text"
+                  value={linea}
+                  onChange={(e) => {
+                    const nuevo = [...p.incluye];
+                    nuevo[i] = e.target.value;
+                    set("incluye", nuevo);
+                  }}
+                  style={{ ...inputStyle, flex: 1 }}
+                />
+                <button
+                  onClick={() => set("incluye", p.incluye.filter((_, idx) => idx !== i))}
+                  style={{ ...btnStyle, padding: "8px 12px", color: "#b04a5a" }}
+                  aria-label="Quitar paso"
+                >
+                  <i className="fa-solid fa-trash" />
+                </button>
+              </div>
+            ))}
+            <button onClick={() => set("incluye", [...p.incluye, ""])} style={btnStyle}>
+              <i className="fa-solid fa-plus" /> Agregar paso
+            </button>
+            <p style={{ margin: "6px 0 0", fontSize: 10, color: textMuted, ...MONO }}>Si lo dejas vacío, esta sección no aparece en la página.</p>
+          </div>
+
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Segunda foto (aparece junto a “Cómo es la sesión”)</label>
+            {p.foto2 && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={p.foto2} alt="Segunda foto" style={{ display: "block", width: 220, height: 150, objectFit: "cover", borderRadius: 12, marginBottom: 10, border: `1.5px solid ${border}` }} />
+            )}
+            <label style={{ ...btnStyle, cursor: subiendoFoto ? "wait" : "pointer" }}>
+              <i className={`fa-solid ${subiendoFoto ? "fa-spinner fa-spin" : "fa-image"}`} />
+              {subiendoFoto ? "Subiendo…" : p.foto2 ? "Cambiar foto" : "Subir foto"}
+              <input
+                type="file"
+                accept="image/*"
+                disabled={subiendoFoto}
+                style={{ display: "none" }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) subirFoto2(f); e.target.value = ""; }}
+              />
+            </label>
+            {p.foto2 && (
+              <button onClick={() => set("foto2", "")} style={{ ...btnStyle, marginLeft: 8, color: "#b04a5a" }}>
+                <i className="fa-solid fa-trash" /> Quitar
+              </button>
+            )}
+            <p style={{ margin: "6px 0 0", fontSize: 10, color: textMuted, ...MONO }}>La foto principal de arriba se cambia en Gestión de Servicios.</p>
+          </div>
 
           <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Es para ti si… (lo que incluye / a quién le sirve)</label>

@@ -58,6 +58,8 @@ export async function POST(req: NextRequest) {
         : undefined,
       waTexto: value.waTexto?.trim() || undefined,
       faqCuanto: value.faqCuanto?.trim() || undefined,
+      incluye: Array.isArray(value.incluye) ? value.incluye.map((t) => String(t).trim()).filter(Boolean) : undefined,
+      foto2: typeof value.foto2 === "string" && /^https:\/\//.test(value.foto2.trim()) ? value.foto2.trim() : undefined,
     };
 
     await saveServicioLPOverride(slug, limpio);
