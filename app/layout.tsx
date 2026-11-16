@@ -3,6 +3,7 @@ import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Analytics } from "@vercel/analytics/next";
 import PageTracker from "@/components/PageTracker";
+import ClickTracker from "@/components/ClickTracker";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CookieConsent from "@/components/CookieConsent";
 import { getSetting } from "@/lib/db";
@@ -233,6 +234,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <ThemeProvider />
         <PageTracker />
+        <ClickTracker />
         <GoogleAnalytics />
         {children}
         <CookieConsent />

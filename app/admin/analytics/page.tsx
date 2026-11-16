@@ -47,8 +47,34 @@ export default async function AnalyticsPage() {
 
   const stats = (totals[0] as Record<string, number>) ?? {};
 
+  // Clics en WhatsApp (la tabla la crea /api/track/clic al primer clic; si aún no existe, queda en 0)
+  const waTotales = await sql`
+    SELECT
+      SUM(clics) FILTER (WHERE date = (NOW() AT TIME ZONE 'America/Santiago')::date)::int                    AS today,
+      SUM(clics) FILTER (WHERE date >= (NOW() AT TIME ZONE 'America/Santiago')::date - 6)::int               AS week,
+      SUM(clics) FILTER (WHERE date >= DATE_TRUNC('month', NOW() AT TIME ZONE 'America/Santiago')::date)::int AS month,
+      SUM(clics)::int                                                                                         AS total
+    FROM clics_whatsapp
+  `.catch(() => [{}]);
+  const waStats = (waTotales[0] as Record<string, number>) ?? {};
+
+  const waPorPagina = await sql`
+    SELECT path, origen, SUM(clics)::int AS clics
+    FROM clics_whatsapp
+    GROUP BY path, origen
+    ORDER BY clics DESC
+    LIMIT 10
+  `.catch(() => []);
+
   return (
     <AnalyticsClient
+      wa={{
+        today: waStats.today ?? 0,
+        week: waStats.week ?? 0,
+        month: waStats.month ?? 0,
+        total: waStats.total ?? 0,
+        porPagina: waPorPagina as { path: string; origen: string; clics: number }[],
+      }}
       daily={daily as { date: string; views: number }[]}
       topPages={topPages as { path: string; views: number }[]}
       today={stats.today ?? 0}

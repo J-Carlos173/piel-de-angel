@@ -24,9 +24,16 @@ function fmtDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-CL", { day: "2-digit", month: "short" });
 }
 
+const ORIGEN_LABELS: Record<string, string> = {
+  flotante: "Botón flotante",
+  pie: "Pie de página",
+  contenido: "Dentro de la página",
+};
+
 export default function AnalyticsClient({
-  daily, topPages, today, week, month, total,
+  wa, daily, topPages, today, week, month, total,
 }: {
+  wa: { today: number; week: number; month: number; total: number; porPagina: { path: string; origen: string; clics: number }[] };
   daily: { date: string; views: number }[];
   topPages: { path: string; views: number }[];
   today: number; week: number; month: number; total: number;
@@ -82,6 +89,45 @@ export default function AnalyticsClient({
               <p style={{ margin: 0, fontSize: 28, fontWeight: 700, color: "#C68A95", ...MONO }}>{s.value ?? 0}</p>
             </div>
           ))}
+        </div>
+
+        {/* Clics en WhatsApp */}
+        <div style={{ background: cardBg, borderRadius: 20, padding: "28px 24px", border: `1.5px solid ${border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.07)", marginBottom: 28 }}>
+          <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: "normal", color: textMain }}>
+            <i className="fa-brands fa-whatsapp" style={{ color: "#C68A95", marginRight: 8 }} />
+            Clics en WhatsApp
+          </h3>
+          <p style={{ margin: "0 0 20px", fontSize: 12, color: textMuted, ...MONO }}>
+            Personas que apretaron el botón para escribir (no significa que hayan enviado el mensaje)
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 12, marginBottom: wa.porPagina.length ? 24 : 0 }}>
+            {[
+              { label: "Hoy", value: wa.today },
+              { label: "7 días", value: wa.week },
+              { label: "Este mes", value: wa.month },
+              { label: "Total", value: wa.total },
+            ].map((s) => (
+              <div key={s.label} style={{ textAlign: "center", padding: "12px 8px", borderRadius: 14, border: `1px solid ${border}` }}>
+                <p style={{ margin: "0 0 4px", fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: "0.14em", ...MONO }}>{s.label}</p>
+                <p style={{ margin: 0, fontSize: 24, fontWeight: 700, color: "#C68A95", ...MONO }}>{s.value}</p>
+              </div>
+            ))}
+          </div>
+          {wa.porPagina.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <p style={{ margin: "0 0 4px", fontSize: 12, color: textMuted, ...MONO }}>Desde dónde (total histórico)</p>
+              {wa.porPagina.map((r) => (
+                <div key={r.path + r.origen} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <span style={{ fontSize: 13, color: textMain }}>
+                    {label(r.path)} <span style={{ color: textMuted, fontSize: 12 }}>· {ORIGEN_LABELS[r.origen] ?? r.origen}</span>
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#C68A95", ...MONO }}>{r.clics}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ margin: 0, fontSize: 13, color: textMuted }}>Aún no hay clics registrados; se cuentan desde ahora.</p>
+          )}
         </div>
 
         {total === 0 ? (
